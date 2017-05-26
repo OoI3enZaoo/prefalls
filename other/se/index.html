@@ -1,0 +1,224 @@
+﻿<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="css/foundation.min.css"/>
+<link rel="stylesheet" type="text/css" href="css/animate.css"/>
+<link rel="stylesheet" type="text/css" href="css/style.css"/>
+<title>PARKiNG SySTEM</title>
+    
+<script>
+
+    function showFilled(Value) {
+        return (Value > 9) ? "" + Value : "0" + Value;
+    }
+    function StartClock24() {
+        TheTime = new Date;
+        document.clock.showTime.value = showFilled(TheTime.getHours()) + ":" +
+        showFilled(TheTime.getMinutes()) + ":" + showFilled(TheTime.getSeconds());
+        setTimeout("StartClock24()",1000)
+    }
+    
+    function init(){
+        if (window.XMLHttpRequest){
+            xmlhttp=new XMLHttpRequest();
+        }
+        else {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+                var obj = JSON.parse(xmlhttp.responseText); 
+                document.getElementById("free").innerHTML = obj.free;
+                document.getElementById("unfree").innerHTML = (10 - obj.free);
+                 for(var i = 0 ; i < obj.carin.length ; i++){
+                     var txts = obj.carin[i].id + "-status" ;
+                     var txtt = obj.carin[i].id + "-time" ;  
+                     
+                     document.getElementById(obj.carin[i].id).className = "fieldset area1 red";
+                     document.getElementById(obj.carin[i].id).style = "border:1px solid #FF0000;" ;
+                     document.getElementById("free").innerHTML = obj.free;
+                     document.getElementById("unfree").innerHTML = (10 - obj.free);                    
+                     document.getElementById(txts).innerHTML = obj.carin[i].carid ;
+                     document.getElementById(txtt).innerHTML = obj.carin[i].time;                   
+                 }              
+                       
+    		}
+  		}
+
+		var url = "http://sysnet.utcc.ac.th/mobilise/other/se/getCar.jsp";
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send();
+        
+        StartClock24();        
+    }
+    
+    function sendRequest(){
+        if (window.XMLHttpRequest){
+            xmlhttp=new XMLHttpRequest();
+        }
+        else {
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+                var obj = JSON.parse(xmlhttp.responseText);
+                var id = obj.id;
+                if(obj.status == 0){
+                    alert("เต็ม");
+                } else if (obj.status == 1){
+                    var txts = obj.id + "-status" ;
+                    var txtt = obj.id + "-time" ;
+                    var url = "http://sysnet.utcc.ac.th/mobilise/other/se/queue.jsp?carid="+obj.car+"&id="+obj.id ;
+                    
+                    document.getElementById(obj.id).className = "fieldset area1 red";
+                    document.getElementById(obj.id).style = "border:1px solid #FF0000;" ;
+                    document.getElementById("free").innerHTML = obj.free;
+                    document.getElementById("unfree").innerHTML = (10 - obj.free);                    
+                    document.getElementById(txts).innerHTML = obj.car;
+                    document.getElementById(txtt).innerHTML = obj.timein;
+                    
+                    window.open(url, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=500,width=400,height=400");
+                    
+                } else if (obj.status == 2){
+                    var txts2 = obj.id + "-status" ;
+                    var txtt2 = obj.id + "-time" ;
+                    var url2 = "http://sysnet.utcc.ac.th/mobilise/other/se/bill.jsp?id="+obj.carid+"&in="+obj.timein+"&out="+obj.timeout+"&total="+obj.timetotal+"&p="+obj.price ;
+                    
+                    document.getElementById(obj.id).className = "fieldset area1 green";
+                    document.getElementById(obj.id).style = "border:1px solid #00CC00;" ;
+                    document.getElementById("free").innerHTML = obj.free;
+                    document.getElementById("unfree").innerHTML = (10 - obj.free);                    
+                    document.getElementById(txts2).innerHTML = "ว่าง";
+                    document.getElementById(txtt2).innerHTML = "-";
+                    
+                    window.open(url2, "_blank", "toolbar=yes,scrollbars=yes,resizable=yes,top=100,left=500,width=400,height=400");
+                }
+                            
+    		}
+  		}
+
+		var carid = document.getElementById("carid").value;
+		var url = "http://sysnet.utcc.ac.th/mobilise/other/se/pks.jsp?car="+carid;
+		xmlhttp.open("GET",url,true);
+		xmlhttp.send();
+	}
+
+</script>
+    
+</head>
+<body onload="init()">
+    <!-- <fieldset class="fieldset area1 red" style="border:1px solid #FF0000;"> -->
+<div class="aa11">
+<img src="img/Untitled-1.png" class="animated bounceInLeft" style="margin-left:40px;">
+<fieldset class="fieldset">
+    <legend><i>PARKING SYSTEM</i></legend>
+    <div class="conLeft float-left">
+        <fieldset class="fieldset areaLeft">
+            <legend><b><i>
+            
+                <script>
+
+                print1="";
+                print2="";
+                today = new Date();
+                weekday = today.getDay();
+
+                    if (weekday == 6) print1='วันเสาร์ที่';
+                    if (weekday == 0) print1='วันอาทิตย์ที่';
+                    if (weekday == 1) print1='วันจันทร์ที่';
+                    if (weekday == 2) print1='วันอังคารที่';
+                    if (weekday == 3) print1='วันพุธที่';
+                    if (weekday == 4) print1='วันพฤหัสบดีที่';
+                    if (weekday == 5) print1='วันศุกร์ที่';
+
+                month = today.getMonth();
+
+                    if (month == 0) print2='มกราคม';
+                    if (month == 1) print2='กุมภาพันธ์';
+                    if (month == 2) print2='มีนาคม';
+                    if (month == 3) print2='เมษายน';
+                    if (month == 4) print2='พฤษภาคม';
+                    if (month == 5) print2='มิถุนายน';
+                    if (month == 6) print2='กรกฎาคม';
+                    if (month == 7) print2='สิงหาคม';
+                    if (month == 8) print2='กันยายน';
+                    if (month == 9) print2='ตุลาคม';
+                    if (month == 10) print2='พฤศจิกายน';
+                    if (month == 11) print2='ธันวาคม';
+
+                date = today.getDate();
+                year = today.getFullYear();
+                document.write (print1,' ',date, ' ', print2,' ',year+543);
+
+                </script>
+                
+            </i></b></legend>
+            
+            <form name="clock">
+                <input type="text" name="showTime" class="clock">
+            </form>
+            <div class="input-group">
+                <span class="input-group-label"><b>เลขทะเบียน</b></span>
+                <input class="input-group-field" type="text" id="carid">
+                <div class="input-group-button">
+                    <b><input type="button" class="warning button" value="ยืนยัน" onClick="sendRequest()"></b>
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="fieldset areaLeft">
+            <legend><b><i>รายละเอียด</i></b></legend>
+            <div class="cc green">จำนวนที่จอดรถว่าง<div class="float-right" id="free">10</div></div>
+            <div class="cc red">จำนวนที่จอดรถไม่ว่าง<div class="float-right" id="unfree">0</div></div>
+            <div class="cc">จำนวนที่จอดรถทั้งหมด<div class="float-right">10</div></div>
+        </fieldset>
+    </div>
+    <div class="conRight float-right">        
+        <fieldset id="A1" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A1</i></legend>
+            <font class="float-left"><b id="A1-status" >ว่าง</b></font><font class="float-right" id="A1-time">-</font>
+        </fieldset>
+        <fieldset id="A2" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A2</i></legend>
+            <font class="float-left"><b id="A2-status">ว่าง</b></font><font class="float-right" id="A2-time">-</font>
+        </fieldset>
+        <fieldset id="A3" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A3</i></legend>
+            <font class="float-left"><b id="A3-status">ว่าง</b></font><font class="float-right" id="A3-time">-</font>
+        </fieldset>
+        <fieldset id="A4" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A4</i></legend>
+            <font class="float-left"><b id="A4-status">ว่าง</b></font><font class="float-right" id="A4-time">-</font>
+        </fieldset>
+        <fieldset id="A5" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A5</i></legend>
+            <font class="float-left"><b id="A5-status">ว่าง</b></font><font class="float-right" id="A5-time">-</font>
+        </fieldset>
+        <fieldset id="A6" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A6</i></legend>
+            <font class="float-left"><b id="A6-status">ว่าง</b></font><font class="float-right" id="A6-time">-</font>
+        </fieldset>
+        <fieldset id="A7" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A7</i></legend>
+            <font class="float-left"><b id="A7-status">ว่าง</b></font><font class="float-right" id="A7-time">-</font>
+        </fieldset>
+        <fieldset id="A8" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A8</i></legend>
+            <font class="float-left"><b id="A8-status">ว่าง</b></font><font class="float-right" id="A8-time">-</font>
+        </fieldset>
+        <fieldset id="A9" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A9</i></legend>
+            <font class="float-left"><b id="A9-status">ว่าง</b></font><font class="float-right" id="A9-time">-</font>
+        </fieldset>
+        <fieldset id="A10" class="fieldset area1 green" style="border:1px solid #00CC00;">
+            <legend><i>A10</i></legend>
+            <font class="float-left"><b id="A10-status">ว่าง</b></font><font class="float-right" id="A10-time">-</font>
+        </fieldset>
+    </div>
+</fieldset>
+</div>
+<div class="footer">@ be bear</div>
+</body>
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery.inview.js"></script>
+<script src="js/5605100052.js"></script>
+</html>

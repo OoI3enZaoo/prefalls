@@ -1,0 +1,3 @@
+<%
+int msgInterval = 3;
+%>

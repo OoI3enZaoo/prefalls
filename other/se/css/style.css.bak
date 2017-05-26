@@ -1,0 +1,29 @@
+.aa11 { width:1120px; height:602px; background:url(../img/head.png); background-repeat: no-repeat; margin-left:auto; margin-right:auto; padding-top:118px; }
+
+.clock,.clock:focus { width:400px; height:80px; font-size:40pt; margin:0px; border-style:none; box-shadow:none;}
+
+.fieldset { width:1000px; margin-left:auto; margin-right:auto; }
+.fieldset legend { color:#b2b2b2; text-align:right; }
+
+.conLeft { width:50%; }
+.conRight { width:50%; }
+
+.areaLeft { width:220px; height:auto; float:left; font-size:20px; margin:0px 0px 10px 10px; padding:0px 20px 5px 20px; border:1px solid #cacaca; }
+.areaLeft legend { font-size:18px; color:#000000; }
+
+.cc { width:400px; }
+
+.red { color:#FF0000; }
+.bred { border:1px solid #FF0000; }
+
+.green { color:#00CC00; }
+.bgreen { border:1px solid #33CC33; }
+
+.time { font-size:50px; }
+
+.area1 { width:220px; height:auto; float:left; font-size:20px; margin:0px 0px 10px 10px; padding:0px 10px 5px 10px; border:1px solid #cacaca; }
+.area1 legend { font-size:15px; color:#b2b2b2; }
+
+.input-group { width:400px; }
+
+.footer { text-align:center; }
