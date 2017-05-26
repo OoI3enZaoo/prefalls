@@ -7,31 +7,31 @@
    if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
-   
+
     String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
-   
+
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-	
+
 	dbm.createConnection();
-	
+
 	int sleep = 0;
 	int stationary = 0;
 	int active = 0;
 	int hactive = 0;
-	
+
 	int lsleep = 0;
 	int lstationary = 0;
 	int lactive = 0;
 	int lhactive = 0;
-	
+
 	int sstep = 0;
 	double sdistance = 0.0;
 	double scalories = 0.0;
 	int sismobile = 0;
-	
+
 	String acttype = "\'{\"activity\": [";
 	String activity = "\'{\"allactivity\": [";
 
@@ -41,46 +41,46 @@
     try {
         String sql = "SELECT firstname,lastname FROM `patients` WHERE SSSN = '"+sssn+"';";
         ResultSet rs = dbm.executeQuery(sql);
-        
+
         if (rs.next()){
-            
+
             name = "\'" + rs.getString("firstname") + " " + rs.getString("lastname") + "\'";
             session.setAttribute("fname",rs.getString("firstname"));
             session.setAttribute("lname",rs.getString("lastname"));
 		}
-        
+
         } catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-	
+
 	try {
 		String sql = "SELECT act_group, COUNT(*) * " + String.valueOf(msgInterval) + "  AS SEC, MAX(long_sleep) AS LSLEEP, MAX(long_stationary) AS LSTATIONARY, MAX(long_active) AS LACTIVE, MAX(long_hactive) AS LHACTIVE FROM actgroup a, archive_" + sssn + " b WHERE (a.group_id = b.act_group) AND (DATE(tstamp) = CURRENT_DATE()) GROUP BY act_group;";
 		ResultSet rs = dbm.executeQuery(sql);
-		
-		while((rs!=null) && (rs.next())){			
+
+		while((rs!=null) && (rs.next())){
 			switch (rs.getInt("act_group")){
-				case 1: 
+				case 1:
 					sleep = rs.getInt("SEC");
 					lsleep = rs.getInt("LSLEEP");
 					break;
-				case 2: 
+				case 2:
 					stationary = rs.getInt("SEC");
 					lstationary = rs.getInt("LSTATIONARY");
 					break;
-				case 3: 
+				case 3:
 					active = rs.getInt("SEC");
 					lactive = rs.getInt("LACTIVE");
 					break;
-				case 4: 
+				case 4:
 					hactive = rs.getInt("SEC");
 					lhactive = rs.getInt("LHACTIVE");
 					break;
-				default: 
+				default:
 					out.println("Error case !!!");
 			}
 		}
-		
+
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
@@ -89,18 +89,18 @@
 	try {
 		String sql = "SELECT SUM(step) AS SSTEP, SUM(calories) AS SCALORIES, SUM(ismobile) AS SISMOBILE, SUM(dist) AS SDISTANCE FROM archive_" + sssn + " WHERE (DATE(tstamp) = CURRENT_DATE());";
 		ResultSet rs = dbm.executeQuery(sql);
-		
+
 		if (rs.next()){
 			sstep = rs.getInt("SSTEP");
 			scalories = rs.getDouble("SCALORIES");
 			sismobile = rs.getInt("SISMOBILE");
 			sdistance = rs.getDouble("SDISTANCE");
 		}
-		
+
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}		
+		}
 
 	try {
 		String sql = "SELECT act_type, act_name, group_name FROM acttype a, actgroup b WHERE (a.group_id = b.group_id);";
@@ -115,7 +115,7 @@
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}		
+		}
 
 	try {
 		String sql = "SELECT UNIX_TIMESTAMP(tstamp) * 1000 AS MILLISECONDS, act_type FROM archive_" + sssn + " WHERE (DATE(tstamp) = CURRENT_DATE());";
@@ -130,8 +130,8 @@
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}				
-		dbm.closeConnection();	
+		}
+		dbm.closeConnection();
 %>
 <!doctype html>
 <head>
@@ -164,7 +164,7 @@
 	//alert("sismobile: " + sismobile);
 	var mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 	//alert("Mobility: " + mobilityIdx);
-	var notAvail = 86400 - sleep - stationary - active - hactive;	
+	var notAvail = 86400 - sleep - stationary - active - hactive;
 
 	var lsleep = <%=lsleep%>;
 	var lstationary = <%=lstationary%>;
@@ -176,11 +176,11 @@
 	var acttype = JSON.parse(actString);
 	var curact = "Not Available";
 	var name = <%=name%>;
-	
+
 	var allact = JSON.parse(<%=activity%>);
 	//var chartActivityDetail = [];
-	
-	//Chart2 
+
+	//Chart2
 	var startDate = new Date();
 	startDate.setHours(0);
 	startDate.setMinutes(0);
@@ -193,7 +193,7 @@
 	/*
 	var chart2 = AmCharts.makeChart("chartdiv2", {
               "type": "xy",
-			  "theme": "light",	
+			  "theme": "light",
 			  "dataDateFormat": "YYYY-MM-DD",
               "startDuration": 0,
               "trendLines": [],
@@ -213,7 +213,7 @@
               "valueAxes": [
                 {
                   "id": "ValueAxis-1",
-                  "axisAlpha": 0, 
+                  "axisAlpha": 0,
 				  "labelFunction": formatValue
                 }, {
 				 "id": "ValueAxis-2",
@@ -234,14 +234,14 @@
 
 	var chart2 = AmCharts.makeChart("chartdiv2", {
               "type": "xy",
-			  "theme": "light",	
+			  "theme": "light",
               "startDuration": 0,
               "trendLines": [],
               "graphs": [
                 {
                   "balloonText": "x:<b>[[x]]</b> y:<b>[[y]]</b><br>value:<b>[[value]]</b>",
-                  "bullet": "square", 
-				  "bulletSize": 0, 
+                  "bullet": "square",
+				  "bulletSize": 0,
                   "id": "AmGraph-1",
                   "lineAlpha": 0,
                   "lineColor": "#b0de09",
@@ -254,12 +254,12 @@
               "valueAxes": [
                 {
                   "id": "ValueAxis-1",
-                  "axisAlpha": 0, 
+                  "axisAlpha": 0,
 				  "labelFunction": formatValue
                 }, {
 				 "id": "ValueAxis-2",
 				 "axisAlpha": 0,
-				 "position": "bottom", 
+				 "position": "bottom",
 				 "labelFunction": formatTimeAxis
 				}
               ],
@@ -268,35 +268,35 @@
               "titles": [],
               "chartScrollbar":{},
               "dataProvider": []
-            });			
-	
+            });
+
 	//Initialize Data for chart 2
 	/*
-	for (var i = 0; i < allact.allactivity.length; i++) { 
+	for (var i = 0; i < allact.allactivity.length; i++) {
 		chart2.dataProvider.push({"time": new Date(parseInt(allact.allactivity[i].timestamp)), "acttype": parseInt(allact.allactivity[i].act_type), "value": 1});
 		chart2.validateData();
 	}
 	*/
-	for (var i = 0; i < allact.allactivity.length; i++) { 
+	for (var i = 0; i < allact.allactivity.length; i++) {
 		chart2.dataProvider.push({"time": parseInt(allact.allactivity[i].timestamp), "acttype": parseInt(allact.allactivity[i].act_type), "value": 1});
 		chart2.validateData();
-	}	
-		
+	}
+
 	function init(){
 		document.getElementById("curdate").innerHTML = curdate;
 		document.getElementById("curact").innerHTML = curact;
 		document.getElementById("patient").innerHTML = "Patient Name : " + name;
-		
-		updateChart();		
+
+		updateChart();
 	}
-	
+
     var amq = org.activemq.Amq;
-    amq.init({ 
+    amq.init({
      uri: '../amq',
      logging: true,
      timeout: 20
     });
-	
+
 	var myHandler =
       {
         rcvMessage: function(message)
@@ -319,63 +319,63 @@
 				lhactive = 0;
 				sismobile = 0;
 				sdistance = 0.0;
-		   }		   
+		   }
            hr = message.getAttribute('hr');
 		   sstep = sstep + parseInt(message.getAttribute('step'));
 		   scalories = scalories + parseFloat(message.getAttribute('cal'));
 		   actgroup = parseInt(message.getAttribute('act_group'));
 		   sdistance = sdistance + parseFloat(message.getAttribute('dist'));
-		   
-		   for (var i = 0; i < acttype.activity.length; i++) { 
+
+		   for (var i = 0; i < acttype.activity.length; i++) {
 				if (parseInt(message.getAttribute('act_type')) == parseInt(acttype.activity[i].act_type)){
 					//curact = acttype.activity[i].act_name;
 					curact = acttype.activity[i].group_name;
 					break;
 				}
 		   }
-		   
+
 		   if (message.getAttribute('ismobile') == "true"){
 				sismobile++;
 		   }
 		   switch (actgroup){
-				case 1: 
+				case 1:
 					sleep = sleep + msgInterval;
 					if (parseInt(message.getAttribute('long_sleep')) > lsleep){
 						lsleep = parseInt(message.getAttribute('long_sleep'));
-					} 
+					}
 					break;
 				case 2:
 					stationary = stationary + msgInterval;
 					if (parseInt(message.getAttribute('long_stationary')) > lstationary){
 						lstationary = parseInt(message.getAttribute('long_stationary'));
-					} 					
+					}
 					break;
-				case 3: 
+				case 3:
 					active = active + msgInterval;
 					if (parseInt(message.getAttribute('long_active')) > lactive){
 						lactive = parseInt(message.getAttribute('long_active'));
-					} 					
+					}
 					break;
-				case 4: 
+				case 4:
 					hactive = hactive + msgInterval;
 					if (parseInt(message.getAttribute('long_hactive')) > lhactive){
 						lhactive = parseInt(message.getAttribute('long_hactive'));
-					} 										
+					}
 					break;
 		   }
 		   notAvail = 86400 - sleep - stationary - active - hactive;
-		   
+
 		   var nd = parseInt(message.getAttribute('ts'));
 		   chart2.dataProvider.push({"time": nd, "acttype": parseInt(message.getAttribute('act_type')), "value": 1});
-		   updateChart();		   
+		   updateChart();
         },
         myId: 'test0',
         myDestination: 'topic://<%=sssn%>_pred'
       };
-    
+
 	amq.addListener(myHandler.myId, myHandler.myDestination,myHandler.rcvMessage);
 
-	
+
 	//xxxxxxxxxxxxxxxx create chart xxxxxxxxxxxxxxxxxx
 	var chart = AmCharts.makeChart( "chartdiv", {
 	  "type": "pie",
@@ -383,14 +383,14 @@
 	  "theme": "light",
 
 	  "allLabels": [{
-        "text": "Mobilise Index", 
-		"size": 25, 
+        "text": "Mobilise Index",
+		"size": 25,
         "align": "center",
         "bold": true,
         "y": 220
     },{
         "text": mobilityIdx + " %",
-		"size": 20, 
+		"size": 20,
         "align": "center",
         "bold": false,
         "y": 250
@@ -428,26 +428,26 @@
 
 	function formatValue(value, formattedValue, valueAxis){
 		var actvalue = "";
-    	for (var i = 0; i < acttype.activity.length; i++) { 
+    	for (var i = 0; i < acttype.activity.length; i++) {
 			if (value == parseInt(acttype.activity[i].act_type)){
 				actvalue = acttype.activity[i].act_name;
 				break;
 			}
 		}
 		return actvalue;
-	}	
+	}
 
 	function formatTimeAxis(value, formattedValue, valueAxis){
 		var timevalue = new Date(value);
 		return (timevalue.toTimeString()).substr(0, 5);
-	}		
-	
+	}
+
 	function updateChart(){
 		var chartData = [];
 		var chartMobility = [];
 		mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 		chartData.push({"title": "Sleep","value": Math.round(((sleep/864) + 0.00001) * 100) / 100});
-		chartData.push({"title": "Stationary","value": Math.round(((stationary/864) + 0.00001) * 100) / 100});		
+		chartData.push({"title": "Stationary","value": Math.round(((stationary/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Active","value": Math.round(((active/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Highly Active","value": Math.round(((hactive/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Not Available","value": Math.round(((notAvail/864) + 0.00001) * 100) / 100});
@@ -456,7 +456,7 @@
 		chartMobility.push({"text": mobilityIdx + " %", "size": 20, "align": "center", "bold": false, "y": 250});
 		chart.allLabels = chartMobility;
 		chart.validateData();
-		
+
 		document.getElementById("curact").innerHTML = curact;
 		document.getElementById("curdate").innerHTML = curdate;
 		document.getElementById("hr").innerHTML = Math.round(hr);
@@ -469,26 +469,26 @@
 		document.getElementById("lstationary").innerHTML = showTime(lstationary);
 		document.getElementById("active").innerHTML = showTime(active);
 		document.getElementById("lactive").innerHTML = showTime(lactive);
-		document.getElementById("highlyactive").innerHTML = showTime(hactive);		
+		document.getElementById("highlyactive").innerHTML = showTime(hactive);
 		document.getElementById("lhighlyactive").innerHTML = showTime(lhactive);
-		
+
 		//chart2.dataProvider = chartActivityDetail;
 		chart2.validateData();
-		
+
 		document.getElementById("patient").innerHTML = "Patient Name : " + name;
-		
-		//alert(chartActivityDetail.length);		
-		//alert(chartActivityDetail[0].time + " " + chartActivityDetail[0].acttype + " " +  chartActivityDetail[0].value);				
+
+		//alert(chartActivityDetail.length);
+		//alert(chartActivityDetail[0].time + " " + chartActivityDetail[0].acttype + " " +  chartActivityDetail[0].value);
 	}
-	
-	
+
+
 	function numberWithCommas(num) {
 		var parts = num.toString().split(".");
 		parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		return parts.join(".");
-	}	
-	
-	function showTime(sec){		
+	}
+
+	function showTime(sec){
 		var hour = 0;
 		var min = 0;
 		var second = sec;
@@ -523,10 +523,10 @@
 .nav-tabs > li a:hover { border-color: transparent; background: none; }
 
 @media (min-width:1000px){
-    
+
 	.chart { height:450px; }
 	.asd { margin:10px; padding-bottom:5px; font-size:20px; }
-    
+
 }
 </style>
 
@@ -534,20 +534,68 @@
 <body onload="init()">
 
 <%@include file="../include/nav.jsp"%>
-    
+
 <div class="container">
 	<div class="panel"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
 	<ul class="nav nav-tabs" style="margin-left:10px;margin-right:10px;">
-		<li class="active"><a data-toggle="tab" href="#summary"><font class="s17">Summary Data</font></a></li>
-		<li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
+    <li class="active"><a data-toggle="tab" href="#fall-risk-analysis"><font class="s17">Fall Risk Analysis</font></a></li>
+    <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
 	</ul>
+
 	<div class="tab-content">
-        <div id="summary" class="tab-pane fade in active">
+    <div id="fall-risk-analysis" class="tab-pane  fade in active">
+      <div class="col-md-6 col-xs-12">
+          <div class="panel">
+              <%-- <div id="chartdiv" class="chart"></div> --%>
+              <p>benbenbensdfdfsadfasdsfdfdasdfadffafdaaasdfsdf</p>
+        </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+        <div class="panel">
+
+              <div class="fs20">&nbsp;Real-Time Activity&nbsp;:&nbsp;<span id="curact"></span>&nbsp;</div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-xs-12">
+        <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px;">
+            <div class="icon"><img src="../images/icons/sleep.png" width="50" height="50"></div>
+            <div class="fs20">Sleep time&nbsp;:&nbsp;<font id="sleep"></font></div>
+            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lsleep"></font></div>
+        </div>
+        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+            <div class="icon"><img src="../images/icons/stattime.png" width="50" height="50"></div>
+            <div class="fs20">Stationary time&nbsp;:&nbsp;<font id="stationary"></font></div>
+            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div>
+        </div>
+        <div class="panel" style="color:#f57a3e;margin-left:5px;margin-right:5px;">
+            <div class="icon"><img src="../images/icons/active.png" width="50" height="50"></div>
+            <div class="fs20">Active time&nbsp;:&nbsp;<font id="active"></font></div>
+            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lactive"></font></div>
+        </div>
+        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px;">
+            <div class="icon"><img src="../images/icons/highlyactive.png" width="50" height="50"></div>
+            <div class="fs20">Highly Active time&nbsp;:&nbsp;<font id="highlyactive"></font></div>
+            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lhighlyactive"></font></div>
+        </div>
+    </div>
+      <div class="col-md-6 col-xs-12">
+        <div class="panel">
+          <div id="chartdiv" class="chart"></div>
+        </div>
+      </div>
+
+
+  </div>
+
+        <div id="activity" class="tab-pane fade">
             <div class="col-md-6 col-xs-12">
                 <div class="panel" style="margin-left:5px;margin-right:5px;">
                     <div id="chartdiv" class="chart"></div>
                 </div>
             </div>
+
+
             <div class="col-md-6 col-xs-12">
                 <div class="panel" style="margin-left:5px;margin-right:5px;">
                     <div class="fs20">&nbsp;Real-Time Activity&nbsp;:&nbsp;<span id="curact"></span>&nbsp;</div>
@@ -566,7 +614,7 @@
                         </div>
                     </div>
                 </div>
-            </div>    
+            </div>
             <div class="col-md-6 col-xs-12">
                 <div class="row" style="margin-left:0px;margin-right:0px;">
                     <div class="col-md-6">
@@ -580,13 +628,13 @@
                         </div>
                     </div>
                 </div>
-            </div> 
+            </div>
             <div class="col-md-6 col-xs-12">
                 <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px;">
                     <div class="icon"><img src="../images/icons/sleep.png" width="50" height="50"></div>
                     <div class="fs20">Sleep time&nbsp;:&nbsp;<font id="sleep"></font></div>
                     <div class="fs15">Longest&nbsp;:&nbsp;<font id="lsleep"></font></div>
-                </div>	
+                </div>
                 <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
                     <div class="icon"><img src="../images/icons/stattime.png" width="50" height="50"></div>
                     <div class="fs20">Stationary time&nbsp;:&nbsp;<font id="stationary"></font></div>
@@ -604,11 +652,7 @@
                 </div>
             </div>
         </div>
-        <div id="activity" class="tab-pane fade">
-            <div class="panel">
-                <div id="chartdiv2" class="chart"></div>
-            </div>
-        </div>
+
     </div>
 </div>
 <script src="../js/jquery.min.js"></script>
