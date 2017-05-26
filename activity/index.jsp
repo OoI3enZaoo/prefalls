@@ -149,6 +149,8 @@
 <script src="../js/amcharts/pie.js"></script>
 <script src="../js/amcharts/xy.js"></script>
 <script src="../js/amcharts/themes/light.js"></script>
+<script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+
 <script type="text/javascript">
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
@@ -232,6 +234,135 @@
             });
 	*/
 
+var bottomTextSta;
+  var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
+    "type": "gauge",
+    "theme": "light",
+    "axes": [ {
+      "axisThickness": 1,
+      "axisAlpha": 0.2,
+      "tickAlpha": 0.2,
+      "valueInterval": 20,
+      "bands": [ {
+        "color": "#84b761",
+        "endValue": 90,
+        "startValue": 0
+      }, {
+        "color": "#fdd400",
+        "endValue": 130,
+        "startValue": 90
+      }, {
+        "color": "#cc4748",
+        "endValue": 220,
+        "innerRadius": "95%",
+        "startValue": 130
+      } ],
+      "bottomText": "0 km/h",
+      "bottomTextYOffset": -20,
+      "endValue": 220
+    } ],
+    "arrows": [ {} ],
+    "export": {
+      "enabled": true
+    }
+  } );
+
+
+  setInterval( randomValueSta, 2000 );
+
+  // set random value
+  function randomValueSta() {
+    var value = Math.round( Math.random() * 200 );
+
+
+
+    if ( gaugeChartSta ) {
+      if ( gaugeChartSta.arrows ) {
+        if ( gaugeChartSta.arrows[ 0 ] ) {
+          if ( gaugeChartSta.arrows[ 0 ].setValue ) {
+            gaugeChartSta.arrows[ 0 ].setValue( value );
+            var level;
+            if(value >140){
+              level = "Dangerous";
+            }else if(value > 100){
+              level = "Warning";
+            }else if(value> 0){
+              level = "Normal";
+            }
+            gaugeChartSta.axes[ 0 ].setBottomText( value + "\n\n Stability Level : "+level);
+
+
+
+          }
+        }
+      }
+    }
+  }
+
+
+
+
+
+
+
+  var gaugeChartSym = AmCharts.makeChart( "chart-sym", {
+    "type": "gauge",
+    "theme": "light",
+    "axes": [ {
+      "axisThickness": 1,
+      "axisAlpha": 0.2,
+      "tickAlpha": 0.2,
+      "valueInterval": 20,
+      "bands": [ {
+        "color": "#84b761",
+        "endValue": 90,
+        "startValue": 0
+      }, {
+        "color": "#fdd400",
+        "endValue": 130,
+        "startValue": 90
+      }, {
+        "color": "#cc4748",
+        "endValue": 220,
+        "innerRadius": "95%",
+        "startValue": 130
+      } ],
+      "bottomText": "0 km/h",
+      "bottomTextYOffset": -20,
+      "endValue": 220
+    } ],
+    "arrows": [ {} ],
+    "export": {
+      "enabled": true
+    }
+  } );
+
+  setInterval( randomValueSym, 2000 );
+
+
+  // set random value
+  function randomValueSym() {
+    var value = Math.round( Math.random() * 200 );
+    var level;
+    if(value >140){
+      level = "Dangerous";
+    }else if(value > 100){
+      level = "Warning";
+    }else if(value> 0){
+      level = "Normal";
+    }
+    if ( gaugeChartSym ) {
+      if ( gaugeChartSym.arrows ) {
+        if ( gaugeChartSym.arrows[ 0 ] ) {
+          if ( gaugeChartSym.arrows[ 0 ].setValue ) {
+            gaugeChartSym.arrows[ 0 ].setValue( value );
+            gaugeChartSym.axes[ 0 ].setBottomText( value + "\n\n symmetry Level : "+level);
+          }
+        }
+      }
+    }
+  }
+
 	var chart2 = AmCharts.makeChart("chartdiv2", {
               "type": "xy",
 			  "theme": "light",
@@ -277,6 +408,10 @@
 		chart2.validateData();
 	}
 	*/
+
+
+
+
 	for (var i = 0; i < allact.allactivity.length; i++) {
 		chart2.dataProvider.push({"time": parseInt(allact.allactivity[i].timestamp), "acttype": parseInt(allact.allactivity[i].act_type), "value": 1});
 		chart2.validateData();
@@ -286,6 +421,10 @@
 		document.getElementById("curdate").innerHTML = curdate;
 		document.getElementById("curact").innerHTML = curact;
 		document.getElementById("patient").innerHTML = "Patient Name : " + name;
+
+
+
+
 
 		updateChart();
 	}
@@ -544,46 +683,67 @@
 
 	<div class="tab-content">
     <div id="fall-risk-analysis" class="tab-pane  fade in active">
+      <div class = "row">
       <div class="col-md-6 col-xs-12">
-          <div class="panel">
-              <%-- <div id="chartdiv" class="chart"></div> --%>
-              <p>benbenbensdfdfsadfasdsfdfdasdfadffafdaaasdfsdf</p>
-        </div>
-    </div>
-    <div class="col-md-6 col-xs-12">
-        <div class="panel">
+            <div class="panel" style="margin-left:20px;margin-right:5px; margin-bottom: 0px;">
+            <div class = "fs20 text-primary text-center">Stability Index</div>
+              <div id="chart-sta" class="chart"  width = "200px" style = "padding-bottom: 90px;"></div>
 
-              <div class="fs20">&nbsp;Real-Time Activity&nbsp;:&nbsp;<span id="curact"></span>&nbsp;</div>
-      </div>
+                <div class = "fs20 text-primary text-center">Symmetry Index</div>
+                <div id="chart-sym" class="chart" style = "padding-bottom: 90px;" ></div>
+
+        </div>
     </div>
 
     <div class="col-md-6 col-xs-12">
-        <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px;">
-            <div class="icon"><img src="../images/icons/sleep.png" width="50" height="50"></div>
-            <div class="fs20">Sleep time&nbsp;:&nbsp;<font id="sleep"></font></div>
-            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lsleep"></font></div>
+      <%-- <div class="row" style="margin-left:0px;margin-right:0px;">
+          <div class="col-md-6">
+                  <div class="panel" style="color:#2f4074; margin-left:0px;margin-right:0px;">
+                      <div class="fs20">&nbsp;Stability Level&nbsp;:&nbsp;<span id="curact2">20</span>&nbsp;</div>
+                  </div>
+
+                </div>
+                <div class="col-md-6">
+                        <div class="panel" style="color:#2f4074; margin-left:0px;margin-right:0px;">
+                            <div class="fs20">&nbsp;Symmetry Level&nbsp;:&nbsp;<span id="curact21">20</span>&nbsp;</div>
+                        </div>
+
+                      </div>
+
+                </div> --%>
+
+
+
+        <div class="panel" style="color:#ea5f5c; margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
+            <div class="fs20"><img src="../images/icons/hr.png" width="30" height="30">&nbsp;<font id="hr1">86</font>&nbsp;bpm</div>
+
         </div>
-        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-            <div class="icon"><img src="../images/icons/stattime.png" width="50" height="50"></div>
-            <div class="fs20">Stationary time&nbsp;:&nbsp;<font id="stationary"></font></div>
-            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div>
+        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
+              <div class="fs20"><img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1">2,597</font>&nbsp;Steps</div>
+
+            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
         </div>
-        <div class="panel" style="color:#f57a3e;margin-left:5px;margin-right:5px;">
-            <div class="icon"><img src="../images/icons/active.png" width="50" height="50"></div>
-            <div class="fs20">Active time&nbsp;:&nbsp;<font id="active"></font></div>
-            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lactive"></font></div>
+        <div class="panel" style="color:#f57a3e;margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
+            <div class="icon"><img src="../images/icons/active.png" width="30" height="30"></div>
+              <div class="fs20"><font id="strides">1,210&nbsp;strides</font></div>
+            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lactive"></font></div> --%>
         </div>
-        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px;">
-            <div class="icon"><img src="../images/icons/highlyactive.png" width="50" height="50"></div>
-            <div class="fs20">Highly Active time&nbsp;:&nbsp;<font id="highlyactive"></font></div>
-            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lhighlyactive"></font></div>
+        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
+            <div class="fs20">AVG velocity&nbsp;:&nbsp;<font id="velocity">2.2&nbsp;m/s</font></div>
         </div>
+        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
+            <div class="fs20">AVG step frequency&nbsp;:&nbsp;<font id="velocity">2&nbsp;steps/s</font></div>
+
+        </div>
+        <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
+            <div class="fs20">AVG step length&nbsp;:&nbsp;<font id="velocity">40&nbsp;CM.</font></div>
+        </div>
+        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
+            <div class="fs20">Distance&nbsp;:&nbsp;<font id="velocity">5,209&nbsp;M.</font></div>
+        </div>
+
     </div>
-      <div class="col-md-6 col-xs-12">
-        <div class="panel">
-          <div id="chartdiv" class="chart"></div>
-        </div>
-      </div>
+  </div>
 
 
   </div>

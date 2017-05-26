@@ -10,7 +10,7 @@ body { background:#f1f1f1; }
 .navbar-default .navbar-nav>li>a:focus,
 .navbar-default .navbar-nav>li>a:hover { color:#fff;background-color:#28a193;transition: all 0.50s ease; }
 
-.navbar .nav > li.dropdown.open.active > a:hover, 
+.navbar .nav > li.dropdown.open.active > a:hover,
 .navbar .nav > li.dropdown.open > a { color:#fff; background-color: #28a193; border-color: #229588; }
 
 .panel { margin: 0px 10px 10px 10px; padding:10px; border-radius:0px; }
