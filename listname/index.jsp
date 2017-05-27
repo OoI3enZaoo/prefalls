@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*"%>
+
 <jsp:useBean id="dbm" class="th.ac.utcc.database.DBManager" />
 <%
 	int sismobile = 0;
@@ -191,7 +192,8 @@
 											</div>
 
 											<div class = "col-md-4">
-												<h2>benna</h2>
+												<img class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
+												<img class = "warnning_blink" src="../images/icons/alert/fall.png" width="50" height="50"></img>
 											</div>
 
 				</div>
@@ -202,6 +204,37 @@
 		<br>
 
 		<script>
+// var count = 0;
+// 		var interval = window.setInterval(function(){
+// 			if(count == 0){
+// 				$("#warnning_blink").attr('src','../images/icons/alert/warning_b.png');
+//
+// 				count = 1;
+//
+// 			}else{
+// 				$("#warnning_blink").attr('src','../images/icons/alert/warning_a.png');
+//
+//
+// 				count = 0;
+//
+// 			}
+// 		}, 10);
+
+// var img = document.getElementById('warnning_blink');
+// var interval = window.setInterval(function(){
+//     if(img.style.visibility == 'hidden'){
+//         img.style.visibility = 'visible';
+//
+//     }else{
+//         img.style.visibility = 'hidden';
+//
+//     }
+// }, 200);
+//
+
+
+
+
 			//xxxxxxxxxxxxxxxx  mobility index xxxxxxxxxxxxxx
 			var myHandler<%=sssn%>_pred =
 		      {

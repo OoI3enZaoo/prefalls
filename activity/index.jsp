@@ -356,7 +356,7 @@ var bottomTextSta;
         if ( gaugeChartSym.arrows[ 0 ] ) {
           if ( gaugeChartSym.arrows[ 0 ].setValue ) {
             gaugeChartSym.arrows[ 0 ].setValue( value );
-            gaugeChartSym.axes[ 0 ].setBottomText( value + "\n\n symmetry Level : "+level);
+            gaugeChartSym.axes[ 0 ].setBottomText( value + "\n\n Symmetry Level : "+level);
           }
         }
       }
@@ -682,71 +682,89 @@ var bottomTextSta;
 	</ul>
 
 	<div class="tab-content">
-    <div id="fall-risk-analysis" class="tab-pane  fade in active">
-      <div class = "row">
-      <div class="col-md-6 col-xs-12">
-            <div class="panel" style="margin-left:20px;margin-right:5px; margin-bottom: 0px;">
-            <div class = "fs20 text-primary text-center">Stability Index</div>
-              <div id="chart-sta" class="chart"  width = "200px" style = "padding-bottom: 90px;"></div>
+  <div id="fall-risk-analysis" class="tab-pane  fade in active">
+    <div class="row" style="margin-left:0px;margin-right:0px;">
+      <div class="col-md-12 col-xs-12">
+        <div class="panel" style="margin-left:0px;margin-right:0px;">
 
-                <div class = "fs20 text-primary text-center">Symmetry Index</div>
-                <div id="chart-sym" class="chart" style = "padding-bottom: 90px;" ></div>
+          <div class="row" style="margin-left:0px;margin-right:0px;">
+            <div class="col-md-6 col-xs-12">
+              <div class="fs20 text-primary text-center">Stability Index</div>
+              <div id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px;"></div>
+
+            </div>
+            <div class="col-md-6 col-xs-12">
+              <div class="fs20 text-primary text-center">Symmetry Index</div>
+              <div id="chart-sym" class="chart" style="padding-bottom: 90px;"></div>
+
+            </div>
+
+          </div>
 
         </div>
+      </div>
     </div>
 
-    <div class="col-md-6 col-xs-12">
-      <%-- <div class="row" style="margin-left:0px;margin-right:0px;">
-          <div class="col-md-6">
-                  <div class="panel" style="color:#2f4074; margin-left:0px;margin-right:0px;">
-                      <div class="fs20">&nbsp;Stability Level&nbsp;:&nbsp;<span id="curact2">20</span>&nbsp;</div>
+    <div class="row" style="margin-left:0px;margin-right:0px;">
+      <div class="col-md-12 col-xs-12">
+        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:0px; padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
+
+        <div class="row" style="margin-left:0px;margin-right:0px;">
+  <div class="col-md-6 col-xs-12">
+
+    <div class="fs20">
+      <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1" style="color:#2d904f;" >Step Count&nbsp;:&nbsp;2,597</font>&nbsp;Steps</div>
+
+      <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
+
+      <div class="fs20"  style="margin-top: 10px">
+        <img src="../images/icons/active.png" width="30" height="30">
+
+          <font id="strides" style="color:#f57a3e;" >Stride Count&nbsp;:&nbsp;1,210&nbsp;strides</font>
+        </div>
+
+        <div class="fs20"  style="margin-top: 10px">
+          <img src="../images/icons/marker.png" width="30" height="30">
+            <font id="velocity" style="color:#ea5f5c;" >AVG velocity&nbsp;:&nbsp;2.2&nbsp;m/s</font>
+          </div>
+
+        </div>
+
+        <div class="col-md-6 col-xs-12">
+
+          <div class="fs20">
+            <img src="../images/icons/walk.png" width="30" height="30">
+              <font id="velocity" style="color:#2d904f;" >AVG step frequency&nbsp;:&nbsp;2&nbsp;steps/s</font>
+            </div>
+
+            <div class="fs20"  style="margin-top: 10px">
+              <img src="../images/icons/step_length.png" width="35" height="35">
+                <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;40&nbsp;CM.</font>
+              </div>
+
+              <div class="fs20"  style="margin-top: 10px">
+                <img src="../images/icons/distance.png" width="30" height="30">
+
+                  <font id="distrance"  style="color:#2f4074;" >Distance&nbsp;:&nbsp;2000&nbsp;m.</font>
+                </div>
+
+              </div>
+
+            </div>
+
+                    </div>
+
                   </div>
 
+                  <%-- <img src="../images/icons/distance.png" width="30" height="30"><font id="distance">Distance</font>&nbsp;:&nbsp;m.</div> --%>
+
                 </div>
-                <div class="col-md-6">
-                        <div class="panel" style="color:#2f4074; margin-left:0px;margin-right:0px;">
-                            <div class="fs20">&nbsp;Symmetry Level&nbsp;:&nbsp;<span id="curact21">20</span>&nbsp;</div>
-                        </div>
 
-                      </div>
 
-                </div> --%>
+      </div>
 
 
 
-        <div class="panel" style="color:#ea5f5c; margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
-            <div class="fs20"><img src="../images/icons/hr.png" width="30" height="30">&nbsp;<font id="hr1">86</font>&nbsp;bpm</div>
-
-        </div>
-        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
-              <div class="fs20"><img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1">2,597</font>&nbsp;Steps</div>
-
-            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
-        </div>
-        <div class="panel" style="color:#f57a3e;margin-left:5px;margin-right:5px; padding-top: 15px; padding-bottom: 15px;">
-            <div class="icon"><img src="../images/icons/active.png" width="30" height="30"></div>
-              <div class="fs20"><font id="strides">1,210&nbsp;strides</font></div>
-            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lactive"></font></div> --%>
-        </div>
-        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
-            <div class="fs20">AVG velocity&nbsp;:&nbsp;<font id="velocity">2.2&nbsp;m/s</font></div>
-        </div>
-        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
-            <div class="fs20">AVG step frequency&nbsp;:&nbsp;<font id="velocity">2&nbsp;steps/s</font></div>
-
-        </div>
-        <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
-            <div class="fs20">AVG step length&nbsp;:&nbsp;<font id="velocity">40&nbsp;CM.</font></div>
-        </div>
-        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px; padding-top: 10px; padding-bottom: 10px;">
-            <div class="fs20">Distance&nbsp;:&nbsp;<font id="velocity">5,209&nbsp;M.</font></div>
-        </div>
-
-    </div>
-  </div>
-
-
-  </div>
 
         <div id="activity" class="tab-pane fade">
             <div class="col-md-6 col-xs-12">
