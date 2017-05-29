@@ -8,11 +8,11 @@
 	if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("../");
 	}
-	
+
 	String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
 	String sssn = (String)session.getAttribute("SSSN");
-	
+
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
@@ -33,12 +33,12 @@
 	double calstair =0.0;
 	double calruning =0.0;
 	int acttype =0;
-	
+
 	int lsleep = 0;
 	int lstationary = 0;
 	int lactive = 0;
 	int lhactive = 0;
-	
+
 	int sstep = 0;
 	double sdistance = 0.0;
 	double scalories = 0.0;
@@ -46,31 +46,31 @@
 
 	String hr = "\'{\"allhr\": [";
 	String rollalerts = "\'{\"allrollalerts\": [";
-    
+
     int minhr = 0;
     int maxhr = 0;
 
 	dbm.createConnection();
-    
+
     try {
 		String grminmax = "SELECT  hr FROM archive_"+sssn+" where DATE_FORMAT(tstamp,'%Y-%m-%d')= '"+date+"'";
 		ResultSet rshr= dbm.executeQuery(grminmax);
         int hrr;
         int count = 0;
-		while((rshr!=null) && (rshr.next())){        
-            hrr = rshr.getInt("hr");	
-            
+		while((rshr!=null) && (rshr.next())){
+            hrr = rshr.getInt("hr");
+
             if (hrr!=0){
-                
+
                 if(count == 0){
                     minhr = hrr;
                     maxhr = hrr;
                     count++;
-                }             
-   
+                }
+
                 minhr = minhr < hrr ? minhr : hrr;
                 maxhr = maxhr > hrr ? maxhr : hrr;
-    
+
             }
 		}
 
@@ -78,34 +78,34 @@
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-   
+
     try {
 		String sql = "SELECT act_group, COUNT(*) * " + String.valueOf(msgInterval) + "  AS SEC, MAX(long_sleep) AS LSLEEP, MAX(long_stationary) AS LSTATIONARY, MAX(long_active) AS LACTIVE, MAX(long_hactive) AS LHACTIVE FROM actgroup a, archive_" + sssn + " b WHERE (a.group_id = b.act_group) AND DATE_FORMAT(tstamp,'%Y-%m-%d')= '" + date + "' GROUP BY act_group;";
 		ResultSet rs = dbm.executeQuery(sql);
-		
-		while((rs!=null) && (rs.next())){			
+
+		while((rs!=null) && (rs.next())){
 			switch (rs.getInt("act_group")){
-				case 1: 
+				case 1:
 					sleep = rs.getInt("SEC");
 					lsleep = rs.getInt("LSLEEP");
 					break;
-				case 2: 
+				case 2:
 					stationary = rs.getInt("SEC");
 					lstationary = rs.getInt("LSTATIONARY");
 					break;
-				case 3: 
+				case 3:
 					active = rs.getInt("SEC");
 					lactive = rs.getInt("LACTIVE");
 					break;
-				case 4: 
+				case 4:
 					hactive = rs.getInt("SEC");
 					lhactive = rs.getInt("LHACTIVE");
 					break;
-				default: 
+				default:
 					out.println("Error case !!!");
 			}
 		}
-		
+
 	} catch (Exception e) {
 		out.println(e.getMessage());
 		e.printStackTrace();
@@ -114,14 +114,14 @@
 	try {
 		String sql = "SELECT SUM(step) AS SSTEP, SUM(calories) AS SCALORIES, SUM(ismobile) AS SISMOBILE, SUM(dist) AS SDISTANCE FROM archive_" + sssn + " WHERE DATE_FORMAT(tstamp,'%Y-%m-%d')= '" + date + "' ;";
 		ResultSet rs = dbm.executeQuery(sql);
-		
+
 		if (rs.next()){
 			sstep = rs.getInt("SSTEP");
 			scalories = rs.getDouble("SCALORIES");
 			sismobile = rs.getInt("SISMOBILE");
 			sdistance = rs.getDouble("SDISTANCE");
 		}
-		
+
 	} catch (Exception e) {
 		out.println(e.getMessage());
 		e.printStackTrace();
@@ -130,7 +130,7 @@
 	try {
 		String grcl = "SELECT calories,act_type FROM archive_"+sssn+" where DATE_FORMAT(tstamp,'%Y-%m-%d')= '"+date+"'";
 		ResultSet cl= dbm.executeQuery(grcl);
-		
+
 
 		while(cl.next()){
 			if (cl.getInt("act_type")==1){
@@ -191,12 +191,12 @@
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}		
+		}
 
 	dbm.closeConnection();
-    
-    date = "\""+date+"\""; 
-	
+
+    date = "\""+date+"\"";
+
 %>
 
 <!doctype html>
@@ -211,19 +211,22 @@
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
 <!-- JS amCharts File -->
 <script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
-<script src="../js/amcharts/amcharts.js"></script>
-<script src="../js/amcharts/themes/light.js"></script>
-<!-- JS ChartColumn amCharts File -->
-<!-- JS ChartDonut  amCharts File -->
-<script src="../js/amcharts/pie.js"></script>
-<!--JS-->
-<script src="../js/amcharts/serial.js"></script>
-<script src="../js/amcharts/xy.js"></script>
-<script src="https://www.amcharts.com/lib/3/plugins/export/export.min.js"></script>
-<link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
-<script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/amcharts.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/serial.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/gantt.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/plugins/export/export.min.js"></script>
+<link rel="stylesheet" href="../bower_components/amcharts/dist/amcharts/plugins/export/export.css" type="text/css" media="all" />
+<script src="../bower_components/amcharts/dist/amcharts/themes/light.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/pie.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/xy.js"></script>
+
+<%-- <script src="https://www.amcharts.com/lib/3/gantt.js"></script> --%>
+
+
+
+
 <script type="text/javascript">
-    
+
     var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
 	var hr = 0;
@@ -236,7 +239,7 @@
 	var hactive = <%=hactive%>;
 	var sismobile = <%=sismobile%>;
 	var sdistance = <%=sdistance%>;
-	var notAvail = 86400 - sleep - stationary - active - hactive;	
+	var notAvail = 86400 - sleep - stationary - active - hactive;
 
 	var lsleep = <%=lsleep%>;
 	var lstationary = <%=lstationary%>;
@@ -250,9 +253,9 @@
 	var calwalking = parseInt(<%=calwalking%>,10);
 	var calstair = parseInt(<%=calstair%>,10);
 	var calruning = parseInt(<%=calruning%>,10);
-    
+
     var date = <%=date%>;
-    
+
     var minhr = <%=minhr%>;
     var maxhr = <%=maxhr%>;
 
@@ -263,7 +266,7 @@
 	var rollalerts = <%=rollalerts%>;
 	var	jsonrollalerts = JSON.parse(rollalerts);
 	console.log(jsonrollalerts);
-	
+
 	// Donut chart
 	var donutchart = AmCharts.makeChart( "chartdiv", {
 	  "type": "pie",
@@ -271,14 +274,14 @@
 	  "theme": "light",
 
 	  "allLabels": [{
-        "text": "Mobilise Index", 
-		"size": 25, 
+        "text": "Mobilise Index",
+		"size": 25,
         "align": "center",
         "bold": true,
         "y": 220
     },{
         "text": mobilityIdx + " %",
-		"size": 20, 
+		"size": 20,
         "align": "center",
         "bold": false,
         "y": 250
@@ -377,7 +380,7 @@
 	  }
 
 	});
-	
+
 	//chartHeart rate
     var chartDataHR = ChartDatahr();
     var charthr = AmCharts.makeChart("chartdiv3", {
@@ -429,10 +432,11 @@
     // this method is called when chart is first inited as we listen for "dataUpdated" event
     function zoomChartHR() {
         // different zoom methods can be used - zoomToIndexes, zoomToDates, zoomToCategoryValues
+
         charthr.zoomToIndexes(chartDataHR.length - 250, chartDataHR.length - 100);
     }
 
-    
+
     function ChartDatahr() {
     var Datahr = [];
     for (var i = 0; i < jsonhr.allhr.length; i++) {
@@ -447,24 +451,24 @@
     }
     return Datahr;
 	}
-		
+
     //chartRoll
     var chartDataRoll = ChartDataRoll();
 	console.log("This is chartDataRoll ");
 	console.log(chartDataRoll);
 	var chartRoll = AmCharts.makeChart("chartdiv5", {
               "type": "xy",
-			  "theme": "light",	
+			  "theme": "light",
               "startDuration": 0,
               "trendLines": [],
               "graphs": [
                 {
                   "balloonText": "<b>[[time]]</b>",
-                  "bullet": "square", 
+                  "bullet": "square",
                   "id": "AmGraph-1",
                   "lineAlpha": 0,
                   "lineColorField": "lineColor",
-				  "bulletSize": 16, 
+				  "bulletSize": 16,
 //                  "bulletSizeField": "value",
                   "xField": "time",
                   "yField": "acttype"
@@ -473,30 +477,30 @@
               "guides": [],
 			  "legend": {
 				"data":  [{
-					title: "Less than 1 hour", 
+					title: "Less than 1 hour",
 					color: "#00ff00"}
 					, {
-					title: " 1 - 2 hours", 
-					color: "#ffff00"} 
-					, {		
-					title: " 2 - 3 hours", 
+					title: " 1 - 2 hours",
+					color: "#ffff00"}
+					, {
+					title: " 2 - 3 hours",
 					color: "#ff8000"}
-					, {		
-					title: "More than 3 hours", 
+					, {
+					title: "More than 3 hours",
 					color: "#ff0000"}
 					]
 			  },
               "valueAxes": [
                 {
                   "id": "ValueAxis-1",
-                  "axisAlpha": 0, 
-				  "labelFunction": formatValue, 
-				  "autoGridCount": false, 
+                  "axisAlpha": 0,
+				  "labelFunction": formatValue,
+				  "autoGridCount": false,
 				  "gridCount": 2
                 }, {
 				 "id": "ValueAxis-2",
 				 "axisAlpha": 0,
-				 "position": "bottom", 
+				 "position": "bottom",
 				 "labelFunction": formatTimeAxis
 				}
               ],
@@ -505,9 +509,9 @@
               "titles": [],
               "chartScrollbar":{},
               "dataProvider": chartDataRoll
-            });				
-	
-	
+            });
+
+
     chartRoll.addListener("dataUpdated", zoomChartRoll);
     // when we apply theme, the dataUpdated event is fired even before we add listener, so
     // we need to call zoomChart here
@@ -1164,6 +1168,318 @@
     }]
 });
 
+
+
+var chart23 = AmCharts.makeChart( "chartdivactivity", {
+  "type": "gantt",
+  "theme": "light",
+  "marginRight": 70,
+  "period": "DD",
+  "dataDateFormat": "HH:MM",
+  "columnWidth": 0.5,
+  "valueAxis": {
+    "type": "date"
+  },
+  "brightnessStep": 7,
+  "graph": {
+    "fillAlphas": 1,
+    "lineAlpha": 1,
+    "lineColor": "#fff",
+    "fillAlphas": 0.85,
+    "balloonText": "<b>[[task]]</b>:<br />[[open]] -- [[value]]"
+  },
+  "rotate": true,
+  "categoryField": "category",
+  "segmentsField": "segments",
+  "colorField": "color",
+  "startDateField": "start",
+  "endDateField": "end",
+  "dataProvider": [  {
+    "category": "Walking",
+    "segments": [ {
+       "start": "02:00",
+      "end": "06:50",
+      "color": "#cc4748",
+      "task": "Gathering requirements"
+    }, {
+     "start": "13:00",
+      "end": "14:00",
+      "task": "Producing specifications"
+    }, {
+       "start": "15:10",
+      "end": "15:30",
+      "task": "Development"
+    }, {
+       "start": "15:40",
+      "end": "15:50",
+      "task": "Testing and QA"
+    } ]
+  } , {
+    "category": "Running",
+    "segments": [ {
+       "start": "06:00",
+      "end": "11:00",
+      "color": "#cc4748",
+      "task": "Gathering requirements"
+    }, {
+     "start": "13:00",
+      "end": "14:00",
+      "task": "Producing specifications"
+    }, {
+       "start": "15:10",
+      "end": "15:30",
+      "task": "Development"
+    }, {
+       "start": "15:40",
+      "end": "15:50",
+      "task": "Testing and QA"
+    } ]
+  } ],
+  "valueScrollbar": {
+    "autoGridCount": true
+  },
+  "chartCursor": {
+    "cursorColor": "#55bb76",
+    "valueBalloonsEnabled": false,
+    "cursorAlpha": 0,
+    "valueLineAlpha": 0.5,
+    "valueLineBalloonEnabled": true,
+    "valueLineEnabled": true,
+    "zoomable": false,
+    "valueZoomable": true
+  },
+  "export": {
+    "enabled": true
+  }
+} );
+
+
+
+var chart = AmCharts.makeChart("chartdivtest", {
+    "type": "serial",
+    "theme": "light",
+    "legend": {
+        "equalWidths": false,
+        "useGraphSettings": true,
+        "valueAlign": "left",
+        "valueWidth": 120
+    },
+    "dataProvider": [{
+        "date": "2012-01-01",
+        "distance": 227,
+        "townName": "New York",
+        "townName2": "New York",
+        "townSize": 25,
+        "latitude": 40.71,
+        "duration": 408
+    }, {
+        "date": "2012-01-02",
+        "distance": 371,
+        "townName": "Washington",
+        "townSize": 14,
+        "latitude": 38.89,
+        "duration": 482
+    }, {
+        "date": "2012-01-03",
+        "distance": 433,
+        "townName": "Wilmington",
+        "townSize": 6,
+        "latitude": 34.22,
+        "duration": 562
+    }, {
+        "date": "2012-01-04",
+        "distance": 345,
+        "townName": "Jacksonville",
+        "townSize": 7,
+        "latitude": 30.35,
+        "duration": 379
+    }, {
+        "date": "2012-01-05",
+        "distance": 480,
+        "townName": "Miami",
+        "townName2": "Miami",
+        "townSize": 10,
+        "latitude": 25.83,
+        "duration": 501
+    }, {
+        "date": "2012-01-06",
+        "distance": 386,
+        "townName": "Tallahassee",
+        "townSize": 7,
+        "latitude": 30.46,
+        "duration": 443
+    }, {
+        "date": "2012-01-07",
+        "distance": 348,
+        "townName": "New Orleans",
+        "townSize": 10,
+        "latitude": 29.94,
+        "duration": 405
+    }, {
+        "date": "2012-01-08",
+        "distance": 238,
+        "townName": "Houston",
+        "townName2": "Houston",
+        "townSize": 16,
+        "latitude": 29.76,
+        "duration": 309
+    }, {
+        "date": "2012-01-09",
+        "distance": 218,
+        "townName": "Dalas",
+        "townSize": 17,
+        "latitude": 32.8,
+        "duration": 287
+    }, {
+        "date": "2012-01-10",
+        "distance": 349,
+        "townName": "Oklahoma City",
+        "townSize": 11,
+        "latitude": 35.49,
+        "duration": 485
+    }, {
+        "date": "2012-01-11",
+        "distance": 603,
+        "townName": "Kansas City",
+        "townSize": 10,
+        "latitude": 39.1,
+        "duration": 890
+    }, {
+        "date": "2012-01-12",
+        "distance": 534,
+        "townName": "Denver",
+        "townName2": "Denver",
+        "townSize": 18,
+        "latitude": 39.74,
+        "duration": 810
+    }, {
+        "date": "2012-01-13",
+        "townName": "Salt Lake City",
+        "townSize": 12,
+        "distance": 425,
+        "duration": 670,
+        "latitude": 40.75,
+        "dashLength": 8,
+        "alpha": 0.4
+    }, {
+        "date": "2012-01-14",
+        "latitude": 36.1,
+        "duration": 470,
+        "townName": "Las Vegas",
+        "townName2": "Las Vegas"
+    }, {
+        "date": "2012-01-15"
+    }, {
+        "date": "2012-01-16"
+    }, {
+        "date": "2012-01-17"
+    }, {
+        "date": "2012-01-18"
+    }, {
+        "date": "2012-01-19"
+    }],
+    "valueAxes": [{
+        "id": "distanceAxis",
+        "axisAlpha": 0,
+        "gridAlpha": 0,
+        "position": "left",
+        "title": "distance"
+    }, {
+        "id": "latitudeAxis",
+        "axisAlpha": 0,
+        "gridAlpha": 0,
+        "labelsEnabled": false,
+        "position": "right"
+    }, {
+        "id": "durationAxis",
+        "duration": "mm",
+        "durationUnits": {
+            "hh": "h ",
+            "mm": "min"
+        },
+        "axisAlpha": 0,
+        "gridAlpha": 0,
+        "inside": true,
+        "position": "right",
+        "title": "duration"
+    }],
+    "graphs": [{
+        "alphaField": "alpha",
+        "balloonText": "[[value]] miles",
+        "dashLengthField": "dashLength",
+        "fillAlphas": 0.7,
+        "legendPeriodValueText": "total: [[value.sum]] mi",
+        "legendValueText": "[[value]] mi",
+        "title": "distance",
+        "type": "column",
+        "valueField": "distance",
+        "valueAxis": "distanceAxis"
+    }, {
+        "balloonText": "latitude:[[value]]",
+        "bullet": "round",
+        "bulletBorderAlpha": 1,
+        "useLineColorForBulletBorder": true,
+        "bulletColor": "#FFFFFF",
+        "bulletSizeField": "townSize",
+        "dashLengthField": "dashLength",
+        "descriptionField": "townName",
+        "labelPosition": "right",
+        "labelText": "[[townName2]]",
+        "legendValueText": "[[value]]/[[description]]",
+        "title": "latitude/city",
+        "fillAlphas": 0,
+        "valueField": "latitude",
+        "valueAxis": "latitudeAxis"
+    }, {
+        "bullet": "square",
+        "bulletBorderAlpha": 1,
+        "bulletBorderThickness": 1,
+        "dashLengthField": "dashLength",
+        "legendValueText": "[[value]]",
+        "title": "duration",
+        "fillAlphas": 0,
+        "valueField": "duration",
+        "valueAxis": "durationAxis"
+    }],
+    "chartCursor": {
+        "categoryBalloonDateFormat": "DD",
+        "cursorAlpha": 0.1,
+        "cursorColor":"#000000",
+         "fullWidth":true,
+        "valueBalloonsEnabled": false,
+        "zoomable": false
+    },
+    "dataDateFormat": "YYYY-MM-DD",
+    "categoryField": "date",
+    "categoryAxis": {
+        "dateFormats": [{
+            "period": "DD",
+            "format": "DD"
+        }, {
+            "period": "WW",
+            "format": "MMM DD"
+        }, {
+            "period": "MM",
+            "format": "MMM"
+        }, {
+            "period": "YYYY",
+            "format": "YYYY"
+        }],
+        "parseDates": true,
+        "autoGridCount": false,
+        "axisColor": "#555555",
+        "gridAlpha": 0.1,
+        "gridColor": "#FFFFFF",
+        "gridCount": 50
+    },
+    "export": {
+    	"enabled": true
+     }
+});
+
+
+
+
 chart.addListener("rendered", zoomChart);
 
 zoomChart();
@@ -1171,6 +1487,7 @@ zoomChart();
 function zoomChart() {
     chart.zoomToIndexes(chart.dataProvider.length - 40, chart.dataProvider.length - 1);
 }
+
 
     function ChartDataRoll() {
 	var tmpDataRoll = [];
@@ -1190,7 +1507,7 @@ function zoomChart() {
 		else{
 			var labelcolor = "";
 			console.log(totaltime);
-			
+
 			if (totaltime <= 3600){
 				labelcolor = "#00ff00";
 			}
@@ -1204,32 +1521,32 @@ function zoomChart() {
 					}
 					else {labelcolor = "#ff0000";}
 				}
-			} 			
+			}
 			for (var j = 0; j < tmpDataRoll.length; j++){
 				mytime.setTime(tmpDataRoll[j].time);
 				DataRoll.push({
 					time: mytime,
-					acttype: 1, 
-					value: 4, 
-					lineColor: labelcolor 
+					acttype: 1,
+					value: 4,
+					lineColor: labelcolor
 				});
 			}
 			if (jsonrollalerts.allrollalerts[i].alerttype == 7){
 				mytime.setTime(jsonrollalerts.allrollalerts[i].timestamp);
 				DataRoll.push({
 					time: mytime,
-					acttype: 2, 
-					value: 4, 
+					acttype: 2,
+					value: 4,
 					lineColor: "#ff0000"
-				});				
+				});
 			}
 			totaltime = 0;
 			tmpDataRoll = [];
 		}
     }
     return DataRoll;
-	}	
-	
+	}
+
 	function fillImmobilityTable(){
 		var d = new Date(date);
 		uDate = d.getTime() - (7 * 60 * 60 * 1000); //SE Asia Standard Time
@@ -1246,12 +1563,12 @@ function zoomChart() {
 						var c15 = parseInt($("#c15").html()) + 1;
 						$("#c15").html(c15);
 						continue;
-					}								
+					}
 					if (jsonrollalerts.allrollalerts[i].timestamp <= (uDate + (12 * 3600000))){ //Row2
 						var c25 = parseInt($("#c25").html()) + 1;
 						$("#c25").html(c25);
 						continue;
-					}												
+					}
 					if (jsonrollalerts.allrollalerts[i].timestamp <= (uDate + (18 * 3600000))){ //Row3
 						var c35 = parseInt($("#c35").html()) + 1;
 						$("#c35").html(c35);
@@ -1261,7 +1578,7 @@ function zoomChart() {
 						var c45 = parseInt($("#c45").html()) + 1;
 						$("#c45").html(c45);
 						continue;
-					}					
+					}
 				}
 				else{
 					fillActivity(jsonrollalerts.allrollalerts[i].timestamp - uDate, totaltime);
@@ -1270,13 +1587,13 @@ function zoomChart() {
 			}
 		}
 	}
-	
+
 	function fillActivity(ms, ttime){
 		var row1 = [parseInt($("#c11").html()), parseInt($("#c12").html()), parseInt($("#c13").html()), parseInt($("#c14").html())];
 		var row2 = [parseInt($("#c21").html()), parseInt($("#c22").html()), parseInt($("#c23").html()), parseInt($("#c24").html())];
 		var row3 = [parseInt($("#c31").html()), parseInt($("#c32").html()), parseInt($("#c33").html()), parseInt($("#c34").html())];
 		var row4 = [parseInt($("#c41").html()), parseInt($("#c42").html()), parseInt($("#c43").html()), parseInt($("#c44").html())];
-		
+
 		if (ttime > 0){
 			if ((ms/(3600000)) <= 6){ //Row 1
 				row1[Math.floor(ttime/(3600))] = row1[Math.floor(ttime/(3600000))] + 1;
@@ -1306,7 +1623,7 @@ function zoomChart() {
 		$("#c43").html(row4[2]);
 		$("#c44").html(row4[3]);
 	}
-	
+
 	function formatValue(value, formattedValue, valueAxis){
 		var actvalue = "";
 		if (value == 1){
@@ -1314,22 +1631,22 @@ function zoomChart() {
 		}
 		if (value == 2){
 			actvalue = "Turn Over Time";
-		}		
+		}
 		return actvalue;
-	}	
+	}
 
 	function formatTimeAxis(value, formattedValue, valueAxis){
 		var timevalue = new Date(value);
 		return (timevalue.toTimeString()).substr(0, 5);
-	}		
-	
+	}
+
     function init(){
-        
+
         var chartData = [];
 		var chartMobility = [];
 		mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 		chartData.push({"title": "Sleep","value": Math.round(((sleep/864) + 0.00001) * 100) / 100});
-		chartData.push({"title": "Stationary","value": Math.round(((stationary/864) + 0.00001) * 100) / 100});		
+		chartData.push({"title": "Stationary","value": Math.round(((stationary/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Active","value": Math.round(((active/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Highly Active","value": Math.round(((hactive/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Not Available","value": Math.round(((notAvail/864) + 0.00001) * 100) / 100});
@@ -1338,7 +1655,7 @@ function zoomChart() {
 		chartMobility.push({"text": mobilityIdx + " %", "size": 20, "align": "center", "bold": false, "y": 250});
 		donutchart.allLabels = chartMobility;
 		donutchart.validateData();
-        
+
 		document.getElementById("steps").innerHTML = numberWithCommas(sstep);
 		document.getElementById("dist").innerHTML = numberWithCommas(Math.round(sdistance * 100)/100);
 		document.getElementById("cal").innerHTML = Math.round(scalories * 100)/100;
@@ -1348,14 +1665,14 @@ function zoomChart() {
 		document.getElementById("lstationary").innerHTML = showTime(lstationary);
 		document.getElementById("active").innerHTML = showTime(active);
 		document.getElementById("lactive").innerHTML = showTime(lactive);
-		document.getElementById("highlyactive").innerHTML = showTime(hactive);		
+		document.getElementById("highlyactive").innerHTML = showTime(hactive);
 		document.getElementById("lhighlyactive").innerHTML = showTime(lhactive);
-        
-        document.getElementById("patient").innerHTML = "Patient Name : " + name;    
+
+        document.getElementById("patient").innerHTML = "Patient Name : " + name;
         document.getElementById("date").innerHTML = date;
         document.getElementById("minhr").innerHTML = minhr;
         document.getElementById("maxhr").innerHTML = maxhr;
-		
+
 		fillImmobilityTable();
 	}
 
@@ -1365,7 +1682,7 @@ function zoomChart() {
 		return parts.join(".");
 	}
 
-    function showTime(sec){		
+    function showTime(sec){
 		var hour = 0;
 		var min = 0;
 		var second = sec;
@@ -1385,7 +1702,6 @@ function zoomChart() {
 	}
 
 </script>
-// function google map
     <script>
 
       function initMap() {
@@ -1407,7 +1723,7 @@ function zoomChart() {
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
     </script>
 <style>
-    
+
 .chart { width:100%; height:500px; }
 .icon { float:left; margin-right:10px; }
 .col-md-6 { padding-left:5px; padding-right:5px; }
@@ -1421,18 +1737,18 @@ function zoomChart() {
 .nav-tabs > li a:hover { border-color: transparent; background: none; }
 
 @media (min-width:1000px){
-    
+
 	.chart { height:450px; }
 	.asd { margin:10px; padding-bottom:5px; font-size:20px; }
     .connn { height:500px; border-left: solid 1px #e1e1e1; }
-    
+
 }
 
 #chartdiv2 {
 	width		: 100%;
 	height		: 500px;
-	font-size	: 11px;  
-}										
+	font-size	: 11px;
+}
 
 .amcharts-export-menu-top-right {
   top: 10px;
@@ -1446,7 +1762,7 @@ function zoomChart() {
 #chartdiv4 {
 	width	: 100%;
 	height	: 500px;
-}													
+}
 #chartdiv5 {
 	width	: 100%;
 	height	: 500px;
@@ -1454,7 +1770,16 @@ function zoomChart() {
 #chartdivheart_fall {
 	width	: 100%;
 	height	: 250px;
-}													
+}
+#chartdivactivity {
+	width: 100%;
+ height: 500px;
+}
+#chartdivtest {
+  width: 100%;
+  height: 500px;
+}
+
 </style>
 
 <style>
@@ -1473,7 +1798,7 @@ function zoomChart() {
 <body onload="init()">
 
 <%@include file="../include/nav.jsp"%>
-    
+
 <div class="container">
     <div class="panel"><font class="fs17">History > <span id="date"></span><span id="patient" class="right"></span></font></div>
 	<div class="row">
@@ -1485,7 +1810,7 @@ function zoomChart() {
                 <li><a href="#tab3default" data-toggle="tab">Heart rate</a></li>
 <!--                <li><a href="#tab4default" data-toggle="tab">อัตราความเร็วที่ใช้ในการเคลื่อนไหว</a></li>-->
 				<li><a href="#tab5default" data-toggle="tab">Immobility</a></li>
-				<li><a href="#tab6default" data-toggle="tab">Immobility Summary</a></li>				
+				<li><a href="#tab6default" data-toggle="tab">Immobility Summary</a></li>
             </ul>
             <div class="tab-content">
 				<div id="tab0default" class="tab-pane fade in active">
@@ -1500,7 +1825,7 @@ function zoomChart() {
                             <div class="icon"><img src="https://image.flaticon.com/icons/svg/148/148976.svg" width="30" height="30"></div>
                             <div class="fs20">Date : <font id="date"></font> 10/5/2017 , Time : 12.50 </div>
                         </div>
-                    </div>	
+                    </div>
 					<div class="col-md-6 col-xs-12">
                         <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
                             <div class="icon"><img src="https://image.flaticon.com/icons/svg/149/149060.svg" width="30" height="30"></div>
@@ -1512,26 +1837,24 @@ function zoomChart() {
                             <div class="icon"><img src="https://image.flaticon.com/icons/svg/130/130160.svg" width="30" height="30"></div>
                             <div class="fs20">Type of Falling : <font id="type_of_falling"></font>Falling to front</div>
                         </div>
-                    </div>   
+                    </div>
                     <div class="col-md-6 col-xs-12">
                         <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
                             <div class="icon"><img src="https://image.flaticon.com/icons/svg/109/109394.svg" width="30" height="30"></div>
                             <div class="fs20">Speed before falling : <font id="speed_before"></font>50 km/hr</div>
-                        </div>	
+                        </div>
                         <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
                             <div class="icon"><img src="https://image.flaticon.com/icons/svg/353/353990.svg" width="30" height="30"></div>
-                            <div class="fs20">Additional info : <font id="additional">Test ADditional Data for testing once</font></div>   
+                            <div class="fs20">Additional info : <font id="additional">Test ADditional Data for testing once</font></div>
                         </div>
                         <div class="panel" style="margin-left:10px;margin-right:10px;">
                             <div id="chartdivheart_fall"></div>
                         </div>
-                        <!--<div class="panel" style="color:#2d904f;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img src="../images/icons/highlyactive.png" width="50" height="50"></div>
-                            <div class="fs20">Highly Active time&nbsp;:&nbsp;<font id="highlyactive"></font></div>
-                            <div class="fs15">Longest&nbsp;:&nbsp;<font id="lhighlyactive"></font></div>
-                        </div>-->
-                    </div>   
-                </div>                                    
+                        <div class="panel" style="margin-left:10px;margin-right:10px;">
+                            <div id="chartdivtest"></div>
+                        </div>
+                    </div>
+                </div>
                 <div id="tab1default" class="tab-pane fade">
                     <div class="col-md-6 col-xs-12">
                         <div class="panel" style="margin-left:5px;margin-right:5px;">
@@ -1558,7 +1881,7 @@ function zoomChart() {
                                 </div>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                     <div class="col-md-6 col-xs-12">
                         <div class="row" style="margin-left:5px;margin-right:5px;">
                             <!--div class="col-md-6"-->
@@ -1567,13 +1890,13 @@ function zoomChart() {
                                 </div>
                             <!--/div-->
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-6 col-xs-12">
                         <div class="panel" style="color:#2f4074;margin-left:5px;margin-right:5px;">
                             <div class="icon"><img src="../images/icons/sleep.png" width="50" height="50"></div>
                             <div class="fs20">Sleep time&nbsp;:&nbsp;<font id="sleep"></font></div>
                             <div class="fs15">Longest&nbsp;:&nbsp;<font id="lsleep"></font></div>
-                        </div>	
+                        </div>
                         <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
                             <div class="icon"><img src="../images/icons/stattime.png" width="50" height="50"></div>
                             <div class="fs20">Stationary time&nbsp;:&nbsp;<font id="stationary"></font></div>
@@ -1590,7 +1913,7 @@ function zoomChart() {
                             <div class="fs15">Longest&nbsp;:&nbsp;<font id="lhighlyactive"></font></div>
                         </div>
                     </div>
-                </div>    
+                </div>
                 <div class="tab-pane fade" id="tab2default">
                     <div class="panel" style="margin-left:10px;margin-right:10px;">
                         <div id="chartdiv2"></div>
@@ -1610,7 +1933,7 @@ function zoomChart() {
                 	<div class="panel" style="margin-left:10px;margin-right:10px;">
                 		<div id="chartdiv5"></div>
                 	</div>
-                </div>				
+                </div>
                 <div class="tab-pane fade" id="tab6default">
                 	<div class="panel" style="margin-left:10px;margin-right:10px;">
 					<table class="table table-striped table-bordered">
@@ -1625,7 +1948,7 @@ function zoomChart() {
 								<th class="text-center">1 - 2 hours</th>
 								<th class="text-center">2 - 3 hours</th>
 								<th class="text-center">more than 3 hours</th>
-							</tr>							
+							</tr>
 						</thead>
 						<tbody>
 							<tr>
@@ -1659,11 +1982,11 @@ function zoomChart() {
 								<td class="text-center" id = "c43">0</td>
 								<td class="text-center" id = "c44">0</td>
 								<td class="text-center" id = "c45">0</td>
-							</tr>							
+							</tr>
 						</tbody>
 					</table>
                 	</div>
-                </div>								
+                </div>
             </div>
         </div>
 	</div>
