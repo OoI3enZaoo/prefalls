@@ -29,6 +29,36 @@
      timeout: 20
     });
 
+var countna = 0;
+
+function RandomData(){
+var Heartrate_random = Math.floor((Math.random() * 600) + 1);
+
+	var color = ["#0000ff","#00ff1d","#b6ff00","#ff00a5","#4340ad","#3d706a","#507555","#6b7550","#755d50","#755050","#3a0707"];
+var item = color[Math.floor(Math.random()
+
+if(countna == 0){
+	var object  = {
+		lineColor:"",
+		date: "",
+		Heartrate : Heartrate_random;
+	}
+	return object;
+}
+	if(count == 5){
+		var object = {
+			date: "",
+			Heartrate : Heartrate_random;
+		}
+		countna = 0
+		return object;
+
+	}
+
+
+	return object;
+}
+
 </script>
 <style>
 
@@ -192,8 +222,8 @@
 											</div>
 
 											<div class = "col-md-4">
-												<img class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
-												<img class = "warnning_blink" src="../images/icons/alert/fall.png" width="50" height="50"></img>
+
+												<img  class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
 											</div>
 
 				</div>
@@ -204,35 +234,29 @@
 		<br>
 
 		<script>
-// var count = 0;
-// 		var interval = window.setInterval(function(){
-// 			if(count == 0){
-// 				$("#warnning_blink").attr('src','../images/icons/alert/warning_b.png');
-//
-// 				count = 1;
-//
-// 			}else{
-// 				$("#warnning_blink").attr('src','../images/icons/alert/warning_a.png');
-//
-//
-// 				count = 0;
-//
-// 			}
-// 		}, 10);
-
-// var img = document.getElementById('warnning_blink');
-// var interval = window.setInterval(function(){
-//     if(img.style.visibility == 'hidden'){
-//         img.style.visibility = 'visible';
-//
-//     }else{
-//         img.style.visibility = 'hidden';
-//
-//     }
-// }, 200);
-//
 
 
+		$('.warnning_blink').each(function(i, obj) {
+
+			var count = 0;
+			var oneminute = window.setInterval(function(){
+
+			var interval22 = window.setInterval(function(){
+				if(count == 0){
+					$(".warnning_blink").hide();
+					count = 1;
+					//var snd = new Audio("file.wav");
+					snd.play();
+
+						}else{
+							$(".warnning_blink").show();
+							count = 0;
+						}
+
+					},1000);
+
+			},60000);
+	});
 
 
 			//xxxxxxxxxxxxxxxx  mobility index xxxxxxxxxxxxxx

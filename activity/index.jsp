@@ -675,8 +675,8 @@ var bottomTextSta;
 <%@include file="../include/nav.jsp"%>
 
 <div class="container">
-	<div class="panel"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
-	<ul class="nav nav-tabs" style="margin-left:10px;margin-right:10px;">
+	<div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
+	<ul class="nav nav-tabs" style="margin-left:15px;margin-right:15px;">
     <li class="active"><a data-toggle="tab" href="#fall-risk-analysis"><font class="s17">Fall Risk Analysis</font></a></li>
     <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
 	</ul>
@@ -686,7 +686,6 @@ var bottomTextSta;
     <div class="row" style="margin-left:0px;margin-right:0px;">
       <div class="col-md-12 col-xs-12">
         <div class="panel" style="margin-left:0px;margin-right:0px;">
-
           <div class="row" style="margin-left:0px;margin-right:0px;">
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center">Stability Index</div>
@@ -707,23 +706,22 @@ var bottomTextSta;
 
     <div class="row" style="margin-left:0px;margin-right:0px;">
       <div class="col-md-12 col-xs-12">
-        <div class="panel" style="color:#2d904f;margin-left:5px;margin-right:0px; padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
+        <div class="panel" style="color:#2d904f;margin-left:0px;margin-right:0px;padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
 
         <div class="row" style="margin-left:0px;margin-right:0px;">
-  <div class="col-md-6 col-xs-12">
-
+          <div class="col-md-6 col-xs-12">
     <div class="fs20">
       <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1" style="color:#2d904f;" >Step Count&nbsp;:&nbsp;2,597</font>&nbsp;Steps</div>
 
       <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
 
-      <div class="fs20"  style="margin-top: 10px">
+      <div class="fs20"  style="margin-top: 15px">
         <img src="../images/icons/active.png" width="30" height="30">
 
           <font id="strides" style="color:#f57a3e;" >Stride Count&nbsp;:&nbsp;1,210&nbsp;strides</font>
         </div>
 
-        <div class="fs20"  style="margin-top: 10px">
+        <div class="fs20"  style="margin-top: 15px">
           <img src="../images/icons/marker.png" width="30" height="30">
             <font id="velocity" style="color:#ea5f5c;" >AVG velocity&nbsp;:&nbsp;2.2&nbsp;m/s</font>
           </div>
@@ -737,12 +735,12 @@ var bottomTextSta;
               <font id="velocity" style="color:#2d904f;" >AVG step frequency&nbsp;:&nbsp;2&nbsp;steps/s</font>
             </div>
 
-            <div class="fs20"  style="margin-top: 10px">
+            <div class="fs20"  style="margin-top: 15px">
               <img src="../images/icons/step_length.png" width="35" height="35">
                 <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;40&nbsp;CM.</font>
               </div>
 
-              <div class="fs20"  style="margin-top: 10px">
+              <div class="fs20"  style="margin-top: 15px">
                 <img src="../images/icons/distance.png" width="30" height="30">
 
                   <font id="distrance"  style="color:#2f4074;" >Distance&nbsp;:&nbsp;2000&nbsp;m.</font>
@@ -768,7 +766,7 @@ var bottomTextSta;
 
         <div id="activity" class="tab-pane fade">
             <div class="col-md-6 col-xs-12">
-                <div class="panel" style="margin-left:5px;margin-right:5px;">
+                <div class="panel" style="margin-left:10px;margin-right:10px;">
                     <div id="chartdiv" class="chart"></div>
                 </div>
             </div>
