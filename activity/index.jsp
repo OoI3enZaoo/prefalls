@@ -151,6 +151,8 @@
 <script src="../js/amcharts/themes/light.js"></script>
 <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
 
+
+
 <script type="text/javascript">
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
@@ -648,6 +650,8 @@ var bottomTextSta;
 </script>
 
 <style>
+
+
 .chart { width:100%; height:500px; }
 .icon { float:left; margin-right:10px; }
 
@@ -705,58 +709,74 @@ var bottomTextSta;
     </div>
 
     <div class="row" style="margin-left:0px;margin-right:0px;">
-      <div class="col-md-12 col-xs-12">
-        <div class="panel" style="color:#2d904f;margin-left:0px;margin-right:0px;padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
+  <div class="col-md-12 col-xs-12">
+    <div class="panel" style="color:#2d904f;margin-left:0px;margin-right:0px;padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
 
-        <div class="row" style="margin-left:0px;margin-right:0px;">
-          <div class="col-md-6 col-xs-12">
-    <div class="fs20">
-      <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1" style="color:#2d904f;" >Step Count&nbsp;:&nbsp;2,597</font>&nbsp;Steps</div>
-
-      <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
-
-      <div class="fs20"  style="margin-top: 15px">
-        <img src="../images/icons/active.png" width="30" height="30">
-
-          <font id="strides" style="color:#f57a3e;" >Stride Count&nbsp;:&nbsp;1,210&nbsp;strides</font>
-        </div>
-
-        <div class="fs20"  style="margin-top: 15px">
-          <img src="../images/icons/marker.png" width="30" height="30">
-            <font id="velocity" style="color:#ea5f5c;" >AVG velocity&nbsp;:&nbsp;2.2&nbsp;m/s</font>
-          </div>
-
-        </div>
-
+      <div class="row" style="margin-left:0px;margin-right:0px;">
         <div class="col-md-6 col-xs-12">
-
           <div class="fs20">
-            <img src="../images/icons/walk.png" width="30" height="30">
-              <font id="velocity" style="color:#2d904f;" >AVG step frequency&nbsp;:&nbsp;2&nbsp;steps/s</font>
-            </div>
+            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1" style="color:#2d904f;">Step Count&nbsp;:&nbsp;2,597</font>&nbsp;Steps</div>
 
-            <div class="fs20"  style="margin-top: 15px">
-              <img src="../images/icons/step_length.png" width="35" height="35">
-                <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;40&nbsp;CM.</font>
+            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
+
+            <div class="fs20" style="margin-top: 15px">
+              <img src="../images/icons/active.png" width="30" height="30">
+
+                <font id="strides" style="color:#f57a3e;">Stride Count&nbsp;:&nbsp;1,210&nbsp;strides</font>
               </div>
 
-              <div class="fs20"  style="margin-top: 15px">
-                <img src="../images/icons/distance.png" width="30" height="30">
-
-                  <font id="distrance"  style="color:#2f4074;" >Distance&nbsp;:&nbsp;2000&nbsp;m.</font>
+              <div class="fs20" style="margin-top: 15px">
+                <img src="../images/icons/marker.png" width="30" height="30">
+                  <font id="velocity" style="color:#ea5f5c;">AVG velocity&nbsp;:&nbsp;2.2&nbsp;m/s</font>
                 </div>
 
               </div>
 
-            </div>
+              <div class="col-md-6 col-xs-12">
+
+                <div class="fs20">
+                  <img src="../images/icons/walk.png" width="30" height="30">
+                    <font id="velocity" style="color:#2d904f;">AVG step frequency&nbsp;:&nbsp;2&nbsp;steps/s</font>
+                  </div>
+
+                  <div class="fs20" style="margin-top: 15px">
+                    <img src="../images/icons/step_length.png" width="35" height="35">
+                      <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;40&nbsp;CM.</font>
+                    </div>
+
+                    <div class="fs20" style="margin-top: 15px">
+                      <img src="../images/icons/distance.png" width="30" height="30">
+
+                        <font id="distrance" style="color:#2f4074;">Distance&nbsp;:&nbsp;2000&nbsp;m.</font>
+                      </div>
 
                     </div>
 
                   </div>
 
-                  <%-- <img src="../images/icons/distance.png" width="30" height="30"><font id="distance">Distance</font>&nbsp;:&nbsp;m.</div> --%>
-
                 </div>
+
+              </div>
+
+
+            </div>
+
+
+
+
+<%--
+                <canvas id="sleeping" width="40" height="40" style="border:2px solid #000000; padding 0 15px; float: left;">t --%>
+
+
+<%-- <canvas id="lying" width="40" height="40" style="border:2px solid #000000;">
+  <canvas id="sitting" width="40" height="40" style="border:2px solid #000000;">
+<canvas id="standing" width="40" height="40" style="border:2px solid #000000;">
+<canvas id="walking" width="40" height="40" style="border:2px solid #000000;">
+<canvas id="running" width="40" height="40" style="border:2px solid #000000;">
+<canvas id="climbing" width="40" height="40" style="border:2px solid #000000;"> --%>
+
+
+
 
 
       </div>
@@ -831,6 +851,47 @@ var bottomTextSta;
 
     </div>
 </div>
+<script>
+
+var blue = document.getElementById("sleeping");
+  var ctx = blue.getContext("2d");
+  ctx.fillStyle = '#009AFF';
+  ctx.fillRect(0, 0, 80, 80);
+
+
+  // var blue = document.getElementById("lying");
+  //   var ctx = blue.getContext("2d");
+  //   ctx.fillStyle = '#009AFF';
+  //   ctx.fillRect(0, 0, 80, 80);
+  //
+  //   var blue = document.getElementById("sitting");
+  //     var ctx = blue.getContext("2d");
+  //     ctx.fillStyle = '#009AFF';
+  //     ctx.fillRect(0, 0, 80, 80);
+  //
+  //     var blue = document.getElementById("standing");
+  //       var ctx = blue.getContext("2d");
+  //       ctx.fillStyle = '#009AFF';
+  //       ctx.fillRect(0, 0, 80, 80);
+  //
+  //       var blue = document.getElementById("walking");
+  //         var ctx = blue.getContext("2d");
+  //         ctx.fillStyle = '#009AFF';
+  //         ctx.fillRect(0, 0, 80, 80);
+  //
+  //         var blue = document.getElementById("running");
+  //           var ctx = blue.getContext("2d");
+  //           ctx.fillStyle = '#009AFF';
+  //           ctx.fillRect(0, 0, 80, 80);
+  //
+  //           var blue = document.getElementById("climbing");
+  //             var ctx = blue.getContext("2d");
+  //             ctx.fillStyle = '#009AFF';
+  //             ctx.fillRect(0, 0, 80, 80);
+
+
+
+</script>
 <script src="../js/jquery.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
 </body>

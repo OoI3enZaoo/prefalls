@@ -20,11 +20,23 @@
 <body>
 <nav class="navbar navbar-default navbar-static-top">
 	<div class="container-fluid">
-		<div class="navbar-header">
+		<%-- <div class="navbar-header">
 			<a class="header-brand" href="#"><img src="images/logo.png"></a>
-		</div>
+		</div> --%>
+
+    <div class="navbar-header">
+       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+       </button>
+       <a class="header-brand" ><img src="images/logo.png" style = "width: 178px; height: 35px;   margin-top: 8px;"></a>
+    </div>
+
+
 	</div>
 </nav>
+
 <div class="container">
 	<div class="container-header line"><font class="s17">Sign in</font></div>
 	<div class="container-login">
@@ -35,27 +47,27 @@
 		</form>
 	</div>
 
-<% 
+<%
 	if(session.getAttribute("ssuid") != null){
 		response.sendRedirect("./listname/");
 	}
-	
+
 	if(request.getParameter("checkLogin") != null){
-		
+
 		dbm.createConnection();
-		
+
 		try {
-		
+
 			String email = request.getParameter("email");
 			String pass = request.getParameter("pass");
-		
+
 			String sql = "select * from caregiver where email = '" + email +"' and password = '" + pass + "' ;";
 			ResultSet rs = dbm.executeQuery(sql);
-		
-			if(!rs.next()) out.print("<center><div ><br><font style='color:#ff0000'>ที่อยู่อีเมลหรือรหัสผ่านไม่ถูกต้อง</font></div></center");
-		
+
+			if(!rs.next()) out.print("<center><div ><br><font style='color:#ff0000'>à¸—à¸µà¹ˆà¸­à¸¢à¸¹à¹ˆà¸­à¸µà¹€à¸¡à¸¥à¸«à¸£à¸·à¸­à¸£à¸«à¸±à¸ªà¸œà¹ˆà¸²à¸™à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡</font></div></center");
+
 			else {
-			
+
 				rs.first();
 				session.setAttribute("ssfn",rs.getString("firstname"));
 				session.setAttribute("ssln",rs.getString("lastname"));
@@ -63,15 +75,15 @@
 				session.setAttribute("sstypeid",rs.getString("type_id"));
 				response.sendRedirect("./listname/");
 			}
-		
+
 		}	catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		dbm.closeConnection();
-		
-	} 
+
+	}
 %>
 
 </div>

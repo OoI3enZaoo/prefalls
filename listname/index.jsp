@@ -29,36 +29,6 @@
      timeout: 20
     });
 
-var countna = 0;
-
-function RandomData(){
-var Heartrate_random = Math.floor((Math.random() * 600) + 1);
-
-	var color = ["#0000ff","#00ff1d","#b6ff00","#ff00a5","#4340ad","#3d706a","#507555","#6b7550","#755d50","#755050","#3a0707"];
-var item = color[Math.floor(Math.random()
-
-if(countna == 0){
-	var object  = {
-		lineColor:"",
-		date: "",
-		Heartrate : Heartrate_random;
-	}
-	return object;
-}
-	if(count == 5){
-		var object = {
-			date: "",
-			Heartrate : Heartrate_random;
-		}
-		countna = 0
-		return object;
-
-	}
-
-
-	return object;
-}
-
 </script>
 <style>
 
@@ -129,7 +99,7 @@ if(countna == 0){
 	            <span class="icon-bar"></span>
 	            <span class="icon-bar"></span>
 	        </button>
-	        <a class="header-brand" href="#"><img src="../images/logo.png"></a>
+	        <a class="header-brand" href="#"><img src="../images/logo.png" style = "width: 178px; height: 35px;   margin-top: 8px;"></a>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
 	        <ul class="nav navbar-nav navbar-right">
@@ -222,7 +192,6 @@ if(countna == 0){
 											</div>
 
 											<div class = "col-md-4">
-
 												<img  class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
 											</div>
 
@@ -233,30 +202,28 @@ if(countna == 0){
 
 		<br>
 
-		<script>
-
-
+<script>
 		$('.warnning_blink').each(function(i, obj) {
-
 			var count = 0;
-			var oneminute = window.setInterval(function(){
 
-			var interval22 = window.setInterval(function(){
-				if(count == 0){
-					$(".warnning_blink").hide();
-					count = 1;
-					//var snd = new Audio("file.wav");
-					snd.play();
+				window.setInterval(function(){
+						if(count == 0){
+							$(".warnning_blink").hide();
+							count = 1;
+							//var snd = new Audio("file.wav");
+							//snd.play();
+								}else{
+									$(".warnning_blink").show();
+									count = 0;
+								}
+							},1000);
 
-						}else{
-							$(".warnning_blink").show();
-							count = 0;
-						}
-
-					},1000);
-
-			},60000);
 	});
+
+
+
+
+
 
 
 			//xxxxxxxxxxxxxxxx  mobility index xxxxxxxxxxxxxx
