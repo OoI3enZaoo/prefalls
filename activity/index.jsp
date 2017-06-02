@@ -31,6 +31,16 @@
 	double sdistance = 0.0;
 	double scalories = 0.0;
 	int sismobile = 0;
+  double sta_index = 0.0;
+  double sym_index = 0.0;
+  int StepCount = 0;
+  int StrideCount = 0;
+  double Distance = 0.0;
+  float stab_mean = 0.0f;
+  float stab_3mean = 0.0f;
+  float sym_mean = 0.0f;
+  float sym_3mean = 0.0f;
+
 
 	String acttype = "\'{\"activity\": [";
 	String activity = "\'{\"allactivity\": [";
@@ -131,6 +141,63 @@
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
+
+
+    try {
+  		String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride) as StrideCount FROM archive_" + sssn ;
+
+  		ResultSet rs = dbm.executeQuery(sql);
+
+  		if (rs.next()){
+  			StepCount  = rs.getInt("StepCount");
+  			StrideCount  = rs.getInt("StrideCount");
+        Distance = rs.getDouble("Distance");
+  		}
+
+  		} catch (Exception e) {
+  			out.println(e.getMessage());
+  			e.printStackTrace();
+  		}
+
+      try {
+        String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride) as StrideCount FROM archive_" + sssn ;
+
+        ResultSet rs = dbm.executeQuery(sql);
+
+        if (rs.next()){
+          StepCount  = rs.getInt("StepCount");
+          StrideCount  = rs.getInt("StrideCount");
+          Distance = rs.getDouble("Distance");
+        }
+
+        } catch (Exception e) {
+          out.println(e.getMessage());
+          e.printStackTrace();
+        }
+
+        try {
+          String sql ="SELECT cast(stab_mean  as decimal(16,2)) as stab_mean , cast(stab_3mean  as decimal(16,2)) as stab_3mean , cast(sym_mean  as decimal(16,2))  as sym_mean, cast(sym_3mean  as decimal(16,2)) as sym_3mean FROM `gait_criterion`";
+          ResultSet rs = dbm.executeQuery(sql);
+
+          if (rs.next()){
+
+            stab_mean  = rs.getFloat("stab_mean");
+            stab_3mean  = rs.getFloat("stab_3mean");
+            sym_mean = rs.getFloat("sym_mean");
+            sym_3mean = rs.getFloat("sym_3mean");
+            session.setAttribute("stab_mean",stab_mean);
+            session.setAttribute("stab_3mean",stab_3mean);
+            session.setAttribute("sym_mean",sym_mean);
+            session.setAttribute("sym_3mean",sym_3mean);
+
+          }
+
+          } catch (Exception e) {
+            out.println(e.getMessage());
+            e.printStackTrace();
+          }
+
+
 		dbm.closeConnection();
 %>
 <!doctype html>
@@ -165,6 +232,16 @@
 	var hactive = <%=hactive%>;
 	var sismobile = <%=sismobile%>;
 	var sdistance = <%=sdistance%>;
+  var sta_index = <%=sta_index%>;
+  var sym_index = <%=sym_index%>;
+  var StepCount  = <%=StepCount%>;
+  var StrideCount = <%=StrideCount%>;
+  var Distance = <%=Distance%>;
+  var stab_mean = <%=stab_mean%>;
+  var stab_3mean = <%=stab_3mean%>;
+  var sym_mean = <%=sym_mean%>;
+  var sym_3mean = <%=sym_3mean%>;
+
 	//alert("sismobile: " + sismobile);
 	var mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 	//alert("Mobility: " + mobilityIdx);
@@ -244,65 +321,32 @@ var bottomTextSta;
       "axisThickness": 1,
       "axisAlpha": 0.2,
       "tickAlpha": 0.2,
-      "valueInterval": 20,
+
       "bands": [ {
         "color": "#84b761",
-        "endValue": 90,
+        "endValue": <%=stab_mean%>,
         "startValue": 0
       }, {
         "color": "#fdd400",
-        "endValue": 130,
-        "startValue": 90
+        "endValue": <%=stab_3mean%>,
+        "startValue": <%=stab_mean%>
       }, {
         "color": "#cc4748",
-        "endValue": 220,
+        "endValue": <%=stab_3mean *2 %>,
         "innerRadius": "95%",
-        "startValue": 130
+        "startValue":<%=stab_3mean%>
       } ],
-      "bottomText": "0 km/h",
+      "bottomText": "0",
       "bottomTextYOffset": -20,
-      "endValue": 220
+      "endValue": <%=stab_3mean *2 %>,
+
+      "bottomTextFontSize" : 15
     } ],
     "arrows": [ {} ],
     "export": {
-      "enabled": true
+      "enabled": false
     }
   } );
-
-
-  setInterval( randomValueSta, 2000 );
-
-  // set random value
-  function randomValueSta() {
-    var value = Math.round( Math.random() * 200 );
-
-
-
-    if ( gaugeChartSta ) {
-      if ( gaugeChartSta.arrows ) {
-        if ( gaugeChartSta.arrows[ 0 ] ) {
-          if ( gaugeChartSta.arrows[ 0 ].setValue ) {
-            gaugeChartSta.arrows[ 0 ].setValue( value );
-            var level;
-            if(value >140){
-              level = "Dangerous";
-            }else if(value > 100){
-              level = "Warning";
-            }else if(value> 0){
-              level = "Normal";
-            }
-            gaugeChartSta.axes[ 0 ].setBottomText( value + "\n\n Stability Level : "+level);
-
-
-
-          }
-        }
-      }
-    }
-  }
-
-
-
 
 
 
@@ -314,24 +358,25 @@ var bottomTextSta;
       "axisThickness": 1,
       "axisAlpha": 0.2,
       "tickAlpha": 0.2,
-      "valueInterval": 20,
+
       "bands": [ {
         "color": "#84b761",
-        "endValue": 90,
+        "endValue": <%=sym_mean%>,
         "startValue": 0
       }, {
         "color": "#fdd400",
-        "endValue": 130,
-        "startValue": 90
+        "endValue": <%=sym_3mean%>,
+        "startValue": <%=sym_mean%>
       }, {
         "color": "#cc4748",
-        "endValue": 220,
+        "endValue": <%=sym_3mean *2%>,
         "innerRadius": "95%",
-        "startValue": 130
+        "startValue": <%=sym_3mean%>
       } ],
-      "bottomText": "0 km/h",
+      "bottomText": "0",
       "bottomTextYOffset": -20,
-      "endValue": 220
+      "endValue": <%=sym_3mean *2%>,
+      "bottomTextFontSize" : 15
     } ],
     "arrows": [ {} ],
     "export": {
@@ -339,31 +384,6 @@ var bottomTextSta;
     }
   } );
 
-  setInterval( randomValueSym, 2000 );
-
-
-  // set random value
-  function randomValueSym() {
-    var value = Math.round( Math.random() * 200 );
-    var level;
-    if(value >140){
-      level = "Dangerous";
-    }else if(value > 100){
-      level = "Warning";
-    }else if(value> 0){
-      level = "Normal";
-    }
-    if ( gaugeChartSym ) {
-      if ( gaugeChartSym.arrows ) {
-        if ( gaugeChartSym.arrows[ 0 ] ) {
-          if ( gaugeChartSym.arrows[ 0 ].setValue ) {
-            gaugeChartSym.arrows[ 0 ].setValue( value );
-            gaugeChartSym.axes[ 0 ].setBottomText( value + "\n\n Symmetry Level : "+level);
-          }
-        }
-      }
-    }
-  }
 
 	var chart2 = AmCharts.makeChart("chartdiv2", {
               "type": "xy",
@@ -427,8 +447,8 @@ var bottomTextSta;
 
 
 
-
-		updateChart();
+    updateChart_FallRisk();
+		updateChart_ActivityDetail();
 	}
 
     var amq = org.activemq.Amq;
@@ -461,11 +481,14 @@ var bottomTextSta;
 				sismobile = 0;
 				sdistance = 0.0;
 		   }
-           hr = message.getAttribute('hr');
+
+       hr = message.getAttribute('hr');
 		   sstep = sstep + parseInt(message.getAttribute('step'));
 		   scalories = scalories + parseFloat(message.getAttribute('cal'));
 		   actgroup = parseInt(message.getAttribute('act_group'));
 		   sdistance = sdistance + parseFloat(message.getAttribute('dist'));
+       sta_index = parseFloat(message.getAttribute("stab"));
+       sym_index = parseFloat(message.getAttribute("sym"));
 
 		   for (var i = 0; i < acttype.activity.length; i++) {
 				if (parseInt(message.getAttribute('act_type')) == parseInt(acttype.activity[i].act_type)){
@@ -508,7 +531,8 @@ var bottomTextSta;
 
 		   var nd = parseInt(message.getAttribute('ts'));
 		   chart2.dataProvider.push({"time": nd, "acttype": parseInt(message.getAttribute('act_type')), "value": 1});
-		   updateChart();
+		   updateChart_ActivityDetail();
+       updateChart_FallRisk();
         },
         myId: 'test0',
         myDestination: 'topic://<%=sssn%>_pred'
@@ -583,7 +607,71 @@ var bottomTextSta;
 		return (timevalue.toTimeString()).substr(0, 5);
 	}
 
-	function updateChart(){
+function updateChart_FallRisk(){
+  document.getElementById("StepCount").innerHTML = StepCount;
+  document.getElementById("StrideCount").innerHTML = StrideCount;
+  var dist = Distance.toFixed(2);
+  document.getElementById("Distance").innerHTML = dist;
+
+// console.log("StepCount: " + StepCount);
+// console.log("StrideCount: " + StrideCount);
+// console.log("Distance: " + Distance);
+console.log("sta_index: " + sta_index);
+console.log("sym_index: " + sym_index);
+
+
+
+
+
+
+    if ( gaugeChartSta ) {
+      if ( gaugeChartSta.arrows ) {
+        if ( gaugeChartSta.arrows[ 0 ] ) {
+          if ( gaugeChartSta.arrows[ 0 ].setValue ) {
+            gaugeChartSta.arrows[ 0 ].setValue( sta_index );
+            var level;
+            if(sta_index> stab_3mean){
+              level = "Dangerous";
+            }
+            else if(sta_index > stab_mean){
+              level = "Warning";
+            }else{
+              level = "Normal";
+            }
+
+            gaugeChartSta.axes[ 0 ].setBottomText(sta_index + "\n\n Stability Level : "+level );
+
+
+
+          }
+        }
+      }
+    }
+
+
+    var level;
+    if(sym_index >sym_3mean){
+      level = "Dangerous";
+    }else if(sym_index > sym_mean){
+      level = "Warning";
+    }else {
+      level = "Normal";
+    }
+    if ( gaugeChartSym ) {
+      if ( gaugeChartSym.arrows ) {
+        if ( gaugeChartSym.arrows[ 0 ] ) {
+          if ( gaugeChartSym.arrows[ 0 ].setValue ) {
+            gaugeChartSym.arrows[ 0 ].setValue( sym_index );
+            gaugeChartSym.axes[ 0 ].setBottomText( sym_index + "\n\n Symmetry Level : "+level);
+
+          }
+        }
+      }
+    }
+
+
+}
+	function updateChart_ActivityDetail(){
 		var chartData = [];
 		var chartMobility = [];
 		mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
@@ -685,6 +773,8 @@ var bottomTextSta;
     <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
 	</ul>
 
+
+
 	<div class="tab-content">
   <div id="fall-risk-analysis" class="tab-pane  fade in active">
     <div class="row" style="margin-left:0px;margin-right:0px;">
@@ -692,12 +782,12 @@ var bottomTextSta;
         <div class="panel" style="margin-left:0px;margin-right:0px;">
           <div class="row" style="margin-left:0px;margin-right:0px;">
             <div class="col-md-6 col-xs-12">
-              <div class="fs20 text-primary text-center">Stability Index</div>
+              <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
               <div id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px;"></div>
 
             </div>
             <div class="col-md-6 col-xs-12">
-              <div class="fs20 text-primary text-center">Symmetry Index</div>
+              <div class="fs20 text-primary text-center" style="margin-top: 10px">Symmetry Index</div>
               <div id="chart-sym" class="chart" style="padding-bottom: 90px;"></div>
 
             </div>
@@ -715,14 +805,14 @@ var bottomTextSta;
       <div class="row" style="margin-left:0px;margin-right:0px;">
         <div class="col-md-6 col-xs-12">
           <div class="fs20">
-            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font id="steps1" style="color:#2d904f;">Step Count&nbsp;:&nbsp;2,597</font>&nbsp;Steps</div>
+            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step Count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;Steps</div>
 
             <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
 
             <div class="fs20" style="margin-top: 15px">
               <img src="../images/icons/active.png" width="30" height="30">
 
-                <font id="strides" style="color:#f57a3e;">Stride Count&nbsp;:&nbsp;1,210&nbsp;strides</font>
+                <font  style="color:#f57a3e;">Stride Count&nbsp;:&nbsp;<font id="StrideCount"></font>&nbsp;strides</font>
               </div>
 
               <div class="fs20" style="margin-top: 15px">
@@ -747,7 +837,7 @@ var bottomTextSta;
                     <div class="fs20" style="margin-top: 15px">
                       <img src="../images/icons/distance.png" width="30" height="30">
 
-                        <font id="distrance" style="color:#2f4074;">Distance&nbsp;:&nbsp;2000&nbsp;m.</font>
+                        <font style="color:#2f4074;">Distance&nbsp;:&nbsp;<font id="Distance" ></font>&nbsp;m.</font>
                       </div>
 
                     </div>
@@ -853,41 +943,6 @@ var bottomTextSta;
 </div>
 <script>
 
-var blue = document.getElementById("sleeping");
-  var ctx = blue.getContext("2d");
-  ctx.fillStyle = '#009AFF';
-  ctx.fillRect(0, 0, 80, 80);
-
-
-  // var blue = document.getElementById("lying");
-  //   var ctx = blue.getContext("2d");
-  //   ctx.fillStyle = '#009AFF';
-  //   ctx.fillRect(0, 0, 80, 80);
-  //
-  //   var blue = document.getElementById("sitting");
-  //     var ctx = blue.getContext("2d");
-  //     ctx.fillStyle = '#009AFF';
-  //     ctx.fillRect(0, 0, 80, 80);
-  //
-  //     var blue = document.getElementById("standing");
-  //       var ctx = blue.getContext("2d");
-  //       ctx.fillStyle = '#009AFF';
-  //       ctx.fillRect(0, 0, 80, 80);
-  //
-  //       var blue = document.getElementById("walking");
-  //         var ctx = blue.getContext("2d");
-  //         ctx.fillStyle = '#009AFF';
-  //         ctx.fillRect(0, 0, 80, 80);
-  //
-  //         var blue = document.getElementById("running");
-  //           var ctx = blue.getContext("2d");
-  //           ctx.fillStyle = '#009AFF';
-  //           ctx.fillRect(0, 0, 80, 80);
-  //
-  //           var blue = document.getElementById("climbing");
-  //             var ctx = blue.getContext("2d");
-  //             ctx.fillStyle = '#009AFF';
-  //             ctx.fillRect(0, 0, 80, 80);
 
 
 

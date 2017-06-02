@@ -6,18 +6,18 @@
 	if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
-
+	
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-
+   
     String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
 	String sssn = (String)session.getAttribute("SSSN");
     String fname = (String)session.getAttribute("fname");
     String lname = (String)session.getAttribute("lname");
     String name = " Patient Name : " + session.getAttribute("fname") + " " + (String)session.getAttribute("lname") + " ";
-
+	
     int test_senverity = 12;
 %>
 
@@ -43,40 +43,21 @@
 		} );
 
 	</script>
-
-	<script>
-		function getLocation(count,lat ,lon){
-			$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lon+"&sensor=false", function(result){
-				$("#div"+count).text(result.results[0].formatted_address);
-			});
-		}
-		function startNewTab(value,date){
-
-			 if(value == "warning"){
-				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/fallrisk.jsp?date="+date, '_blank');
-				 win.focus();
-			 }
-			 else{
-				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/warningfall.jsp?date="+date, '_blank');
-				 win.focus();
-			 }
-		}
-	</script>
-
-
+	
+	
 	 <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
     </script>
-
+	
 </head>
 <body>
 
-<%@include file="../include/nav.jsp"%>
-
+<%@include file="../include/nav.jsp"%>    
+    
 <div class="container">
     <div class="panel"><font class="fs17">Assessment Log<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel">
-
+	
 
     <table id="example" class="table table-striped table-bordered" cellspacing="0" width="100%">
   	<thead>
@@ -95,57 +76,64 @@
             String sql = "SELECT DATE_FORMAT(alerts.start,'%Y-%m-%d %H:%i:%s') as date , alerts.lat ,alerts.lon , alerts.alert_type, alerttypename.alert_name FROM `alerts`, `alerttypename` WHERE alerts.SSSN = '"+sssn+"' AND alerts.alert_type = alerttypename.alert_type ORDER BY alerts.id";
 
 			ResultSet rs = dbm.executeQuery(sql);
-
+            
             int count=0;
             while((rs!=null) && (rs.next())){
 			Double lat = Double.parseDouble(rs.getString("lat"));
 			Double lon = Double.parseDouble(rs.getString("lon"));
             %>
+			
+			<script>
 
+	function getLocation(lat ,lon){
+	var location_test = "";	
+	$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lon+"&sensor=false", function(result){
+       location_test = result.results[0].formatted_address;
+	   console.log(lat , lon);
+		console.log(""+location_test);
+		$("#div<%=count%>").text(result.results[0].formatted_address);
+    });
 
-
+	}
+	</script>
+			
            <tr style="cursor: pointer;">
                 <td id=<%=count%>><%= rs.getString("date")%></td>
-                <td ><div id="div<%=count%>">
-				<% if (lat == 0 || lon == 0){ %>
-					N/A
-				<%}
-				else if (lat <= 90 && lon <= 180){ %>
-					<script>getLocation(<%=count%>,<%=lat%>,<%=lon%>);</script>
-				<%}%>
-				</div></td>
-
-				<td><%=rs.getString("alert_name")%></td>
+                <td ><div id="div<%=count%>"></div></td>
+                <td><%=rs.getString("alert_name")%></td>
+				
 				<td>
 				<% if (rs.getString("alert_type").equals("7")){%>
-
-						<center><img onclick="startNewTab('fall','<%= rs.getString("date")%>');"   src="../images/icons/alert/fall.png" width="20px" height="20px"></center>
-				<%}
-				else if (rs.getString("alert_type").equals("3") || rs.getString("alert_type").equals("4")){%>
-						<center><img onclick="startNewTab('warning','<%= rs.getString("date")%>');" src="../images/icons/alert/warning_a.png" width="20px" height="20px"></center>
+						<center><img src="../images/icons/alert/fall.png" width="20px" height="20px"></center>
 				<%}%>
-
+				
+				<% if (rs.getString("alert_type").equals("3")){%>
+						<center><img src="../images/icons/alert/warning_a.png" width="20px" height="20px"></center>
+				<%}%>
+			
+				<% if (rs.getString("alert_type").equals("4")){%>
+						<center><img src="../images/icons/alert/warning_a.png" width="20px" height="20px"></center>
+				<%}%>
 				</td>
-
-            </tr>
+           
+            </tr>     
 
             <% count++;}
         } catch (Exception e) {
                 out.print(e);
         }
-
+            
         dbm.closeConnection();
-    %>
-
-
-
-
+    %> 
+            
+		
+	
+		
   	</tbody>
     </table>
     </div>
 </div>
 <script type="text/javascript">
-
     function myFunction(id) {
         var date = document.getElementById(id).firstChild.nodeValue;
         var url = "http://sysnet.utcc.ac.th/mobilise/mobility/mobility.jsp?date=" + date ;
