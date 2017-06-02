@@ -50,14 +50,14 @@
 				$("#div"+count).text(result.results[0].formatted_address);
 			});
 		}
-		function startNewTab(value,date){
+		function startNewTab(value,tstamp){
 
 			 if(value == "warning"){
-				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/fallrisk.jsp?date="+date, '_blank');
+				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/fallrisk.jsp?date="+tstamp, '_self');
 				 win.focus();
 			 }
 			 else{
-				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/warningfall.jsp?date="+date, '_blank');
+				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/warningfall.jsp?date="+tstamp, '_self');
 				 win.focus();
 			 }
 		}

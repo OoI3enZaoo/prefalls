@@ -616,8 +616,8 @@ function updateChart_FallRisk(){
 // console.log("StepCount: " + StepCount);
 // console.log("StrideCount: " + StrideCount);
 // console.log("Distance: " + Distance);
-console.log("sta_index: " + sta_index);
-console.log("sym_index: " + sym_index);
+console.log("sta_index: " + sta_index + " typeof: " + typeof sta_index);
+console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
 
 

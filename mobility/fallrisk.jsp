@@ -23,7 +23,7 @@
   String tstamp = "2017-06-01 19:10:04";
 
 
-
+ tstamp = (String)request.getParameter("date");
     String ssfn = (String)session.getAttribute("ssfn");
 	   String ssln = (String)session.getAttribute("ssln");
 
@@ -95,11 +95,16 @@ if(request.getParameter("stab_3mean") != null){
   <link rel="Shortcut Icon" href="../images/icon.png"/>
   <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
   <link rel="stylesheet" type="text/css" href="../css/style.css"/>
-  <script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="../js/jquery.min.js"></script>
   <script src="../js/amcharts/amcharts.js"></script>
   <script src="../js/amcharts/xy.js"></script>
   <script src="../js/amcharts/themes/light.js"></script>
   <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+  <script src="../js/bootstrap-notify.min.js"></script>
+  <link rel="stylesheet" href="../css/animate.min.css">
+
+
+
 
   <style media="screen">
     .chart { width:100%; height:500px; }
@@ -118,16 +123,12 @@ if(request.getParameter("stab_3mean") != null){
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
               <div id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px;"></div>
-
             </div>
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center" style="margin-top: 10px">Symmetry Index</div>
               <div id="chart-sym" class="chart" style="padding-bottom: 90px;"></div>
-
             </div>
-
           </div>
-
         </div>
       </div>
     </div>
@@ -191,8 +192,7 @@ if(request.getParameter("stab_3mean") != null){
         </body>
 
         <script type="text/javascript">
-        var tstamp = <%=tstamp%>;
-        console.log("tstamp: " + tstamp);
+
         var stab_mean = <%=stab_mean%>;
         var stab_3mean = <%=stab_3mean%>;
         var sym_mean = <%=sym_mean%>;
@@ -201,8 +201,6 @@ if(request.getParameter("stab_3mean") != null){
         stab_3mean = parseFloat(stab_3mean);
         sym_mean = parseFloat(sym_mean);
         sym_3mean = parseFloat(sym_3mean);
-        var gaugeChartSta;
-        var gaugeChartSym;
         var sta_index = <%=sta_index%>;
         var sym_index = <%=sym_index%>;
         var step_index = <%=step_index%>;
@@ -211,136 +209,98 @@ if(request.getParameter("stab_3mean") != null){
         var step_frq_index = <%=step_frq_index%>;
         var step_len_index = <%=step_len_index%>;
         var spd_index = <%=spd_index%>;
-
-
-
-        setChartDiv();
-        setValueInChart();
-        setValueInTable();
-
-        function setChartDiv(){
-         gaugeChartSta = AmCharts.makeChart( "chart-sta", {
-            "type": "gauge",
-            "theme": "light",
-            "axes": [ {
-              "axisThickness": 1,
-              "axisAlpha": 0.2,
-              "tickAlpha": 0.2,
-
-              "bands": [ {
-                "color": "#84b761",
-                "endValue": stab_mean,
-                "startValue": 0
-              }, {
-                "color": "#fdd400",
-                "endValue": stab_3mean,
-                "startValue": stab_mean
-              }, {
-                "color": "#cc4748",
-                "endValue": stab_3mean*2,
-                "innerRadius": "95%",
-                "startValue":stab_3mean
-              } ],
-              "bottomText": "0",
-              "bottomTextYOffset": -20,
-              "endValue": stab_3mean*2,
-
-              "bottomTextFontSize" : 15
-            } ],
-            "arrows": [ {} ],
-            "export": {
-              "enabled": false
-            }
-          } );
-
-
-
-            gaugeChartSym = AmCharts.makeChart( "chart-sym", {
-              "type": "gauge",
-              "theme": "light",
-              "axes": [ {
-                "axisThickness": 1,
-                "axisAlpha": 0.2,
-                "tickAlpha": 0.2,
-
-                "bands": [ {
-                  "color": "#84b761",
-                  "endValue": sym_mean,
-                  "startValue": 0
-                }, {
-                  "color": "#fdd400",
-                  "endValue": sym_3mean,
-                  "startValue": sym_mean
-                }, {
-                  "color": "#cc4748",
-                  "endValue": sym_3mean*2,
-                  "innerRadius": "95%",
-                  "startValue": sym_3mean
-                } ],
-                "bottomText": "0",
-                "bottomTextYOffset": -20,
-                "endValue": sym_3mean*2,
-                "bottomTextFontSize" : 15
-              } ],
-              "arrows": [ {} ],
-              "export": {
-                "enabled": true
-              }
-            } );
-        }
-        function setValueInChart(){
-
-          if ( gaugeChartSta ) {
-            if ( gaugeChartSta.arrows ) {
-              if ( gaugeChartSta.arrows[ 0 ] ) {
-                if ( gaugeChartSta.arrows[ 0 ].setValue ) {
-                  gaugeChartSta.arrows[ 0 ].setValue( sta_index );
-                  var level;
-                  if(sta_index> stab_3mean){
-                    level = "Dangerous";
-                  }
-                  else if(sta_index > stab_mean){
-                    level = "Warning";
-                  }else{
-                    level = "Normal";
-                  }
-                  gaugeChartSta.axes[ 0 ].setBottomText(sta_index + "\n\n Stability Level : "+level );
-                }
-              }
-            }
-          }
-          var level;
-          if(sym_index >sym_3mean){
-            level = "Dangerous";
-          }else if(sym_index > sym_mean){
-            level = "Warning";
-          }else {
-            level = "Normal";
-          }
-          if ( gaugeChartSym ) {
-            if ( gaugeChartSym.arrows ) {
-              if ( gaugeChartSym.arrows[ 0 ] ) {
-                if ( gaugeChartSym.arrows[ 0 ].setValue ) {
-                  gaugeChartSym.arrows[ 0 ].setValue( sym_index );
-                  gaugeChartSym.axes[ 0 ].setBottomText( sym_index + "\n\n Symmetry Level : "+level);
-
-                }
-              }
-            }
-          }
-          console.log("sta_index: " + sta_index);
-          console.log("sym_index: " + sym_index);
-          console.log("step_index: " + step_index);
-          console.log("stride_index: " + stride_index);
-          console.log("dist_index: " + dist_index);
-          console.log("step_frq_index: " + step_frq_index);
-          console.log("step_len_index: " + step_len_index);
-          console.log("spd_index: " + spd_index);
-
+        var timegauge = setInterval(setValueInGauge,1);
+        console.log("sta_index: " + sta_index);
+        console.log("sym_index: " + sym_index);
+        console.log("step_index: " + step_index);
+        console.log("stride_index: " + stride_index);
+        console.log("dist_index: " + dist_index);
+        console.log("step_frq_index: " + step_frq_index);
+        console.log("step_len_index: " + step_len_index);
+        console.log("spd_index: " + spd_index);
+        if(sta_index == 0 && sym_index == 0 && step_index == 0 && stride_index == 0 && dist_index == 0 && step_frq_index == 0 && step_len_index == 0 && spd_index == 0){
+          console.log("no data");
+          $.notify({
+          	title: '<strong>Unsuccessful</strong>',
+          	message: 'Data not found'
+          },{
+          	type: 'danger'
+          });
+        }else{
+          $.notify({
+          	title: '<strong>Successful</strong>',
+          	message: ''
+          },{
+          	type: 'success'
+          });
 
         }
 
-        function setValueInTable(){
+        var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
+           "type": "gauge",
+           "theme": "light",
+           "axes": [ {
+             "axisThickness": 1,
+             "axisAlpha": 0.2,
+             "tickAlpha": 0.2,
+
+             "bands": [ {
+               "color": "#84b761",
+               "endValue": stab_mean,
+               "startValue": 0
+             }, {
+               "color": "#fdd400",
+               "endValue": stab_3mean,
+               "startValue": stab_mean
+             }, {
+               "color": "#cc4748",
+               "endValue": stab_3mean*2,
+               "innerRadius": "95%",
+               "startValue":stab_3mean
+             } ],
+             "bottomText": "0",
+             "bottomTextYOffset": -20,
+             "endValue": stab_3mean*2,
+
+             "bottomTextFontSize" : 15
+           } ],
+           "arrows": [ {} ],
+           "export": {
+             "enabled": false
+           }
+         } );
+         var  gaugeChartSym = AmCharts.makeChart( "chart-sym", {
+             "type": "gauge",
+             "theme": "light",
+             "axes": [ {
+               "axisThickness": 1,
+               "axisAlpha": 0.2,
+               "tickAlpha": 0.2,
+
+               "bands": [ {
+                 "color": "#84b761",
+                 "endValue": sym_mean,
+                 "startValue": 0
+               }, {
+                 "color": "#fdd400",
+                 "endValue": sym_3mean,
+                 "startValue": sym_mean
+               }, {
+                 "color": "#cc4748",
+                 "endValue": sym_3mean*2,
+                 "innerRadius": "95%",
+                 "startValue": sym_3mean
+               } ],
+               "bottomText": "0",
+               "bottomTextYOffset": -20,
+               "endValue": sym_3mean*2,
+               "bottomTextFontSize" : 15
+             } ],
+             "arrows": [ {} ],
+             "export": {
+               "enabled": true
+             }
+           } );
           document.getElementById("StepCount").innerHTML=step_index;
           document.getElementById("StrideCount").innerHTML=stride_index;
           document.getElementById("Distance").innerHTML=dist_index;
@@ -348,14 +308,48 @@ if(request.getParameter("stab_3mean") != null){
           document.getElementById("StepAvg").innerHTML=step_len_index;
           document.getElementById("StepLength").innerHTML=spd_index;
 
-
-
-
-
-
-
+function setValueInGauge(){
+  if ( gaugeChartSta ) {
+    if ( gaugeChartSta.arrows ) {
+      if ( gaugeChartSta.arrows[ 0 ] ) {
+        if ( gaugeChartSta.arrows[ 0 ].setValue ) {
+          gaugeChartSta.arrows[ 0 ].setValue( sta_index );
+          var level;
+          if(sta_index> stab_3mean){
+            level = "Dangerous";
+          }
+          else if(sta_index > stab_mean){
+            level = "Warning";
+          }else{
+            level = "Normal";
+          }
+          gaugeChartSta.axes[ 0 ].setBottomText(sta_index + "\n\n Stability Level : "+level );
+          console.log("stagauge");
         }
+      }
+    }
+  }
+  var level;
+  if(sym_index >sym_3mean){
+    level = "Dangerous";
+  }else if(sym_index > sym_mean){
+    level = "Warning";
+  }else {
+    level = "Normal";
+  }
+  if ( gaugeChartSym ) {
+    if ( gaugeChartSym.arrows ) {
+      if ( gaugeChartSym.arrows[ 0 ] ) {
+        if ( gaugeChartSym.arrows[ 0 ].setValue ) {
+          gaugeChartSym.arrows[ 0 ].setValue( sym_index );
+          gaugeChartSym.axes[ 0 ].setBottomText( sym_index + "\n\n Symmetry Level : "+level);
+        }
+      }
+    }
+  }
 
+  clearInterval(timegauge);
+}
 
 
 
