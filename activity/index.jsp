@@ -223,6 +223,7 @@
 
 
 <script type="text/javascript">
+
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
 	var hr = 0;
@@ -255,6 +256,8 @@
   var checksym = 0;
   var sym_interval1;
   var sym_interval2;
+  var countalertsta = 0;
+  var countalertsym = 0;
 	//alert("sismobile: " + sismobile);
 	var mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 	//alert("Mobility: " + mobilityIdx);
@@ -643,35 +646,40 @@ var bottomTextSta;
 		return (timevalue.toTimeString()).substr(0, 5);
 	}
 
+
 function checkAlert(type) {
 
-  // $.notify({
-  //   title: '<strong>Danger</strong>',
-  //   message: 'Stability Level is Danger'
-  // },{
-  //   type: 'danger'
-  // });
-  //
 
   console.log("alerttype: " + type);
 
 
-        var default_color = "#fff"
-        var color_sta;
-        var color_sym;
 
+  if(sta_index > stab_mean) {
         if(type == 3 && alert_sta != 1){
           alert_sta = 1;
           console.log("do alert 3 alert_sta: " + alert_sta);
           clearInterval(sta_interval2);
           sta_interval1 =   setInterval(function(){
             if(checksta == 0){
-                $("#chart-sta").css("background-color",default_color);
+                $("#chart-sta").css("background-color","#fff");
                 checksta = 1;
             }else{
                 $("#chart-sta").css("background-color","#edf0bf");
                 checksta = 0;
             }
+            countalertsta ++;
+            if(countalertsta == 7){
+              $.notify({
+                // options
+                icon: "glyphicon glyphicon-bell",
+                message: '<strong>Warning</strong> Stability !'
+              },{
+                // settings
+                type: 'warning'
+              });
+              countalertsta = 0;
+            }
+
 
           },1000);
       }
@@ -681,49 +689,102 @@ function checkAlert(type) {
         clearInterval(sta_interval1);
         sta_interval2 =   setInterval(function(){
           if(checksta == 0){
-              $("#chart-sta").css("background-color",default_color);
+              $("#chart-sta").css("background-color","#fff");
               checksta = 1;
           }else{
               $("#chart-sta").css("background-color","#f0c2bf");
               checksta = 0;
           }
+          countalertsta ++;
+          if(countalertsta == 7){
+            $.notify({
+              // options
+              icon: "glyphicon glyphicon-bell",
+              message: '<strong>Danger</strong> Stability !'
+            },{
+              // settings
+              type: 'danger'
+            });
+            countalertsta = 0;
+          }
+
 
         },1000);
       }
+}else{
+  alert_sta = 0;
+  clearInterval(sta_interval1);
+  clearInterval(sta_interval2);
+  $("#chart-sta").css("background-color","#fff");
+  checksta = 1;
+}
 
-
-
+console.log("Symindex " + sym_index + " symmean" + sym_mean);
+  if(sym_index > sym_mean) {
       if(type == 8 && alert_sym != 1){
         alert_sym = 1;
-        console.log("do alert 3 alert_sym: " + alert_sym);
-        clearInterval(sta_interval2);
+        console.log("do alert 8 alert_sym: " + alert_sym);
+        clearInterval(sym_interval2);
         sym_interval1 =   setInterval(function(){
           if(checksym == 0){
-              $("#chart-sta").css("background-color",default_color);
+              $("#chart-sym").css("background-color","#fff");
               checksym = 1;
           }else{
-              $("#chart-sta").css("background-color","#edf0bf");
+              $("#chart-sym").css("background-color","#edf0bf");
               checksym = 0;
           }
+
+          countalertsym ++;
+          if(countalertsym == 7){
+            $.notify({
+              // options
+              icon: "glyphicon glyphicon-bell",
+              message: '<strong>Warning</strong> Symmetry !'
+            },{
+              // settings
+              type: 'warning'
+            });
+            countalertsym = 0;
+          }
+
 
         },1000);
       }
       else if(type == 9 && alert_sym != 2){
       alert_sym = 2;
-      console.log("do alert 4 alert_sym: " + alert_sym);
+      console.log("do alert 9 alert_sym: " + alert_sym);
       clearInterval(sym_interval1);
       sym_interval2 =   setInterval(function(){
         if(checksym == 0){
-            $("#chart-sta").css("background-color",default_color);
+            $("#chart-sym").css("background-color","#fff");
             checksym = 1;
         }else{
-            $("#chart-sta").css("background-color","#f0c2bf");
+            $("#chart-sym").css("background-color","#f0c2bf");
             checksym = 0;
         }
+        countalertsym ++;
+        if(countalertsym == 7){
+          $.notify({
+            // options
+            icon: "glyphicon glyphicon-bell",
+            message: '<strong>Danger</strong> Symmetry !'
+          },{
+            // settings
+            type: 'danger'
+          });
+          countalertsym = 0;
+        }
+
 
       },1000);
       }
-
+}else{
+  alert_sym = 0;
+  $("#chart-sym").css("background-color","#fff");
+  checksym = 1;
+  clearInterval(sym_interval1);
+  clearInterval(sym_interval2);
+}
 
 
       //
@@ -731,7 +792,7 @@ function checkAlert(type) {
       //
       //     sym_interval =   setInterval(function(){
       //       if(checksym == 0){
-      //           $("#chart-sym").css("background-color",default_color);
+      //           $("#chart-sym").css("background-color","#fff");
       //           checksym = 1;
       //       }else{
       //           $("#chart-sym").css("background-color",color_sym);
@@ -1073,15 +1134,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
     </div>
 </div>
-<script>
-
-
-
-
-
-
-
-</script>
+<!-- JS Main File -->
 <script src="../js/jquery.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
 </body>
