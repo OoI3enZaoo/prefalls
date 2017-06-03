@@ -32,9 +32,12 @@
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
 <!--CSS and JS dataTables File -->
 <link rel="stylesheet" type="text/css" href="css/dataTables.bootstrap.min.css"/>
-<script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
 <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="js/dataTables.bootstrap.min.js"></script>
+  <script src="../js/bootstrap-notify.min.js"></script>
+  <link rel="stylesheet" href="../css/animate.min.css">
+
 	<script>
 		$(document).ready(function() {
 			$('#example').DataTable( {
@@ -52,12 +55,14 @@
 		}
 		function startNewTab(value,tstamp){
 
+
 			 if(value == "warning"){
 				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/fallrisk.jsp?date="+tstamp, '_self');
 				 win.focus();
 			 }
 			 else{
-				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/warningfall.jsp?date="+tstamp, '_self');
+
+				 var win = window.open("http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+tstamp, '_self');
 				 win.focus();
 			 }
 		}
@@ -65,7 +70,7 @@
 
 
 	 <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk">
     </script>
 
 </head>
@@ -73,6 +78,11 @@
 
 <%@include file="../include/nav.jsp"%>
 
+<script type="text/javascript">
+
+
+
+</script>
 <div class="container">
     <div class="panel"><font class="fs17">Assessment Log<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel">
@@ -121,7 +131,7 @@
 
 						<center><img onclick="startNewTab('fall','<%= rs.getString("date")%>');"   src="../images/icons/alert/fall.png" width="20px" height="20px"></center>
 				<%}
-				else if (rs.getString("alert_type").equals("3") || rs.getString("alert_type").equals("4")){%>
+				else if (rs.getString("alert_type").equals("3") || rs.getString("alert_type").equals("4")|| rs.getString("alert_type").equals("8")|| rs.getString("alert_type").equals("9")){%>
 						<center><img onclick="startNewTab('warning','<%= rs.getString("date")%>');" src="../images/icons/alert/warning_a.png" width="20px" height="20px"></center>
 				<%}%>
 
@@ -145,6 +155,7 @@
     </div>
 </div>
 <script type="text/javascript">
+
 
     function myFunction(id) {
         var date = document.getElementById(id).firstChild.nodeValue;

@@ -209,7 +209,7 @@
 <link rel="Shortcut Icon" href="../images/icon.png"/>
 <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
-<script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
 <script type="text/javascript" src="../js/amq_jquery_adapter.js"></script>
 <script type="text/javascript" src="../js/amq.js"></script>
 <script src="../js/amcharts/amcharts.js"></script>
@@ -217,6 +217,8 @@
 <script src="../js/amcharts/xy.js"></script>
 <script src="../js/amcharts/themes/light.js"></script>
 <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
+<script src="../js/bootstrap-notify.min.js"></script>
+<link rel="stylesheet" href="../css/animate.min.css">
 
 
 
@@ -242,6 +244,17 @@
   var sym_mean = <%=sym_mean%>;
   var sym_3mean = <%=sym_3mean%>;
 
+
+  var alert_sta = 0;
+  var checksta = 0;
+
+  var sta_interval1;
+  var sta_interval2;
+
+  var alert_sym = 0;
+  var checksym = 0;
+  var sym_interval1;
+  var sym_interval2;
 	//alert("sismobile: " + sismobile);
 	var mobilityIdx = Math.round((((sismobile * msgInterval)/864) + 0.00001) * 100) / 100;
 	//alert("Mobility: " + mobilityIdx);
@@ -489,7 +502,8 @@ var bottomTextSta;
 		   sdistance = sdistance + parseFloat(message.getAttribute('dist'));
        sta_index = parseFloat(message.getAttribute("stab"));
        sym_index = parseFloat(message.getAttribute("sym"));
-
+       console.log("sta_index: " + sta_index);
+ console.log("sym_index: " + sym_index);
 		   for (var i = 0; i < acttype.activity.length; i++) {
 				if (parseInt(message.getAttribute('act_type')) == parseInt(acttype.activity[i].act_type)){
 					//curact = acttype.activity[i].act_name;
@@ -533,12 +547,34 @@ var bottomTextSta;
 		   chart2.dataProvider.push({"time": nd, "acttype": parseInt(message.getAttribute('act_type')), "value": 1});
 		   updateChart_ActivityDetail();
        updateChart_FallRisk();
+
         },
         myId: 'test0',
         myDestination: 'topic://<%=sssn%>_pred'
       };
 
 	amq.addListener(myHandler.myId, myHandler.myDestination,myHandler.rcvMessage);
+
+
+
+  var myHandler2 =
+      {
+        rcvMessage: function(message)
+        {
+            alert_type = message.getAttribute("type");
+            console.log("alert_type: " + alert_type);
+            if(alert_type == 3 || alert_type == 4 || alert_type == 8 || alert_type == 9){
+
+                checkAlert(alert_type);
+            }
+        },
+        myId: 'test1',
+        myDestination: 'topic://<%=sssn%>_alert'
+      };
+
+  amq.addListener(myHandler2.myId, myHandler2.myDestination,myHandler2.rcvMessage);
+
+
 
 
 	//xxxxxxxxxxxxxxxx create chart xxxxxxxxxxxxxxxxxx
@@ -607,6 +643,106 @@ var bottomTextSta;
 		return (timevalue.toTimeString()).substr(0, 5);
 	}
 
+function checkAlert(type) {
+
+  // $.notify({
+  //   title: '<strong>Danger</strong>',
+  //   message: 'Stability Level is Danger'
+  // },{
+  //   type: 'danger'
+  // });
+  //
+
+  console.log("alerttype: " + type);
+
+
+        var default_color = "#fff"
+        var color_sta;
+        var color_sym;
+
+        if(type == 3 && alert_sta != 1){
+          alert_sta = 1;
+          console.log("do alert 3 alert_sta: " + alert_sta);
+          clearInterval(sta_interval2);
+          sta_interval1 =   setInterval(function(){
+            if(checksta == 0){
+                $("#chart-sta").css("background-color",default_color);
+                checksta = 1;
+            }else{
+                $("#chart-sta").css("background-color","#edf0bf");
+                checksta = 0;
+            }
+
+          },1000);
+      }
+      else if(type == 4 && alert_sta != 2){
+        alert_sta = 2;
+        console.log("do alert 4 alert_sta: " + alert_sta);
+        clearInterval(sta_interval1);
+        sta_interval2 =   setInterval(function(){
+          if(checksta == 0){
+              $("#chart-sta").css("background-color",default_color);
+              checksta = 1;
+          }else{
+              $("#chart-sta").css("background-color","#f0c2bf");
+              checksta = 0;
+          }
+
+        },1000);
+      }
+
+
+
+      if(type == 8 && alert_sym != 1){
+        alert_sym = 1;
+        console.log("do alert 3 alert_sym: " + alert_sym);
+        clearInterval(sta_interval2);
+        sym_interval1 =   setInterval(function(){
+          if(checksym == 0){
+              $("#chart-sta").css("background-color",default_color);
+              checksym = 1;
+          }else{
+              $("#chart-sta").css("background-color","#edf0bf");
+              checksym = 0;
+          }
+
+        },1000);
+      }
+      else if(type == 9 && alert_sym != 2){
+      alert_sym = 2;
+      console.log("do alert 4 alert_sym: " + alert_sym);
+      clearInterval(sym_interval1);
+      sym_interval2 =   setInterval(function(){
+        if(checksym == 0){
+            $("#chart-sta").css("background-color",default_color);
+            checksym = 1;
+        }else{
+            $("#chart-sta").css("background-color","#f0c2bf");
+            checksym = 0;
+        }
+
+      },1000);
+      }
+
+
+
+      //
+      //   if(alert_sym == true){
+      //
+      //     sym_interval =   setInterval(function(){
+      //       if(checksym == 0){
+      //           $("#chart-sym").css("background-color",default_color);
+      //           checksym = 1;
+      //       }else{
+      //           $("#chart-sym").css("background-color",color_sym);
+      //           checksym =0;
+      //       }
+      //     },1000);
+      // }
+
+
+
+}
 function updateChart_FallRisk(){
   document.getElementById("StepCount").innerHTML = StepCount;
   document.getElementById("StrideCount").innerHTML = StrideCount;
@@ -618,10 +754,6 @@ function updateChart_FallRisk(){
 // console.log("Distance: " + Distance);
 console.log("sta_index: " + sta_index + " typeof: " + typeof sta_index);
 console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
-
-
-
-
 
 
     if ( gaugeChartSta ) {
@@ -783,7 +915,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
           <div class="row" style="margin-left:0px;margin-right:0px;">
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
-              <div id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px;"></div>
+              <div  id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px; "></div>
 
             </div>
             <div class="col-md-6 col-xs-12">
@@ -942,6 +1074,9 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
     </div>
 </div>
 <script>
+
+
+
 
 
 

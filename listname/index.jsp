@@ -4,6 +4,7 @@
 <jsp:useBean id="dbm" class="th.ac.utcc.database.DBManager" />
 <%
 	int sismobile = 0;
+
 %>
 <!doctype html>
 <head>
@@ -78,7 +79,7 @@
 			e.printStackTrace();
 		}
 
-		dbm.closeConnection();
+
 
 	} else {
 
@@ -192,6 +193,7 @@
 											</div>
 
 											<div class = "col-md-4">
+
 												<img  class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
 											</div>
 
@@ -217,6 +219,11 @@
 									count = 0;
 								}
 							},1000);
+
+							window.setInterval(function(){
+
+
+							},3000);
 
 	});
 

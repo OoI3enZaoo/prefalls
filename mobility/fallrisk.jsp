@@ -30,7 +30,7 @@
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-
+String sssn = (String)session.getAttribute("SSSN");
 
 if(request.getParameter("stab_3mean") != null){
   stab_mean = (String) session.getAttribute("stab_mean");
@@ -65,7 +65,7 @@ if(request.getParameter("stab_3mean") != null){
   try{
     String sql = "select stab, sym, step,stride, dist,step_frq ,step_len,spd from archive_RFG2D3T6ET where tstamp = '"+tstamp+"'";
     ResultSet rs = dbm.executeQuery(sql);
-
+    out.println("SQL: " + sql + " sssn: " + sssn);
     if (rs.next()){
       sta_index = rs.getFloat("stab");
       sym_index = rs.getFloat("sym");
@@ -80,7 +80,6 @@ if(request.getParameter("stab_3mean") != null){
       out.println(e.getMessage());
       e.printStackTrace();
     }
-
 
  		dbm.closeConnection();
 
