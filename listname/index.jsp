@@ -15,9 +15,11 @@
 <link rel="Shortcut Icon" href="../images/icon.png"/>
 <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
-<script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
 <script type="text/javascript" src="../js/amq_jquery_adapter.js"></script>
 <script type="text/javascript" src="../js/amq.js"></script>
+<script src="../js/bootstrap-notify.min.js"></script>
+<link rel="stylesheet" href="../css/animate.min.css">
 <script type="text/javascript">
 	var sismobile = 0;
 	var type = 0;
@@ -31,6 +33,7 @@
     });
 
 </script>
+
 <style>
 
 .c1 { width: 150px; float: left; margin-left: 20px; }
@@ -57,6 +60,9 @@
 	String ssln = (String)session.getAttribute("ssln");
 	String ssuid = (String)session.getAttribute("ssuid");
 	String sstypeid = (String)session.getAttribute("sstypeid");
+	String fname_alert = "";
+	String lname_alert = "";
+	String imgpath_alert = "";
     String name = name = "\'" + session.getAttribute("ssfn") + " " + (String)session.getAttribute("ssln") + "\'";
 
 	if(sstypeid.equals("3")){
@@ -194,7 +200,8 @@
 
 											<div class = "col-md-4">
 
-												<img  class = "warnning_blink" src="../images/icons/alert/warning_a.png" width="50" height="50"></img>
+														<span  id = "icon3_<%=sssn%>"></span>
+
 											</div>
 
 				</div>
@@ -205,27 +212,6 @@
 		<br>
 
 <script>
-		$('.warnning_blink').each(function(i, obj) {
-			var count = 0;
-
-				window.setInterval(function(){
-						if(count == 0){
-							$(".warnning_blink").hide();
-							count = 1;
-							//var snd = new Audio("file.wav");
-							//snd.play();
-								}else{
-									$(".warnning_blink").show();
-									count = 0;
-								}
-							},1000);
-
-							window.setInterval(function(){
-
-
-							},3000);
-
-	});
 
 
 
@@ -262,6 +248,7 @@
 		        rcvMessage: function(message)
 		        {
 		           	type = message.getAttribute('type');
+
 				   	console.log("type var = "+type);
 				   	if(type == 5){
 				   		document.getElementById("icon_<%=sssn%>").innerHTML='<img src="Heart.png" hight="30" width="30"> <i>- low</i>';
@@ -276,9 +263,19 @@
 				   	}else if(type == 2){
 				   		document.getElementById("icon2_<%=sssn%>").innerHTML='<img src="turn.png" hight="45" width="45"> <i>- turn the patient!</i>';
 						setTimeout(function(){
-							document.getElementById("icon2_<%=sssn%>").innerHTML="";
+							document.getElementById("icon2_<%=sssn%>").innerHTML='';
 						}, 2000);
 				   	}
+						if(type == 3 || type == 4 || type == 8 || type == 9){
+							document.getElementById("icon3_<%=sssn%>").innerHTML = '<img src="../images/icons/alert/warning_a.png" width="50" height="50"> <i>- risk!</i>';
+							setTimeout(function(){
+									document.getElementById("icon3_<%=sssn%>").innerHTML = '';
+
+							},2000);
+
+								  checkAlert(type,message.getAttribute('pid'));
+
+						}
 		        },
 		        myId: 'userID<%=sssn%>_alert',
 		        myDestination: 'topic://<%=sssn%>_alert',
@@ -295,7 +292,7 @@
 			e.printStackTrace();
 		}
 
-		dbm.closeConnection();
+
 
 	}
 
@@ -303,7 +300,93 @@
    	</div>
    	</div>
 </div>
-<script src="../js/jquery.min.js"></script>
+
+
+
+
+<script type="text/javascript">
+
+var countsta = 0;
+var countsym = 0;
+function checkAlert(type,uid){
+
+console.log("checkAlert: " + type + " uid: " + uid);
+console.log('<%= fname_alert %>');
+	if(type == 3 || type == 4){
+		countsta++;
+		if(countsta == 1){
+			countsta =0;
+			if(type == 3){alert(1,1,uid);}else{alert(1,2,uid);}
+
+		}
+	}
+	if(type == 8 || type == 9){
+		countsym++;
+		if(countsym == 1){
+			countsym = 0;
+			if(type == 8){alert(2,1,uid);}else{alert(2,2,uid);}
+
+		}
+	}
+}
+function alert(type , level,uid){
+console.log("alert: " + type + " level: " +level + " uid: " + uid);
+var mlevel;
+var mMessage;
+if(type == 1){
+mMessage = "Stability";
+}
+else{
+mMessage = "Symmetry";
+}
+if(level == 1){
+
+	mlevel = "warning";
+}else{
+
+	mlevel = "danger";
+}
+$.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getInfoAlert.jsp?sssn="+uid+"",function(result){
+	var ftitle = "<span style = 'margin-left: 10px; font-weight: bold; margin-bottom: 5px; font-size: 15px; display:block;'>";
+	var mtitle = result[0].firstname + " " + result[0].lastname;
+	var ltitle = "</span>";
+	var resTitle = ftitle + mtitle + ltitle;
+	var res_url = "../activity/?SSSN="+uid;
+	var resicon = "../images/patients/" + result[0].imgPath;
+	$.notify({
+	icon: resicon,
+	title: resTitle,
+	message: "<span style = 'margin-left: 10px;'>"+mMessage+"</span>",
+	url: res_url,
+	target: "_self",
+	allow_dismiss: true
+	},{
+	type: mlevel,
+	delay: 5000,
+	icon_type: 'image',
+	template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+		'<img  data-notify="icon" class="img-circle pull-left" width= "55px" height = "55px"> ' +
+		'<span data-notify="title">{1}</span>' +
+		'<span data-notify="message">{2}</span>' +
+		'<a href="{3}" target="{4}" data-notify="url"></a>' +
+	'</div>'
+	});
+
+
+
+});
+
+
+
+
+
+
+
+
+}
+
+
+  </script>
 <script src="../js/bootstrap.min.js"></script>
 </body>
 </html>

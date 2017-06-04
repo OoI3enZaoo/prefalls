@@ -38,7 +38,7 @@
 </nav>
 
 <div class="container">
-	<div class="container-header line"><font class="s17">Sign in</font></div>
+	<div class="container-header line"><font >Sign in</font></div>
 	<div class="container-login">
 		<form name="frmLogin" method="post" action="index.jsp?checkLogin">
 		<input type="text" name="email" placeholder="username" />

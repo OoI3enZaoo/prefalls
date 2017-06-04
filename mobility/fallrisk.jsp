@@ -21,7 +21,9 @@
   int step_len_index = 0;
   double spd_index = 0.0;
   String tstamp = "2017-06-01 19:10:04";
-
+  String fname = (String)session.getAttribute("fname");
+    String lname = (String)session.getAttribute("lname");
+    String name = " Patient Name : " + fname + " " + lname + " ";
 
  tstamp = (String)request.getParameter("date");
     String ssfn = (String)session.getAttribute("ssfn");
@@ -65,7 +67,6 @@ if(request.getParameter("stab_3mean") != null){
   try{
     String sql = "select stab, sym, step,stride, dist,step_frq ,step_len,spd from archive_RFG2D3T6ET where tstamp = '"+tstamp+"'";
     ResultSet rs = dbm.executeQuery(sql);
-    out.println("SQL: " + sql + " sssn: " + sssn);
     if (rs.next()){
       sta_index = rs.getFloat("stab");
       sym_index = rs.getFloat("sym");
@@ -114,7 +115,7 @@ if(request.getParameter("stab_3mean") != null){
 
 
   <div class="container">
-
+  <div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Fall History<span class="right"><%=name%> <%=tstamp%></span></font></div>
     <div class="row" style="margin-left:0px;margin-right:0px;">
       <div class="col-md-12 col-xs-12">
         <div class="panel" style="margin-left:0px;margin-right:0px;">
@@ -225,6 +226,7 @@ if(request.getParameter("stab_3mean") != null){
           },{
           	type: 'danger'
           });
+          window.location = "./";
         }else{
           $.notify({
           	title: '<strong>Successful</strong>',
@@ -302,10 +304,10 @@ if(request.getParameter("stab_3mean") != null){
            } );
           document.getElementById("StepCount").innerHTML=step_index;
           document.getElementById("StrideCount").innerHTML=stride_index;
-          document.getElementById("Distance").innerHTML=dist_index;
-          document.getElementById("Speed").innerHTML=step_frq_index;
-          document.getElementById("StepAvg").innerHTML=step_len_index;
-          document.getElementById("StepLength").innerHTML=spd_index;
+          document.getElementById("Distance").innerHTML=dist_index.toFixed(2);
+          document.getElementById("Speed").innerHTML=spd_index.toFixed(2);
+          document.getElementById("StepAvg").innerHTML=step_frq_index;
+          document.getElementById("StepLength").innerHTML=step_len_index.toFixed(2);
 
 function setValueInGauge(){
   if ( gaugeChartSta ) {

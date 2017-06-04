@@ -1,6 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*"%>
 <%@include file="config.jsp"%>
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.util.Calendar" %>
+<%@ page import="java.util.Date" %>
+<%@ page import="java.util.GregorianCalendar" %>
 <jsp:useBean id="dbm" class="th.ac.utcc.database.DBManager" />
 
 <%
@@ -33,9 +37,15 @@
 	int sismobile = 0;
   double sta_index = 0.0;
   double sym_index = 0.0;
-  int StepCount = 0;
-  int StrideCount = 0;
-  double Distance = 0.0;
+
+  int step_index = 0;
+  int stride_index = 0;
+  double dist_index = 0.0;
+  int step_frq_index = 0;
+  int step_len_index = 0;
+  double spd_index = 0.0;
+
+
   float stab_mean = 0.0f;
   float stab_3mean = 0.0f;
   float sym_mean = 0.0f;
@@ -47,6 +57,11 @@
 
     String sssn = (String)session.getAttribute("SSSN");
 	String name = "";
+  Calendar c = Calendar.getInstance();
+	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	String currentDate = df.format(c.getTime());
+  String fall_history_json = "\'{\"falling\": [";
+
 
     try {
         String sql = "SELECT firstname,lastname FROM `patients` WHERE SSSN = '"+sssn+"';";
@@ -144,14 +159,18 @@
 
 
     try {
-  		String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride) as StrideCount FROM archive_" + sssn ;
+  		String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride)  as StrideCount ,AVG(step_frq) as step_frq ,AVG(step_len) as step_len ,AVG(spd) as spd FROM archive_" + sssn ;
 
   		ResultSet rs = dbm.executeQuery(sql);
 
   		if (rs.next()){
-  			StepCount  = rs.getInt("StepCount");
-  			StrideCount  = rs.getInt("StrideCount");
-        Distance = rs.getDouble("Distance");
+  			step_index  = rs.getInt("StepCount");
+  			stride_index  = rs.getInt("StrideCount");
+        dist_index = rs.getDouble("Distance");
+        step_frq_index = rs.getInt("step_frq");
+        step_len_index = rs.getInt("step_len");
+        spd_index = rs.getDouble("spd");
+
   		}
 
   		} catch (Exception e) {
@@ -159,21 +178,6 @@
   			e.printStackTrace();
   		}
 
-      try {
-        String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride) as StrideCount FROM archive_" + sssn ;
-
-        ResultSet rs = dbm.executeQuery(sql);
-
-        if (rs.next()){
-          StepCount  = rs.getInt("StepCount");
-          StrideCount  = rs.getInt("StrideCount");
-          Distance = rs.getDouble("Distance");
-        }
-
-        } catch (Exception e) {
-          out.println(e.getMessage());
-          e.printStackTrace();
-        }
 
         try {
           String sql ="SELECT cast(stab_mean  as decimal(16,2)) as stab_mean , cast(stab_3mean  as decimal(16,2)) as stab_3mean , cast(sym_mean  as decimal(16,2))  as sym_mean, cast(sym_3mean  as decimal(16,2)) as sym_3mean FROM `gait_criterion`";
@@ -196,7 +200,22 @@
             out.println(e.getMessage());
             e.printStackTrace();
           }
+          try {
 
+            String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+currentDate+"' , '1:00:00') AND '"+currentDate+"' ";
+            ResultSet rs = dbm.executeQuery(sql);
+            if((rs!=null) && (rs.next())){
+              fall_history_json = fall_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\"}";
+            }
+            while((rs!=null) && (rs.next())){
+              fall_history_json = fall_history_json + ", {\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\" }";
+            }
+              fall_history_json = fall_history_json + "]}\'";
+
+          } catch (Exception e) {
+              out.println(e.getMessage());
+              e.printStackTrace();
+            }
 
 		dbm.closeConnection();
 %>
@@ -213,16 +232,29 @@
 <script type="text/javascript" src="../js/amq_jquery_adapter.js"></script>
 <script type="text/javascript" src="../js/amq.js"></script>
 <script src="../js/amcharts/amcharts.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/serial.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/gantt.js"></script>
+<script src="../bower_components/amcharts/dist/amcharts/plugins/export/export.min.js"></script>
+<link rel="stylesheet" href="../bower_components/amcharts/dist/amcharts/plugins/export/export.css" type="text/css" media="all" />
 <script src="../js/amcharts/pie.js"></script>
 <script src="../js/amcharts/xy.js"></script>
 <script src="../js/amcharts/themes/light.js"></script>
 <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
 <script src="../js/bootstrap-notify.min.js"></script>
 <link rel="stylesheet" href="../css/animate.min.css">
+  <script type="text/javascript" src="../js/moment.min.js"></script>
+  
 
 
 
 <script type="text/javascript">
+
+  var i_realtime =1;
+  var message_act;
+  var message_ts;
+  var message_hr;
+  var fall_history = <%=fall_history_json%>;
+  var json_fall_history = JSON.parse(fall_history);
 
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
@@ -237,9 +269,12 @@
 	var sdistance = <%=sdistance%>;
   var sta_index = <%=sta_index%>;
   var sym_index = <%=sym_index%>;
-  var StepCount  = <%=StepCount%>;
-  var StrideCount = <%=StrideCount%>;
-  var Distance = <%=Distance%>;
+  var step_index = <%=step_index%>;
+  var stride_index = <%=stride_index%>;
+  var dist_index = <%=dist_index%>;
+  var step_frq_index = <%=step_frq_index%>;
+  var step_len_index = <%=step_len_index%>;
+  var spd_index = <%=spd_index%>;
   var stab_mean = <%=stab_mean%>;
   var stab_3mean = <%=stab_3mean%>;
   var sym_mean = <%=sym_mean%>;
@@ -461,7 +496,34 @@ var bottomTextSta;
 		document.getElementById("patient").innerHTML = "Patient Name : " + name;
 
 
-
+    var canvas = document.getElementById("canvas1");
+   var ctx = canvas.getContext("2d");
+   ctx.fillStyle = '#C0C0C0';
+   ctx.fillRect(0, 0, 80, 80);
+   var canvas = document.getElementById("canvas2");
+  var ctx = canvas.getContext("2d");
+  ctx.fillStyle = '#5bda47';
+  ctx.fillRect(0, 0, 80, 80);
+  var canvas = document.getElementById("canvas3");
+ var ctx = canvas.getContext("2d");
+ ctx.fillStyle = '#e448e7';
+ ctx.fillRect(0, 0, 80, 80);
+ var canvas = document.getElementById("canvas4");
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = '#e98529';
+ctx.fillRect(0, 0, 80, 80);
+var canvas = document.getElementById("canvas5");
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = '#003300';
+ctx.fillRect(0, 0, 80, 80);
+var canvas = document.getElementById("canvas6");
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = '#d4f145';
+ctx.fillRect(0, 0, 80, 80);
+var canvas = document.getElementById("canvas7");
+var ctx = canvas.getContext("2d");
+ctx.fillStyle = '#0983d2';
+ctx.fillRect(0, 0, 80, 80);
 
     updateChart_FallRisk();
 		updateChart_ActivityDetail();
@@ -505,6 +567,9 @@ var bottomTextSta;
 		   sdistance = sdistance + parseFloat(message.getAttribute('dist'));
        sta_index = parseFloat(message.getAttribute("stab"));
        sym_index = parseFloat(message.getAttribute("sym"));
+       message_act = parseInt(message.getAttribute("act_type"));
+ message_hr = parseInt(message.getAttribute("hr"));
+ message_ts = moment(parseInt(message.getAttribute("ts"))).format("YYYY-MM-DD HH:mm:ss");
        console.log("sta_index: " + sta_index);
  console.log("sym_index: " + sym_index);
 		   for (var i = 0; i < acttype.activity.length; i++) {
@@ -805,10 +870,12 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
 
 }
 function updateChart_FallRisk(){
-  document.getElementById("StepCount").innerHTML = StepCount;
-  document.getElementById("StrideCount").innerHTML = StrideCount;
-  var dist = Distance.toFixed(2);
-  document.getElementById("Distance").innerHTML = dist;
+  document.getElementById("StepCount").innerHTML=step_index;
+  document.getElementById("StrideCount").innerHTML=stride_index;
+  document.getElementById("Speed").innerHTML=spd_index.toFixed(2);
+  document.getElementById("StepLength").innerHTML=step_len_index.toFixed(2);
+  document.getElementById("StepAvg").innerHTML=step_frq_index;
+  document.getElementById("Distance").innerHTML = dist_index.toFixed(2);
 
 // console.log("StepCount: " + StepCount);
 // console.log("StrideCount: " + StrideCount);
@@ -928,11 +995,144 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 		out = out + second + " s";
 		return out;
 	}
+
+
+
+  	function Generator_Activity() {
+      var Data = [];
+  	var color_code = "";
+
+      for (var i = 0; i < json_fall_history.falling.length; i++) {
+
+  				if(parseInt(json_fall_history.falling[i].act) == 2){color_code = "#C0C0C0";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 1){color_code = "#e98529";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 3){color_code = "#d4f145";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 4){color_code = "#5bda47";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 5){color_code = "#003300";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 8){color_code = "#0983d2";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#e448e7";}
+
+
+  				//console.log("show data json act = " + json_fall_history.falling[i].act);
+  				//console.log("show data json start = " + json_fall_history.falling[i].start);
+  				//console.log("show data json hr = " + json_fall_history.falling[i].value);
+
+  				Data.push({
+  					lineColor: color_code,
+  					heartrate: json_fall_history.falling[i].value,
+  					date: json_fall_history.falling[i].start
+  				});
+
+
+
+      }
+      return Data;
+  	}
+
+    var chart_realtime = AmCharts.makeChart("chartdivactivity", {
+         "type": "serial",
+        "theme": "light",
+        "marginRight": 80,
+    	"dataProvider": Generator_Activity(),
+        "balloon": {
+            "cornerRadius": 6,
+            "horizontalPadding": 15,
+            "verticalPadding": 10
+        },
+      "valueAxes": [{
+            "id": "heartrateAxis",
+            "axisAlpha": 0,
+            "gridAlpha": 0,
+            "position": "left",
+            "title": "heartrate1"
+        }],
+        "graphs": [{
+            "bullet": "square",
+            "bulletBorderAlpha": 1,
+            "bulletBorderThickness": 1,
+            "fillAlphas": 0.3,
+            "fillColorsField": "lineColor",
+            "legendValueText": "[[value]]",
+            "lineColorField": "lineColor",
+            "valueField": "heartrate",
+    		"valueAxis": "heartrateAxis"
+        }],
+    	"chartScrollbar": {
+
+        },
+        "chartCursor": {
+            "categoryBalloonDateFormat": "JJ:NN:SS, DD MMMM YYYY",
+            "cursorPosition": "mouse"
+        },
+        "categoryField": "date",
+    	"dateFormat": "YYYY-MM-DD HH:NN:SS",
+        "categoryAxis": {
+            "minPeriod": "ss",
+            "parseDates": true
+        },
+        "export": {
+            "enabled": true
+        },
+    });
+
+
+    chart_realtime.addListener("dataUpdated", zoomChart_realtime);
+
+    function zoomChart_realtime() {
+        chart_realtime.zoomToIndexes(chart_realtime.endIndex-20,chart_realtime.endIndex);
+    }
+    setInterval( function() {
+      // normally you would load new datapoints here,
+      // but we will just generate some random values
+      // and remove the value from the beginning so that
+      // we get nice sliding graph feeling
+
+      // remove datapoint from the beginning
+      //chart_realtime.dataProvider.shift();
+
+      // add new one at the end
+      var color_text ="";
+    	if(message_act == 2){color_text = "#C0C0C0"}
+    			else if(message_act == 1){color_text = "#e98529";}
+    			else if(message_act == 3){color_text = "#d4f145";}
+    			else if(message_act == 4){color_text = "#5bda47";}
+    			else if(message_act == 5){color_text = "#003300";}
+    			else if(message_act == 8){color_text = "#0983d2";}
+    			else if(message_act == 6){color_text = "#e448e7";}
+
+    	//console.log(date_test);
+    	//console.log(heartrate_random);
+    	//console.log(color_text);
+
+    	console.log("show real time message_act = " + message_act);
+    	console.log("show real time message_hr = " + message_hr);
+    	console.log("show real time message_ts = " + message_ts);
+
+    	chart_realtime.dataProvider.push( {
+
+    	lineColor: color_text,
+    	date: message_ts,
+    	heartrate: message_hr
+
+    	} );
+    	chart_realtime.validateData();
+
+    	}, 3000 );
+
 </script>
 
 <style>
 
-
+.legend{
+  position: absolute; top:0;
+   margin-top: 5px;
+   margin-left: 100px;
+}
+#chartdivactivity {
+  width		: 100%;
+  height		: 500px;
+  font-size	: 11px;
+}
 .chart { width:100%; height:500px; }
 .icon { float:left; margin-right:10px; }
 
@@ -964,7 +1164,8 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 	<ul class="nav nav-tabs" style="margin-left:15px;margin-right:15px;">
     <li class="active"><a data-toggle="tab" href="#fall-risk-analysis"><font class="s17">Fall Risk Analysis</font></a></li>
     <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
-	</ul>
+    <li><a data-toggle="tab" href="#activity_realtime"><font class="s17">Realtime Activity</font></a></li>
+  </ul>
 
 
 
@@ -1010,7 +1211,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
               <div class="fs20" style="margin-top: 15px">
                 <img src="../images/icons/marker.png" width="30" height="30">
-                  <font id="velocity" style="color:#ea5f5c;">AVG velocity&nbsp;:&nbsp;2.2&nbsp;m/s</font>
+                  <font id="velocity" style="color:#ea5f5c;">AVG Speed&nbsp;:&nbsp;<font id ="Speed">2.2</font>&nbsp;m/s</font>
                 </div>
 
               </div>
@@ -1019,12 +1220,12 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
                 <div class="fs20">
                   <img src="../images/icons/walk.png" width="30" height="30">
-                    <font id="velocity" style="color:#2d904f;">AVG step frequency&nbsp;:&nbsp;2&nbsp;steps/s</font>
+                    <font id="velocity" style="color:#2d904f;">AVG step frequency&nbsp;:&nbsp;<font id = "StepAvg">2</font>&nbsp;steps/s</font>
                   </div>
 
                   <div class="fs20" style="margin-top: 15px">
                     <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;40&nbsp;CM.</font>
+                      <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
                     </div>
 
                     <div class="fs20" style="margin-top: 15px">
@@ -1132,10 +1333,65 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
             </div>
         </div>
 
+
+
+          <div id="activity_realtime" class="tab-pane fade">
+
+            <div class="row">
+          		<div class="col-md-12">
+
+          					 <div class="col-md-12 col-xs-12">
+          					    <div class="panel" style="margin-left:0px;margin-right:0px;">
+                                      <div id="chartdivactivity"></div>
+                                  </div>
+          					</div>
+          					<div class="col-md-12 col-xs-12">
+          					    <div class="panel" style="margin-left:0px;margin-right:0px;">
+          							<%-- <div> <img style="margin-left:100px;margin-top:25px;" src="../images/description1.png"></div> --%>
+          							<div class="row" style= "margin-left: 5px; margin-top: 10px; margin-right: 10px; ">
+
+          							  <div class="col-md-4 col-xs-6">
+
+          							    <canvas id="canvas1" width="100" height="30"></canvas>
+          							      <h5 class="text-primary legend" style="">Lying</h5>
+          							    <br> <br>
+          							    <canvas id="canvas2" width="100" height="30"></canvas>
+          							          <h5 class="text-primary legend" style="margin-top: 65px">Standing</h5>
+          							          <br> <br>
+          							          <canvas id="canvas3" width="100" height="30"></canvas>
+          							                <h5 class="text-primary legend" style="margin-top: 125px">Stair Climbing</h5>
+            											<br> <br>
+          							  </div>
+          							  <div class="col-md-4 col-xs-6">
+          							    <canvas id="canvas4" width="100" height="30"></canvas>
+          							      <h5 class="text-primary legend" style="">Sleeping</h5>
+          							      <br><br>
+          							      <canvas id="canvas5" width="100" height="30"></canvas>
+          							        <h5 class="text-primary legend" style="margin-top: 65px">Walking</h5>
+          											<br> <br>
+          							  </div>
+          							  <div class="col-md-4 col-xs-6">
+          							    <canvas id="canvas6" width="100" height="30"></canvas>
+          							      <h5 class="text-primary legend" style="">Sitting</h5>
+          							      <br><br>
+          							      <canvas id="canvas7" width="100" height="30"></canvas>
+          							        <h5 class="text-primary legend" style="margin-top: 65px">Running</h5>
+          											<br> <br>
+
+          							  </div>
+          							</div>
+
+                                  </div>
+          					</div>
+                  </div>
+          	</div>
+
+
+          </div>
+
     </div>
 </div>
 <!-- JS Main File -->
-<script src="../js/jquery.min.js"></script>
 <script src="../js/bootstrap.min.js"></script>
 </body>
 </html>
