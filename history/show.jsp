@@ -12,6 +12,9 @@
 	String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
 	String sssn = (String)session.getAttribute("SSSN");
+	
+	String start_fall = (String)session.getAttribute("tstamp");
+
 
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
@@ -46,10 +49,15 @@
 
 	String hr = "\'{\"allhr\": [";
 	String rollalerts = "\'{\"allrollalerts\": [";
+	String fall_history_json = "\'{\"falling\": [";
 
     int minhr = 0;
     int maxhr = 0;
 
+	
+	String test_lat = "";
+	String test_lon = "";
+	
 	dbm.createConnection();
 
     try {
@@ -188,11 +196,49 @@
 		}
 		rollalerts = rollalerts + "]}\'";
 
+		
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
+	try {
+		start_fall = "2017-06-01 18:00:00";
+		String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+start_fall+"' , '0:30:00') AND ADDTIME('"+start_fall+"' , '0:30:00')";
+		ResultSet rs = dbm.executeQuery(sql);
+		if((rs!=null) && (rs.next())){
+			fall_history_json = fall_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\"}";
+		}
+		while((rs!=null) && (rs.next())){
+			fall_history_json = fall_history_json + ", {\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\" }";
+		}
+		fall_history_json = fall_history_json + "]}\'";
 
+		} catch (Exception e) {
+			out.println(e.getMessage());
+			e.printStackTrace();
+		}
+		//out.println(fall_history_json);
+
+		
+	try {
+		start_fall = "2012-01-02 09:19:52";
+
+		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+start_fall+"','%Y-%m-%d %H:%i:%s')";
+		ResultSet rs = dbm.executeQuery(sql);
+		
+		while((rs!=null) && (rs.next())){
+			test_lat = String.valueOf(rs.getDouble("lat"));
+			test_lon = String.valueOf(rs.getDouble("lon"));
+		}
+
+
+		} catch (Exception e) {
+			out.println(e.getMessage());
+			e.printStackTrace();
+		}	
+		
+		//out.println(test_lat + test_lon);
+		
 	dbm.closeConnection();
 
     date = "\""+date+"\"";
@@ -276,11 +322,13 @@
 	var jsonhr = JSON.parse(hr);
 	var rollalerts = <%=rollalerts%>;
 	var	jsonrollalerts = JSON.parse(rollalerts);
-	console.log(jsonrollalerts);
+	var fall_history = <%=fall_history_json%>;
+	var json_fall_history = JSON.parse(fall_history);
+	console.log(json_fall_history);
 
 	//varible google map
-	var lat = 13.664336;
-	var lng = 100.387573;
+	var lat = 13.664336;//<%=test_lat%>
+	var lng = 100.387573;//<%=test_lon%>
 
 
 	// Donut chart
@@ -541,91 +589,80 @@
 		chartRoll.validateData();
     }
 
-
-	function generateChartData() {
-	var chartData = [];
-	//var i=0;
-	for(i=0;i<20;i++){
-	//var date_test = moment().format('YYYY-MM-D k:mm:ss');
-	var date_test = moment().add(-i, 's').format('YYYY-MM-D k:mm:ss');
+    function Generator_Activity() {
+    var Data = [];
+	var color_code = "";
 	var heartrate_random = Math.floor((Math.random() *100)+1);
-	var color_text = "";
-
-	if (heartrate_random > 60){
-		color_text = "#b7e021";
+    for (var i = 0; i < json_fall_history.falling.length; i++) {
+				if(parseInt(json_fall_history.falling[i].act) == 2){color_code = "#FF0000";}
+				else if(parseInt(json_fall_history.falling[i].act) == 1){color_code = "#FF00BF";}
+				else if(parseInt(json_fall_history.falling[i].act) == 3){color_code = "#FFFF00";}
+				else if(parseInt(json_fall_history.falling[i].act) == 4){color_code = "#00FF00";}
+				else if(parseInt(json_fall_history.falling[i].act) == 5){color_code = "#0000FF";}
+				else if(parseInt(json_fall_history.falling[i].act) == 8){color_code = "#0000FF";}
+				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#FF00FF";}
+ 				Data.push({
+					lineColor: color_code,
+					heartrate: json_fall_history.falling[i].value,
+					date: json_fall_history.falling[i].start
+				});
+    }
+    return Data;
 	}
-	else if (heartrate_random >20){
-		color_text = "#FF0000";
-	}
-	else {
-		color_text = "#FF00FF";
-	}
 
-	console.log("show data" + date_test);
-	console.log("show data" + heartrate_random);
-	console.log("show data" + color_text);
 
-    chartData.push( {
-      "lineColor": color_text,
-      "date": date_test,
-	  "heartrate": heartrate_random
-    } );
-  }
-
-  return chartData;
-}
 
 var chart_realtime = AmCharts.makeChart("chartdivactivity", {
      "type": "serial",
     "theme": "light",
     "marginRight": 80,
-	"dataProvider": generateChartData()
+	"dataProvider": Generator_Activity()
     /*"dataProvider": [{
            "lineColor": "#b7e021",
-        "date": "2012-01-01 10:50:29",
+        "date": "2017-06-02 14:50:29",
         "heartrate": 408
     },{
 			"lineColor": "#b7e021",
-        "date": "2012-01-01 10:50:30",
+      "date": "2017-06-02 14:50:30",
         "heartrate": 208
     }, {
         "lineColor": "#FFFF00",
-        "date": "2012-01-01 10:50:31",
+      "date": "2017-06-02 14:50:31",
          "heartrate": 482
     }, {
         "lineColor": "#FFFF00",
-        "date": "2012-01-01 10:50:32",
+      "date": "2017-06-02 14:50:32",
          "heartrate": 562
     }, {
         "lineColor": "#FFFF00",
-        "date": "2012-01-01 10:50:33",
+      "date": "2017-06-02 14:50:33",
          "heartrate": 379
     }, {
 		        "lineColor": "#FFFF00",
-        "date": "2012-01-01 10:50:34",
+      "date": "2017-06-02 14:50:34",
          "heartrate": 640
     }, {
 		"lineColor": "#2498d2",
-        "date": "2012-01-01 10:50:35",
+      "date": "2017-06-02 14:50:35",
          "heartrate": 379
     }, {
-        "date": "2012-01-01 10:50:36",
-         "heartrate": 640
+      "date": "2017-06-02 14:50:36",
+	  "heartrate": 640
     },{
 		"lineColor": "#FF0000",
-        "date": "2012-01-01 10:50:37",
+      "date": "2017-06-02 14:50:37",
          "heartrate": 379
     }, {
-        "date": "2012-01-01 10:50:38",
+      "date": "2017-06-02 14:50:38",
          "heartrate": 640
     }, {
-        "date": "2012-01-01 10:50:39",
+      "date": "2017-06-02 14:50:39",
          "heartrate": 140
     }, {
-        "date": "2012-01-01 10:50:40",
+      "date": "2017-06-02 14:50:40",
          "heartrate": 240
-    }]*/
-
+    }]
+*/
 	,
     "balloon": {
         "cornerRadius": 6,
@@ -665,12 +702,15 @@ var chart_realtime = AmCharts.makeChart("chartdivactivity", {
     },
     "export": {
         "enabled": true
-
-    }
+    },
 });
 
 
+chart_realtime.addListener("dataUpdated", zoomChart_realtime);
 
+function zoomChart_realtime() {
+    chart_realtime.zoomToIndexes(chart_realtime.endIndex-20,chart_realtime.endIndex);
+}
 
 
     function ChartDataRoll() {
@@ -901,7 +941,7 @@ var chart_realtime = AmCharts.makeChart("chartdivactivity", {
         });
       }
 
-
+		var i_realtime =1;
 	setInterval( function() {
   // normally you would load new datapoints here,
   // but we will just generate some random values
@@ -909,15 +949,15 @@ var chart_realtime = AmCharts.makeChart("chartdivactivity", {
   // we get nice sliding graph feeling
 
   // remove datapoint from the beginning
-  chart_realtime.dataProvider.shift();
+  //chart_realtime.dataProvider.shift();
 
   // add new one at the end
-  /*
-        "lineColor": "#b7e021",
-        "date": "2012-01-01 10:50:30",
-        "heartrate": 408
-  */
-	var date_test = moment().format('YYYY-MM-D k:mm:ss');
+
+	var stringdate = "2017-06-01 18:30:00";
+	var momentdate = moment(stringdate);
+	
+	console.log("show i =" + i_realtime);
+	var date_test = moment(momentdate).add(3*i_realtime,'s').format('YYYY-MM-D k:mm:ss');
 	var heartrate_random = Math.floor((Math.random() *100)+1);
 	var color_text = "";
 	if (heartrate_random > 60){
@@ -930,12 +970,9 @@ var chart_realtime = AmCharts.makeChart("chartdivactivity", {
 		color_text = "#FF00FF";
 	}
 
-
 	console.log(date_test);
 	console.log(heartrate_random);
 	console.log(color_text);
-
-
 
 	chart_realtime.dataProvider.push( {
 
@@ -945,11 +982,14 @@ var chart_realtime = AmCharts.makeChart("chartdivactivity", {
 
 	} );
 	chart_realtime.validateData();
+	
+	i_realtime++;
 	}, 3000 );
 
 
 	$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=false", function(result){
             $("#location").text(result.results[0].formatted_address);
+			console.log("print location = "  + result.results[0].formatted_address);
     });
 
 

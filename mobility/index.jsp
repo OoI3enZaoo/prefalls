@@ -48,11 +48,11 @@
 	</script>
 
 	<script>
-		function getLocation(count,lat ,lon){
-			$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lon+"&sensor=false", function(result){
-				$("#div"+count).text(result.results[0].formatted_address);
-			});
-		}
+		// function getLocation(count,lat ,lon){
+		// 	$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lon+"&sensor=false", function(result){
+		// 		$("#div"+count).text(result.results[0].formatted_address);
+		// 	});
+		// }
 		function startNewTab(value,tstamp){
 
 
@@ -92,7 +92,7 @@
   	<thead>
   		<tr class="success">
   		    <th>Date</th>
-  		    <th>Location</th>
+  		    <%-- <th>Location</th> --%>
             <th>Notification Type</th>
             <th>Detail</th>
   		</tr>
@@ -116,14 +116,7 @@
 
            <tr style="cursor: pointer;">
                 <td id=<%=count%>><%= rs.getString("date")%></td>
-                <td ><div id="div<%=count%>">
-				<% if (lat == 0 || lon == 0){ %>
-					N/A
-				<%}
-				else if (lat <= 90 && lon <= 180){ %>
-					<script>getLocation(<%=count%>,<%=lat%>,<%=lon%>);</script>
-				<%}%>
-				</div></td>
+
 
 				<td><%=rs.getString("alert_name")%></td>
 				<td>

@@ -60,6 +60,13 @@
   Calendar c = Calendar.getInstance();
 	SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	String currentDate = df.format(c.getTime());
+
+  SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+	String currentDate2 = df2.format(c.getTime());
+
+
+
+
   String fall_history_json = "\'{\"falling\": [";
 
 
@@ -159,8 +166,7 @@
 
 
     try {
-  		String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride)  as StrideCount ,AVG(step_frq) as step_frq ,AVG(step_len) as step_len ,AVG(spd) as spd FROM archive_" + sssn ;
-
+  		String sql = "SELECT SUM(step) as StepCount ,SUM(dist) as Distance ,SUM(stride)  as StrideCount ,AVG(step_frq) as step_frq ,AVG(step_len) as step_len ,AVG(spd) as spd FROM archive_" + sssn +" where tstamp like '" + currentDate2 + "%'";
   		ResultSet rs = dbm.executeQuery(sql);
 
   		if (rs.next()){
@@ -202,7 +208,7 @@
           }
           try {
 
-            String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+currentDate+"' , '1:00:00') AND '"+currentDate+"' ";
+            String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+currentDate+"' , '1:00:00') AND '"+currentDate+"' order by tstamp";
             ResultSet rs = dbm.executeQuery(sql);
             if((rs!=null) && (rs.next())){
               fall_history_json = fall_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\"}";
@@ -243,7 +249,7 @@
 <script src="../js/bootstrap-notify.min.js"></script>
 <link rel="stylesheet" href="../css/animate.min.css">
   <script type="text/javascript" src="../js/moment.min.js"></script>
-  
+
 
 
 
@@ -570,6 +576,14 @@ ctx.fillRect(0, 0, 80, 80);
        message_act = parseInt(message.getAttribute("act_type"));
  message_hr = parseInt(message.getAttribute("hr"));
  message_ts = moment(parseInt(message.getAttribute("ts"))).format("YYYY-MM-DD HH:mm:ss");
+
+ step_index += parseInt(message.getAttribute("step"))
+stride_index  += parseInt(message.getAttribute("stride"))
+spd_index = parseFloat(message.getAttribute("spd"))
+step_frq_index = parseFloat(message.getAttribute("step_frq"))
+step_len_index = parseFloat(message.getAttribute("step_len"))
+dist_index += parseFloat(message.getAttribute("dist"))
+
        console.log("sta_index: " + sta_index);
  console.log("sym_index: " + sym_index);
 		   for (var i = 0; i < acttype.activity.length; i++) {
@@ -737,7 +751,7 @@ function checkAlert(type) {
               $.notify({
                 // options
                 icon: "glyphicon glyphicon-bell",
-                message: '<strong>Warning</strong> Stability !'
+                message: '<strong>Warning</strong> Stability index warning !'
               },{
                 // settings
                 type: 'warning'
@@ -765,7 +779,7 @@ function checkAlert(type) {
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
-              message: '<strong>Danger</strong> Stability !'
+              message: '<strong>Danger</strong> Stability index danger !'
             },{
               // settings
               type: 'danger'
@@ -804,7 +818,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
-              message: '<strong>Warning</strong> Symmetry !'
+              message: '<strong>Warning</strong>  Stability index warning !'
             },{
               // settings
               type: 'warning'
@@ -832,7 +846,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
           $.notify({
             // options
             icon: "glyphicon glyphicon-bell",
-            message: '<strong>Danger</strong> Symmetry !'
+            message: '<strong>Danger</strong> Stability index danger !'
           },{
             // settings
             type: 'danger'
@@ -1225,7 +1239,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
                   <div class="fs20" style="margin-top: 15px">
                     <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font id="velocity" style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
+                      <font id="velocity" style="color:#f57a3e;">Estimated step lengh&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
                     </div>
 
                     <div class="fs20" style="margin-top: 15px">

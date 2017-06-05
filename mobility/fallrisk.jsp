@@ -166,7 +166,7 @@ if(request.getParameter("stab_3mean") != null){
 
                   <div class="fs20" style="margin-top: 15px">
                     <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font style="color:#f57a3e;">AVG step length&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
+                      <font style="color:#f57a3e;">Estimated step lengh&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
                     </div>
 
                     <div class="fs20" style="margin-top: 15px">
@@ -226,7 +226,6 @@ if(request.getParameter("stab_3mean") != null){
           },{
           	type: 'danger'
           });
-          window.location = "./";
         }else{
           $.notify({
           	title: '<strong>Successful</strong>',

@@ -20,11 +20,13 @@
 <script type="text/javascript" src="../js/amq.js"></script>
 <script src="../js/bootstrap-notify.min.js"></script>
 <link rel="stylesheet" href="../css/animate.min.css">
+	<script type="text/javascript" src="../js/moment.min.js"></script>
+
 <script type="text/javascript">
+var tstamp2 = "";
 	var sismobile = 0;
 	var type = 0;
 	var mobilityIdx = 0;
-
     var amq = org.activemq.Amq;
     amq.init({
      uri: '../amq',
@@ -145,6 +147,7 @@
 
 	%>
         <script>
+				var <%=sssn%>_isFall = false;
             function id<%=sssn%>(){
                 $('#<%=sssn%>').click();
             }
@@ -198,12 +201,12 @@
 														</div>
 											</div>
 
-											<div class = "col-md-4">
-
-														<span  id = "icon3_<%=sssn%>"></span>
-
+											<div class = "col-md-2">
+														<span id = "icon3_<%=sssn%>"></span>
 											</div>
-
+											<div clsas = "col-md-2">
+												<span id = "icon4_<%=sssn%>" </span>
+											</div>
 				</div>
 
 
@@ -227,6 +230,8 @@
 
 
 		        	ismobile = message.getAttribute('ismobile');
+							tstamp2 = moment(parseInt(message.getAttribute("ts"))).format("YYYY-MM-DD HH:mm:ss");
+
 				   	console.log("ismobile var = "+ismobile);
 				   	if(ismobile == true){
 				   		sismobile=sismobile+3;
@@ -266,15 +271,37 @@
 							document.getElementById("icon2_<%=sssn%>").innerHTML='';
 						}, 2000);
 				   	}
+
+
+						if(type == 7){
+						var countIcon4 = 0;
+						var interval4;
+						if(<%=sssn%>_isFall == false){
+							 interval4 = setInterval(function(){
+								if(countIcon4 == 0){
+									document.getElementById("icon4_<%=sssn%>").innerHTML = '	<img src="../images/icons/alert/fall.png" width="50" height="50"><i>- fall!</i>';
+									countIcon4 = 1;
+								}else{
+									document.getElementById("icon4_<%=sssn%>").innerHTML = '';
+									countIcon4 = 0;
+								}
+								<%=sssn%>_isFall = true;
+							},2000);
+							checkAlert(type,message.getAttribute('pid'));
+						}
+
+						}
 						if(type == 3 || type == 4 || type == 8 || type == 9){
-							document.getElementById("icon3_<%=sssn%>").innerHTML = '<img src="../images/icons/alert/warning_a.png" width="50" height="50"> <i>- risk!</i>';
+							console.log("isfall2: " + <%=sssn%>_isFall);
+							if(<%=sssn%>_isFall == false){
+							document.getElementById("icon3_<%=sssn%>").innerHTML = '<img src="../images/icons/alert/warning_a.png" width="50" height="50"> <i>- fall risk!</i>';
 							setTimeout(function(){
 									document.getElementById("icon3_<%=sssn%>").innerHTML = '';
 
 							},2000);
 
 								  checkAlert(type,message.getAttribute('pid'));
-
+									}
 						}
 		        },
 		        myId: 'userID<%=sssn%>_alert',
@@ -308,6 +335,7 @@
 
 var countsta = 0;
 var countsym = 0;
+var countfall = 0;
 function checkAlert(type,uid){
 
 console.log("checkAlert: " + type + " uid: " + uid);
@@ -328,16 +356,39 @@ console.log('<%= fname_alert %>');
 
 		}
 	}
+
+	if(type == 7){
+		countfall++;
+		if(countfall == 1){
+			countfall = 0;
+			alert(3,2,uid);
+
+		}
+	}
+
 }
 function alert(type , level,uid){
 console.log("alert: " + type + " level: " +level + " uid: " + uid);
 var mlevel;
 var mMessage;
 if(type == 1){
-mMessage = "Stability";
+	if(level == 1){
+			mMessage = "Stability index warning";
+	}else{
+		mMessage = "Stability index danger";
+	}
+
+}
+else if(type == 3){
+	mMessage = "Fall is detected";
 }
 else{
-mMessage = "Symmetry";
+	if(level == 1){
+	mMessage = "Symmetry index warning";
+	}else{
+	mMessage = "Symmetry index danger";
+}
+
 }
 if(level == 1){
 
@@ -346,13 +397,22 @@ if(level == 1){
 
 	mlevel = "danger";
 }
+
 $.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getInfoAlert.jsp?sssn="+uid+"",function(result){
 	var ftitle = "<span style = 'margin-left: 10px; font-weight: bold; margin-bottom: 5px; font-size: 15px; display:block;'>";
 	var mtitle = result[0].firstname + " " + result[0].lastname;
 	var ltitle = "</span>";
 	var resTitle = ftitle + mtitle + ltitle;
-	var res_url = "../activity/?SSSN="+uid;
+	var res_url;
+	console.log("typena : " + type);
+	if(type == 3){
+		res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+tstamp2;
+	}else{
+		res_url = "../activity/?SSSN="+uid;
+	}
+	console.log("res_url: " + res_url);
 	var resicon = "../images/patients/" + result[0].imgPath;
+
 	$.notify({
 	icon: resicon,
 	title: resTitle,
@@ -362,12 +422,16 @@ $.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getInfoAlert.jsp?sssn="+ui
 	allow_dismiss: true
 	},{
 	type: mlevel,
-	delay: 5000,
+	delay: 10000,
 	icon_type: 'image',
 	template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+		'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
 		'<img  data-notify="icon" class="img-circle pull-left" width= "55px" height = "55px"> ' +
 		'<span data-notify="title">{1}</span>' +
 		'<span data-notify="message">{2}</span>' +
+		'<div class="progress" data-notify="progressbar">' +
+			'<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+		'</div>' +
 		'<a href="{3}" target="{4}" data-notify="url"></a>' +
 	'</div>'
 	});

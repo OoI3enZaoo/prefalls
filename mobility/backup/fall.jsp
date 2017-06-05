@@ -22,8 +22,8 @@ String fall_history_json = "\'{\"falling\": [";
 String test_lat = "";
 String test_lon = "";
 
-String impact_force ="";
-
+String impact_force ="";	
+	
 	try {
 
 		String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+tstamp+"' , '0:30:00') AND ADDTIME('"+tstamp+"' , '0:30:00') ORDER BY tstamp";
@@ -43,15 +43,13 @@ String impact_force ="";
 		//out.println(tstamp);
 		//out.println(fall_history_json);
 
-
+		
 	try {
 
 
 		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+tstamp+"','%Y-%m-%d %H:%i:%s')";
-    String new_tstamp = tstamp.substring(0,15);
-    //String sql = "SELECT tstamp , lat , lon FROM archive_RFG2D3T6ET WHERE tstamp like  '2017-06-05 15:37:%' ORDER BY tstamp desc limit 1";
-    console.log("new_tstamp: " + new_tstamp);
 		ResultSet rs = dbm.executeQuery(sql);
+		
 		while((rs!=null) && (rs.next())){
 			test_lat = String.valueOf(rs.getDouble("lat"));
 			test_lon = String.valueOf(rs.getDouble("lon"));
@@ -61,11 +59,11 @@ String impact_force ="";
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}
-
+		}	
+		
 	//out.println(test_lat +"m"+ test_lon);
-
-
+	
+	
 	try {
 
 		String sql = "SELECT pace FROM archive_"+sssn+" WHERE tstamp ='"+tstamp+"'";
@@ -122,10 +120,10 @@ String impact_force ="";
     for (i = 0; i < json_fall_history.falling.length; i++) {
 		var now_time = moment('<%=tstamp%>').format('YYYY-MM-D hh:mm:ss');
 		var json_time = json_fall_history.falling[i].start;
-
+		
 		var d1 = new Date (now_time);
 		var d2 = new Date (json_time);
-
+				
 				if(parseInt(json_fall_history.falling[i].act) == 2){color_code = "#C0C0C0";}
 				else if(parseInt(json_fall_history.falling[i].act) == 1){color_code = "#e98529";}
 				else if(parseInt(json_fall_history.falling[i].act) == 3){color_code = "#d4f145";}
@@ -133,7 +131,7 @@ String impact_force ="";
 				else if(parseInt(json_fall_history.falling[i].act) == 5){color_code = "#003300";}
 				else if(parseInt(json_fall_history.falling[i].act) == 8){color_code = "#0983d2";}
 				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#e448e7";}
-
+				
 				if(d1.getTime() === d2.getTime()){
 					Data.push({
 					lineColor: "#FF0000",
@@ -267,7 +265,7 @@ function zoomChart_realtime() {
 
 	var stringdate = "2017-06-01 18:30:00";
 	var momentdate = moment(stringdate);
-
+	
 	console.log("show i =" + i_realtime);
 	var date_test = moment(momentdate).add(3*i_realtime,'s').format('YYYY-MM-D k:mm:ss');
 	var heartrate_random = Math.floor((Math.random() *100)+1);
@@ -294,7 +292,7 @@ function zoomChart_realtime() {
 
 	} );
 	chart_realtime.validateData();
-
+	
 	i_realtime++;
 	}, 3000 );
 */
@@ -306,7 +304,7 @@ function zoomChart_realtime() {
           zoom: 16,
           center: myLatLng,
 		  draggable: false
-
+		  
         });
 
         var marker = new google.maps.Marker({
@@ -315,7 +313,7 @@ function zoomChart_realtime() {
           title: 'Hello World!'
         });
     }
-
+	  
 	function getLocation (lat , lng){
 		if(lat == 0 || lng == 0){
 			$("#location").text("N/A");
@@ -325,12 +323,12 @@ function zoomChart_realtime() {
 			console.log("print location = "  + result.results[0].formatted_address);
 			});
 		}
-
+		
 	}
 
 
 
-
+	
 	$(function(){
       document.getElementById("patient").innerHTML = "Patient Name : " + name;
 
@@ -369,7 +367,7 @@ ctx.fillRect(0, 0, 80, 80);
 });
 
  </script>
-
+ 
      <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
     </script>
@@ -484,7 +482,7 @@ ctx.fillRect(0, 0, 80, 80);
                   <br> <br>
 				<canvas id="canvas8" width="100" height="30"></canvas>
                   <h5 class="text-primary legend" style="margin-top: 120px">Start of time</h5>
-                  <br> <br>
+                  <br> <br>  
             </div>
             <div class="col-md-4 col-xs-6">
               <canvas id="canvas6" width="100" height="30"></canvas>
@@ -502,3 +500,4 @@ ctx.fillRect(0, 0, 80, 80);
             </div>
           </div>
         </div>
+
