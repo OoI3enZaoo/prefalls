@@ -48,10 +48,8 @@ String impact_force ="";
 
 
 		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+tstamp+"','%Y-%m-%d %H:%i:%s')";
-    String new_tstamp = tstamp.substring(0,15);
-    //String sql = "SELECT tstamp , lat , lon FROM archive_RFG2D3T6ET WHERE tstamp like  '2017-06-05 15:37:%' ORDER BY tstamp desc limit 1";
-    console.log("new_tstamp: " + new_tstamp);
 		ResultSet rs = dbm.executeQuery(sql);
+
 		while((rs!=null) && (rs.next())){
 			test_lat = String.valueOf(rs.getDouble("lat"));
 			test_lon = String.valueOf(rs.getDouble("lon"));
@@ -86,7 +84,7 @@ String impact_force ="";
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -95,7 +93,7 @@ String impact_force ="";
 <link rel="stylesheet" type="text/css" href="../css/bootstrap.min.css"/>
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
 <!-- JS amCharts File -->
-<script type="text/javascript" src="../js/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
 <script src="../bower_components/amcharts/dist/amcharts/amcharts.js"></script>
 <script src="../bower_components/amcharts/dist/amcharts/serial.js"></script>
 <script src="../bower_components/amcharts/dist/amcharts/gantt.js"></script>
@@ -105,6 +103,8 @@ String impact_force ="";
 <script src="../bower_components/amcharts/dist/amcharts/pie.js"></script>
 <script src="../bower_components/amcharts/dist/amcharts/xy.js"></script>
 <script type="text/javascript" src="../js/moment.min.js"></script>
+<script src="../js/bootstrap-notify.min.js"></script>
+<link rel="stylesheet" href="../css/animate.min.css">
 
 
 
@@ -120,21 +120,24 @@ String impact_force ="";
 	var color_code = "";
 	var heartrate_random = Math.floor((Math.random() *100)+1);
     for (i = 0; i < json_fall_history.falling.length; i++) {
-		var now_time = moment('<%=tstamp%>').format('YYYY-MM-D hh:mm:ss');
+		var now_time = moment('<%=tstamp%>').format('YYYY-MM-D kk:mm:ss');
 		var json_time = json_fall_history.falling[i].start;
 
 		var d1 = new Date (now_time);
 		var d2 = new Date (json_time);
-
+					console.log("d1 =" + now_time);
+					console.log("d2 =" + json_time);
 				if(parseInt(json_fall_history.falling[i].act) == 2){color_code = "#C0C0C0";}
 				else if(parseInt(json_fall_history.falling[i].act) == 1){color_code = "#e98529";}
 				else if(parseInt(json_fall_history.falling[i].act) == 3){color_code = "#d4f145";}
 				else if(parseInt(json_fall_history.falling[i].act) == 4){color_code = "#5bda47";}
 				else if(parseInt(json_fall_history.falling[i].act) == 5){color_code = "#003300";}
-				else if(parseInt(json_fall_history.falling[i].act) == 8){color_code = "#0983d2";}
+				else if(parseInt(json_fall_history.falling[i].act) == 8 || parseInt(json_fall_history.falling[i].act) == 7){color_code = "#0983d2";}
 				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#e448e7";}
 
 				if(d1.getTime() === d2.getTime()){
+
+					console.log("red start ");
 					Data.push({
 					lineColor: "#FF0000",
 					heartrate: json_fall_history.falling[i].value,
@@ -332,6 +335,12 @@ function zoomChart_realtime() {
 
 
 	$(function(){
+    $.notify({
+      title: '<strong>Successful</strong>',
+      message: ''
+    },{
+      type: 'success'
+    });
       document.getElementById("patient").innerHTML = "Patient Name : " + name;
 
 		var canvas = document.getElementById("canvas1");
@@ -483,7 +492,7 @@ ctx.fillRect(0, 0, 80, 80);
                   <h5 class="text-primary legend" style="margin-top: 65px">Walking</h5>
                   <br> <br>
 				<canvas id="canvas8" width="100" height="30"></canvas>
-                  <h5 class="text-primary legend" style="margin-top: 120px">Start of time</h5>
+                  <h5 class="text-primary legend" style="margin-top: 120px">Fall time</h5>
                   <br> <br>
             </div>
             <div class="col-md-4 col-xs-6">

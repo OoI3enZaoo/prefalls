@@ -13,35 +13,35 @@
 	String ssuid = (String)session.getAttribute("ssuid");
 	String editpic = "";
    String editpro = "";
-	
+
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-	
+
 	if(sstypeid.equals("1")||sstypeid.equals("2")){
-		
+
 		dbm.createConnection();
-		
+
 		try {
 
 			String sql = "select * from supervise,caregiver where caregiver.type_id = '"+sstypeid+"' and caregiver.UID = supervise.UID";
 			ResultSet rs = dbm.executeQuery(sql);
-			 
-			if(rs.next()){				
+
+			if(rs.next()){
 				rs.first();
 				editpic = editpic + "<span class='glyphicon glyphicon-edit'>Edit</span>";
             editpro = editpro + "<a href='edit.jsp'><button type='button' class='btn btn-warning glyphicon glyphicon-edit' onClick=edit.jsp>Edit</button></a>";
 			}
-			
+
 		}	catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		dbm.closeConnection();
 
    }
-	
+
 		String fn = "";
 		String ln = "";
 		String bd = "";
@@ -66,15 +66,15 @@
       String cr3 = "";
 		String im = "";
       String sn = "";
-	
+
 		dbm.createConnection();
-		
+
 		try {
-			
+
 			String sql = "select * from patients where SSSN = '" + session.getAttribute("SSSN") + "';" ;
 			ResultSet rs = dbm.executeQuery(sql);
-			 
-			if(rs.next()){				
+
+			if(rs.next()){
 				rs.first();
 				fn = rs.getString("firstname");
 				ln = rs.getString("lastname");
@@ -101,17 +101,17 @@
 				im = rs.getString("imgPath");
             sn = rs.getString("SSSN");
 			}
-			
+
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-	
+
 %>
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Shortcut Icon" href="../images/icon.png"/>
@@ -119,9 +119,9 @@
 <link rel="stylesheet" type="text/css" href="../css/style.css"/>
 </head>
 <body>
-    
+
 <%@include file="../include/nav.jsp"%>
-    
+
 <div class="container">
    <div class="col-xs-12 col-sm-6 col-md-3">
       <div class="lpic">

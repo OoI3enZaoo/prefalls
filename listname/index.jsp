@@ -8,7 +8,7 @@
 %>
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -279,7 +279,7 @@ var tstamp2 = "";
 						if(<%=sssn%>_isFall == false){
 							 interval4 = setInterval(function(){
 								if(countIcon4 == 0){
-									document.getElementById("icon4_<%=sssn%>").innerHTML = '	<img src="../images/icons/alert/fall.png" width="50" height="50"><i>- fall!</i>';
+									document.getElementById("icon4_<%=sssn%>").innerHTML = '<img src="../images/icons/alert/fall.png" width="50" height="50"><i>- fall!</i>';
 									countIcon4 = 1;
 								}else{
 									document.getElementById("icon4_<%=sssn%>").innerHTML = '';
@@ -406,7 +406,9 @@ $.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getInfoAlert.jsp?sssn="+ui
 	var res_url;
 	console.log("typena : " + type);
 	if(type == 3){
-		res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+tstamp2;
+		//res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+tstamp2;
+		res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/";
+
 	}else{
 		res_url = "../activity/?SSSN="+uid;
 	}

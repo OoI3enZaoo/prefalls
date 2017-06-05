@@ -12,7 +12,7 @@
 	String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
 	String sssn = (String)session.getAttribute("SSSN");
-	
+
 	String start_fall = (String)session.getAttribute("tstamp");
 
 
@@ -54,10 +54,10 @@
     int minhr = 0;
     int maxhr = 0;
 
-	
+
 	String test_lat = "";
 	String test_lon = "";
-	
+
 	dbm.createConnection();
 
     try {
@@ -196,7 +196,7 @@
 		}
 		rollalerts = rollalerts + "]}\'";
 
-		
+
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
@@ -219,13 +219,13 @@
 		}
 		//out.println(fall_history_json);
 
-		
+
 	try {
 		start_fall = "2012-01-02 09:19:52";
 
 		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+start_fall+"','%Y-%m-%d %H:%i:%s')";
 		ResultSet rs = dbm.executeQuery(sql);
-		
+
 		while((rs!=null) && (rs.next())){
 			test_lat = String.valueOf(rs.getDouble("lat"));
 			test_lon = String.valueOf(rs.getDouble("lon"));
@@ -235,10 +235,10 @@
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
-		}	
-		
+		}
+
 		//out.println(test_lat + test_lon);
-		
+
 	dbm.closeConnection();
 
     date = "\""+date+"\"";
@@ -247,7 +247,7 @@
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -955,7 +955,7 @@ function zoomChart_realtime() {
 
 	var stringdate = "2017-06-01 18:30:00";
 	var momentdate = moment(stringdate);
-	
+
 	console.log("show i =" + i_realtime);
 	var date_test = moment(momentdate).add(3*i_realtime,'s').format('YYYY-MM-D k:mm:ss');
 	var heartrate_random = Math.floor((Math.random() *100)+1);
@@ -982,7 +982,7 @@ function zoomChart_realtime() {
 
 	} );
 	chart_realtime.validateData();
-	
+
 	i_realtime++;
 	}, 3000 );
 
@@ -1105,8 +1105,8 @@ ctx.fillRect(0, 0, 80, 80);
 	<div class="row">
 		<div class="col-md-12">
             <ul class="nav nav-tabs" style="margin-left:10px;margin-right:10px;">
-				<li class="active"><a href="#tab0default" data-toggle="tab">Fall History</a></li>
-                <li><a href="#tab1default" data-toggle="tab">Summary</a></li>
+				<!--<li class="active"><a href="#tab0default" data-toggle="tab">Fall History</a></li>-->
+                <li class="active"><a href="#tab1default" data-toggle="tab">Summary</a></li>
                 <li><a href="#tab2default" data-toggle="tab">Calories</a></li>
                 <li><a href="#tab3default" data-toggle="tab">Heart rate</a></li>
 <!--                <li><a href="#tab4default" data-toggle="tab">อัตราความเร็วที่ใช้ในการเคลื่อนไหว</a></li>-->
@@ -1114,86 +1114,8 @@ ctx.fillRect(0, 0, 80, 80);
 				<li><a href="#tab6default" data-toggle="tab">Immobility Summary</a></li>
             </ul>
             <div class="tab-content">
-				<div id="tab0default" class="tab-pane fade in active">
-                    <div class="col-md-6 col-xs-12">
-                        <div class="panel" style="margin-left:5px;margin-right:5px;">
-							<!--<img src=https://image.flaticon.com/icons/svg/148/148976.svg>-->
-							 <div id="map" style="height:268px;"></div>
-                        </div>
-                    </div>
-					 <div class="col-md-6 col-xs-12">
-                        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img src="https://image.flaticon.com/icons/svg/148/148976.svg" width="30" height="30"></div>
-                            <div class="fs20">Date : <font id="date"></font> 10/5/2017 , Time : 12.50 </div>
-                        </div>
-                    </div>
-					<div class="col-md-6 col-xs-12">
-                        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img style="margin-top:10px;" src="https://image.flaticon.com/icons/svg/149/149060.svg" width="30" height="30" ></div>
-                            <div class="fs20">Location : <font id="location"></font></div>
-                        </div>
-                    </div>
-					<div class="col-md-6 col-xs-12">
-                        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img src="https://image.flaticon.com/icons/svg/130/130160.svg" width="30" height="30"></div>
-                            <div class="fs20">Type of Falling : <font id="type_of_falling"></font>Falling to front</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xs-12">
-                        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img src="https://image.flaticon.com/icons/svg/109/109394.svg" width="30" height="30"></div>
-                            <div class="fs20">Speed before falling : <font id="speed_before"></font>50 km/hr</div>
-                        </div>
-                        <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                            <div class="icon"><img src="https://image.flaticon.com/icons/svg/353/353990.svg" width="30" height="30"></div>
-                            <div class="fs20">Additional info : <font id="additional">Test ADditional Data for testing once</font></div>
-                        </div>
-                    </div>
-					 <div class="col-md-12 col-xs-12">
-					    <div class="panel" style="margin-left:0px;margin-right:0px;">
-                            <div id="chartdivactivity"></div>
-                        </div>
-					</div>
-					<div class="col-md-12 col-xs-12">
-					    <div class="panel" style="margin-left:0px;margin-right:0px;">
-							<%-- <div> <img style="margin-left:100px;margin-top:25px;" src="../images/description1.png"></div> --%>
-							<div class="row" style= "margin-left: 5px; margin-top: 10px; margin-right: 10px; ">
 
-							  <div class="col-md-4 col-xs-6">
-
-							    <canvas id="canvas1" width="100" height="30"></canvas>
-							      <h5 class="text-primary legend" style="">Lying</h5>
-							    <br> <br>
-							    <canvas id="canvas2" width="100" height="30"></canvas>
-							          <h5 class="text-primary legend" style="margin-top: 65px">Standing</h5>
-							          <br> <br>
-							          <canvas id="canvas3" width="100" height="30"></canvas>
-							                <h5 class="text-primary legend" style="margin-top: 125px">Stair Climbing</h5>
-  											<br> <br>
-							  </div>
-							  <div class="col-md-4 col-xs-6">
-							    <canvas id="canvas4" width="100" height="30"></canvas>
-							      <h5 class="text-primary legend" style="">Sleeping</h5>
-							      <br><br>
-							      <canvas id="canvas5" width="100" height="30"></canvas>
-							        <h5 class="text-primary legend" style="margin-top: 65px">Walking</h5>
-											<br> <br>
-							  </div>
-							  <div class="col-md-4 col-xs-6">
-							    <canvas id="canvas6" width="100" height="30"></canvas>
-							      <h5 class="text-primary legend" style="">Sitting</h5>
-							      <br><br>
-							      <canvas id="canvas7" width="100" height="30"></canvas>
-							        <h5 class="text-primary legend" style="margin-top: 65px">Running</h5>
-											<br> <br>
-
-							  </div>
-							</div>
-
-                        </div>
-					</div>
-                </div>
-                <div id="tab1default" class="tab-pane fade">
+                <div id="tab1default" class="tab-pane fade in active">
                     <div class="col-md-6 col-xs-12">
                         <div class="panel" style="margin-left:5px;margin-right:5px;">
                             <div id="chartdiv" class="chart"></div>

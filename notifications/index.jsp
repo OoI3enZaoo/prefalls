@@ -6,23 +6,23 @@
 	if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
-	
+
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-   
+
     String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
 	String sssn = (String)session.getAttribute("SSSN");
     String fname = (String)session.getAttribute("fname");
     String lname = (String)session.getAttribute("lname");
     String name = " Patient Name : " + session.getAttribute("fname") + " " + (String)session.getAttribute("lname") + " ";
-	
+
 %>
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Shortcut Icon" href="../images/icon.png"/>
@@ -39,7 +39,7 @@
 <body>
 
 <%@include file="../include/nav.jsp"%>
-    
+
 <div class="container">
     <div class="panel"><font class="fs17">Notifications<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel">
@@ -59,8 +59,8 @@
 
             String sql = "SELECT a.start,b.alert_name,b.severity FROM alerts a LEFT JOIN alerttypename b ON a.alert_type=b.alert_type where SSSN = '"+sssn+"' GROUP BY a.start ORDER BY a.start";
             ResultSet rs = dbm.executeQuery(sql);
-            
-             
+
+
             while((rs!=null) && (rs.next())){%>
             <tr>
                 <td><%= rs.getString("start")%></td>
@@ -74,12 +74,12 @@
                 }
                         %>
                 </td>
-            </tr>        
+            </tr>
             <%}
         } catch (Exception e) {
                 out.print(e);
         }
-            
+
         dbm.closeConnection();
     %>
 

@@ -6,11 +6,11 @@
 	if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
-	
+
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
-   
+
 	String ssfn = (String)session.getAttribute("ssfn");
 	String ssln = (String)session.getAttribute("ssln");
     String sstypeid = (String)session.getAttribute("sstypeid");
@@ -18,39 +18,39 @@
     String lname = (String)session.getAttribute("lname");
     String name = " Patient Name : " + session.getAttribute("fname") + " " + (String)session.getAttribute("lname") + " ";
 
-    
+
     String minHR = "";
     String maxHR = "";
     String maxS = "";
     String editsetting ="";
-   
+
     dbm.createConnection();
-   
+
 	if(sstypeid.equals("1")||sstypeid.equals("2")){
-		
+
 		try {
 
 			String sql = "select * from supervise,caregiver where caregiver.type_id = '"+sstypeid+"' and caregiver.UID = supervise.UID";
 			ResultSet rs = dbm.executeQuery(sql);
-			 
-			if(rs.next()){				
+
+			if(rs.next()){
 				rs.first();
                 editsetting = editsetting + "<a href='edit.jsp'><button type='button' class='btn btn-warning glyphicon glyphicon-edit' onClick=edit.jsp>Edit</button></a>";
 			}
-			
+
 		}	catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
 
     }
-		
+
     try {
 
         String sql = "select * from patients where SSSN = '" + session.getAttribute("SSSN") + "';" ;
         ResultSet rs = dbm.executeQuery(sql);
 
-        if(rs.next()){				
+        if(rs.next()){
             rs.first();
             minHR = rs.getString("minHeartRate");
             maxHR = rs.getString("maxHeartRate");
@@ -62,14 +62,14 @@
         out.println(e.getMessage());
         e.printStackTrace();
     }
-		
+
    dbm.closeConnection();
-	
+
 %>
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Shortcut Icon" href="../images/icon.png"/>
@@ -78,8 +78,8 @@
 </head>
 <body>
 
-<%@include file="../include/nav.jsp"%>   
-    
+<%@include file="../include/nav.jsp"%>
+
 <div class="container">
     <div class="panel"><font class="fs17">Settings<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel" style="margin-left:10px;margin-right:10px;">

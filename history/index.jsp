@@ -16,7 +16,7 @@
 	}
 
 	dbm.createConnection();
-   
+
     String fname = (String)session.getAttribute("fname");
     String lname = (String)session.getAttribute("lname");
     String name = " Patient Name : " + session.getAttribute("fname") + " " + (String)session.getAttribute("lname") + " ";
@@ -27,7 +27,7 @@
     String datealert = "";
     String strtype = "";
     int type = 0;
-	
+
 	try {
 
 		String sql = "SELECT count(*) * 3 as sec,DATE_FORMAT(tstamp,'%Y-%m-%d') as date FROM `archive_"+sssn+"` WHERE tstamp < CURRENT_TIMESTAMP and `ismobile` = true group by DATE_FORMAT(tstamp,'%Y-%m-%d')";
@@ -60,7 +60,7 @@
 							"$(element).find('.fc-time').prepend('<img src=\"../images/icons/HRdown.png\" style= \"width:25px;\">"+
 							"');"+
 							"}"+
-						"}";	
+						"}";
 				}
 				if (type == 6){
 				 	icons +="if(event.id == '"+datealert+"'){"+
@@ -71,30 +71,30 @@
 							"$(element).find('.fc-time').prepend('<img src=\"../images/icons/HRup.png\" style= \"width:25px;\">"+
 							"');"+
 							"}"+
-						"}";	
+						"}";
 				}
 			 }
 		} catch (Exception e) {
 		out.print(e);
-		}	 
+		}
 		while(rs.next()){
 
 			dateMobility = rs.getString("date");
 			sec = rs.getString("sec");
-            
+
             int mobility = Integer.valueOf(sec);
             mobility = 100*mobility/86400;
             //mobility=30000
-            
 
-          
+
+
 			String progress ="";
 
 			if (mobility <= 25){
 
 				progress = "progress-bar progress-bar-danger";
 
-			} 
+			}
 
 			else if (mobility <= 50){
 
@@ -134,14 +134,14 @@
 	} catch (Exception e) {
 		out.print(e);
 	}
-		
+
 	dbm.closeConnection();
 
 %>
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Shortcut Icon" href="../images/icon.png"/>
@@ -177,9 +177,9 @@
 			loading: function(bool) {
 				$('#loading').toggle(bool);
 			}
-			
+
 		});
-    
+
 	});
 
 	function OpenInNewTab(url) {
@@ -197,12 +197,12 @@
 </head>
 <body>
 
-<%@include file="../include/nav.jsp"%>                
-                
+<%@include file="../include/nav.jsp"%>
+
 <div class="container">
     <div class="panel"><font class="fs17">History<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel">
-        <div id='calendar'></div> 
+        <div id='calendar'></div>
     </div>
 </div>
 <!-- JS Main File -->

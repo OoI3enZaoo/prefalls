@@ -23,7 +23,7 @@
 
 <!doctype html>
 <head>
-<title>mobilise</title>
+<title>PreFall</title>
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="Shortcut Icon" href="../images/icon.png"/>
@@ -103,7 +103,6 @@
         try {
 
             String sql = "SELECT DATE_FORMAT(alerts.start,'%Y-%m-%d %H:%i:%s') as date , alerts.lat ,alerts.lon , alerts.alert_type, alerttypename.alert_name FROM `alerts`, `alerttypename` WHERE alerts.SSSN = '"+sssn+"' AND alerts.alert_type = alerttypename.alert_type ORDER BY alerts.id";
-
 			ResultSet rs = dbm.executeQuery(sql);
 
             int count=0;
