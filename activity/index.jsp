@@ -645,10 +645,11 @@ dist_index += parseFloat(message.getAttribute("dist"))
         {
             alert_type = message.getAttribute("type");
             console.log("alert_type: " + alert_type);
-            if(alert_type == 3 || alert_type == 4 || alert_type == 8 || alert_type == 9){
-
-                checkAlert(alert_type);
-            }
+            // if(alert_type == 3 || alert_type == 4 || alert_type == 8 || alert_type == 9){
+            //
+            //
+            // }
+            checkAlert(alert_type);
         },
         myId: 'test1',
         myDestination: 'topic://<%=sssn%>_alert'
@@ -758,6 +759,11 @@ function checkAlert(type) {
               });
               countalertsta = 0;
             }
+
+            // if(countalertsta == 30){
+            //   clearInterval(sta_interval1);
+            //   countalertsta = 0;
+            // }
 
 
           },1000);
@@ -1023,7 +1029,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
   				else if(parseInt(json_fall_history.falling[i].act) == 3){color_code = "#d4f145";}
   				else if(parseInt(json_fall_history.falling[i].act) == 4){color_code = "#5bda47";}
   				else if(parseInt(json_fall_history.falling[i].act) == 5){color_code = "#003300";}
-  				else if(parseInt(json_fall_history.falling[i].act) == 8){color_code = "#0983d2";}
+  				else if(parseInt(json_fall_history.falling[i].act) == 8 || parseInt(json_fall_history.falling[i].act) == 7){color_code = "#0983d2";}
   				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#e448e7";}
 
 
@@ -1111,7 +1117,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
     			else if(message_act == 3){color_text = "#d4f145";}
     			else if(message_act == 4){color_text = "#5bda47";}
     			else if(message_act == 5){color_text = "#003300";}
-    			else if(message_act == 8){color_text = "#0983d2";}
+    			else if(message_act == 8 || message_act == 7){color_text = "#0983d2";}
     			else if(message_act == 6){color_text = "#e448e7";}
 
     	//console.log(date_test);

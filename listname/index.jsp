@@ -322,7 +322,7 @@ var tstamp2 = "";
 
 
 	}
-
+dbm.closeConnection();
    	%>
    	</div>
    	</div>
@@ -336,6 +336,8 @@ var tstamp2 = "";
 var countsta = 0;
 var countsym = 0;
 var countfall = 0;
+var res_url = "";
+
 function checkAlert(type,uid){
 
 console.log("checkAlert: " + type + " uid: " + uid);
@@ -398,45 +400,75 @@ if(level == 1){
 	mlevel = "danger";
 }
 
+var res_tstamp;
 $.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getInfoAlert.jsp?sssn="+uid+"",function(result){
+	var resicon = "../images/patients/" + result[0].imgPath;
 	var ftitle = "<span style = 'margin-left: 10px; font-weight: bold; margin-bottom: 5px; font-size: 15px; display:block;'>";
 	var mtitle = result[0].firstname + " " + result[0].lastname;
 	var ltitle = "</span>";
 	var resTitle = ftitle + mtitle + ltitle;
-	var res_url;
 	console.log("typena : " + type);
 	if(type == 3){
-		//res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+tstamp2;
-		res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/";
 
-	}else{
+		$.getJSON("http://sysnet.utcc.ac.th/prefalls/listname/getTstamp.jsp?sssn="+uid+"",function(result2){
+			res_tstamp = result2[0].tstamp;
+			res_url = "http://sysnet.utcc.ac.th/prefalls/mobility/fall.jsp?date="+res_tstamp+"&sssn=" +uid;
+			console.log("res_url_fall: " + res_url);
+			$.notify({
+			icon: resicon,
+			title: resTitle,
+			message: "<span style = 'margin-left: 10px;'>"+mMessage+"</span>",
+			url: res_url,
+			target: "_self",
+			allow_dismiss: true
+			},{
+			type: mlevel,
+			delay: 10000,
+			icon_type: 'image',
+			template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+				'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
+				'<img  data-notify="icon" class="img-circle pull-left" width= "55px" height = "55px"> ' +
+				'<span data-notify="title">{1}</span>' +
+				'<span data-notify="message">{2}</span>' +
+				'<div class="progress" data-notify="progressbar">' +
+					'<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+				'</div>' +
+				'<a href="{3}" target="{4}" data-notify="url"></a>' +
+			'</div>'
+			});
+
+		});
+
+	}else if(type == 1 || type == 4){
 		res_url = "../activity/?SSSN="+uid;
-	}
-	console.log("res_url: " + res_url);
-	var resicon = "../images/patients/" + result[0].imgPath;
 
-	$.notify({
-	icon: resicon,
-	title: resTitle,
-	message: "<span style = 'margin-left: 10px;'>"+mMessage+"</span>",
-	url: res_url,
-	target: "_self",
-	allow_dismiss: true
-	},{
-	type: mlevel,
-	delay: 10000,
-	icon_type: 'image',
-	template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
-		'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
-		'<img  data-notify="icon" class="img-circle pull-left" width= "55px" height = "55px"> ' +
-		'<span data-notify="title">{1}</span>' +
-		'<span data-notify="message">{2}</span>' +
-		'<div class="progress" data-notify="progressbar">' +
-			'<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
-		'</div>' +
-		'<a href="{3}" target="{4}" data-notify="url"></a>' +
-	'</div>'
-	});
+		$.notify({
+		icon: resicon,
+		title: resTitle,
+		message: "<span style = 'margin-left: 10px;'>"+mMessage+"</span>",
+		url: res_url,
+		target: "_self",
+		allow_dismiss: true
+		},{
+		type: mlevel,
+		delay: 10000,
+		icon_type: 'image',
+		template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+			'<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
+			'<img  data-notify="icon" class="img-circle pull-left" width= "55px" height = "55px"> ' +
+			'<span data-notify="title">{1}</span>' +
+			'<span data-notify="message">{2}</span>' +
+			'<div class="progress" data-notify="progressbar">' +
+				'<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+			'</div>' +
+			'<a href="{3}" target="{4}" data-notify="url"></a>' +
+		'</div>'
+		});
+
+	}
+
+
+
 
 
 

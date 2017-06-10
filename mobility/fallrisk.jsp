@@ -24,29 +24,23 @@
   String fname = (String)session.getAttribute("fname");
     String lname = (String)session.getAttribute("lname");
     String name = " Patient Name : " + fname + " " + lname + " ";
-
  tstamp = (String)request.getParameter("date");
     String ssfn = (String)session.getAttribute("ssfn");
 	   String ssln = (String)session.getAttribute("ssln");
-
 	if(request.getParameter("SSSN") != null){
 		session.setAttribute("SSSN",request.getParameter("SSSN"));
 	}
 String sssn = (String)session.getAttribute("SSSN");
-
 if(request.getParameter("stab_3mean") != null){
   stab_mean = (String) session.getAttribute("stab_mean");
   stab_3mean = (String) session.getAttribute("stab_3mean");
   sym_mean = (String) session.getAttribute("sym_mean");
   sym_3mean = (String) session.getAttribute("sym_3mean");
 }else{
-
   try {
     String sql ="SELECT cast(stab_mean  as decimal(16,2)) as stab_mean , cast(stab_3mean  as decimal(16,2)) as stab_3mean , cast(sym_mean  as decimal(16,2))  as sym_mean, cast(sym_3mean  as decimal(16,2)) as sym_3mean FROM `gait_criterion`";
     ResultSet rs = dbm.executeQuery(sql);
-
     if (rs.next()){
-
       stab_mean  = rs.getString("stab_mean");
       stab_3mean  = rs.getString("stab_3mean");
       sym_mean = rs.getString("sym_mean");
@@ -55,15 +49,12 @@ if(request.getParameter("stab_3mean") != null){
       session.setAttribute("stab_3mean",stab_3mean);
       session.setAttribute("sym_mean",sym_mean);
       session.setAttribute("sym_3mean",sym_3mean);
-
     }
-
     } catch (Exception e) {
       out.println(e.getMessage());
       e.printStackTrace();
     }
   }
-
   try{
     String sql = "select stab, sym, step,stride, dist,step_frq ,step_len,spd from archive_RFG2D3T6ET where tstamp = '"+tstamp+"'";
     ResultSet rs = dbm.executeQuery(sql);
@@ -81,9 +72,9 @@ if(request.getParameter("stab_3mean") != null){
       out.println(e.getMessage());
       e.printStackTrace();
     }
+    
 
  		dbm.closeConnection();
-
   %>
 
   <!doctype html>
@@ -102,12 +93,22 @@ if(request.getParameter("stab_3mean") != null){
   <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
   <script src="../js/bootstrap-notify.min.js"></script>
   <link rel="stylesheet" href="../css/animate.min.css">
-
+    <script async defer
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
+   </script>
 
 
 
   <style media="screen">
     .chart { width:100%; height:500px; }
+    #map {
+          position: relative;
+          width: 100%;
+          height: 45vh;
+          margin: 0;
+          padding: 0;
+      }
+
   </style>
   <body>
 <%@include file="../include/nav.jsp"%>
@@ -116,6 +117,47 @@ if(request.getParameter("stab_3mean") != null){
 
   <div class="container">
   <div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Fall History<span class="right"><%=name%> <%=tstamp%></span></font></div>
+
+  <div class="row">
+
+    <div id="tab0default" class="tab-pane fade in active">
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="margin-left:5px;margin-right:5px;">
+          <!--<img src=https://image.flaticon.com/icons/svg/148/148976.svg>-->
+           <div id="map" style="height:268px;"></div>
+                    </div>
+                </div>
+       <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/148/148976.svg" width="30" height="30"></div>
+                        <div class="fs20">Date : <font id="date"></font></div>
+                    </div>
+                </div>
+      <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img style="margin-top:10px;" src="https://image.flaticon.com/icons/svg/149/149060.svg" width="30" height="30" ></div>
+                        <div class="fs20">Location : <font id="location"></font></div>
+                    </div>
+                </div>
+     <!-- <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/130/130160.svg" width="30" height="30"></div>
+                        <div class="fs20">Type of Falling : <font id="type_of_falling"></font>Falling to front</div>
+                    </div>
+                </div>-->
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/109/109394.svg" width="30" height="30"></div>
+                        <div class="fs20">Impact Force : <font id="speed_before"></font> N</div>
+                    </div>
+                    <!--<div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/353/353990.svg" width="30" height="30"></div>
+                        <div class="fs20">Additional info : <font id="additional">Test ADditional Data for testing once</font></div>
+                    </div>-->
+                </div>
+              </div>
+            </div>
+
     <div class="row" style="margin-left:0px;margin-right:0px;">
       <div class="col-md-12 col-xs-12">
         <div class="panel" style="margin-left:0px;margin-right:0px;">
@@ -136,7 +178,6 @@ if(request.getParameter("stab_3mean") != null){
     <div class="row" style="margin-left:0px;margin-right:0px;">
   <div class="col-md-12 col-xs-12">
     <div class="panel" style="color:#2d904f;margin-left:0px;margin-right:0px;padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
-
       <div class="row" style="margin-left:0px;margin-right:0px;">
         <div class="col-md-6 col-xs-12">
           <div class="fs20">
@@ -192,7 +233,6 @@ if(request.getParameter("stab_3mean") != null){
         </body>
 
         <script type="text/javascript">
-
         var stab_mean = <%=stab_mean%>;
         var stab_3mean = <%=stab_3mean%>;
         var sym_mean = <%=sym_mean%>;
@@ -233,9 +273,7 @@ if(request.getParameter("stab_3mean") != null){
           },{
           	type: 'success'
           });
-
         }
-
         var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
            "type": "gauge",
            "theme": "light",
@@ -243,7 +281,6 @@ if(request.getParameter("stab_3mean") != null){
              "axisThickness": 1,
              "axisAlpha": 0.2,
              "tickAlpha": 0.2,
-
              "bands": [ {
                "color": "#84b761",
                "endValue": stab_mean,
@@ -261,7 +298,6 @@ if(request.getParameter("stab_3mean") != null){
              "bottomText": "0",
              "bottomTextYOffset": -20,
              "endValue": stab_3mean*2,
-
              "bottomTextFontSize" : 15
            } ],
            "arrows": [ {} ],
@@ -276,7 +312,6 @@ if(request.getParameter("stab_3mean") != null){
                "axisThickness": 1,
                "axisAlpha": 0.2,
                "tickAlpha": 0.2,
-
                "bands": [ {
                  "color": "#84b761",
                  "endValue": sym_mean,
@@ -307,7 +342,6 @@ if(request.getParameter("stab_3mean") != null){
           document.getElementById("Speed").innerHTML=spd_index.toFixed(2);
           document.getElementById("StepAvg").innerHTML=step_frq_index;
           document.getElementById("StepLength").innerHTML=step_len_index.toFixed(2);
-
 function setValueInGauge(){
   if ( gaugeChartSta ) {
     if ( gaugeChartSta.arrows ) {
@@ -347,14 +381,36 @@ function setValueInGauge(){
       }
     }
   }
-
   clearInterval(timegauge);
 }
 
+function initMap() {
+    var myLatLng = {lat:lat, lng: lng};
 
+    var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 16,
+      center: myLatLng,
+  draggable: false
 
+    });
 
+    var marker = new google.maps.Marker({
+      position: myLatLng,
+      map: map,
+      title: 'Hello World!'
+    });
+}
 
+function getLocation (lat , lng){
+if(lat == 0 || lng == 0){
+  $("#location").text("N/A");
+}else{
+  $.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=false", function(result){
+        $("#location").text(result.results[0].formatted_address);
+  console.log("print location = "  + result.results[0].formatted_address);
+  });
+}
 
+}
 
         </script>
