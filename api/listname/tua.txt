@@ -1,0 +1,1512 @@
+/ กาน้ำ.cpp : Defines the entry point for the console application.
+//
+// teapot.cpp : Defines the entry point for the console application.
+//
+
+#include "stdafx.h"
+#include <stdlib.h>
+#include <GL/glut.h>
+#include<math.h>
+#define UP 0
+#define DOWN 1
+#define UP2 2
+#define DOWN2 3
+#define UP3 4
+#define DOWN3 5
+#define UP4 6
+#define DOWN4 7
+#define UP5 8
+#define DOWN5 9
+#define UP6 10
+#define DOWN6 11
+#define UP7 12
+#define DOWN7 13
+int u = 0;
+int x = 0;
+int y = 0;
+int t = 0;
+int c = 2.0;
+
+int a = 0;
+int s = 0;
+int d = 0;
+
+float q=38;
+float i=88;
+float o=140;
+float p=88;
+float k=38;
+float l=2.0;
+int wingDir = UP; 
+int wingDir2 = UP2; 
+int wingDir3 = UP3; 
+int wingDir4 = UP4; 
+int wingDir5 = UP5;
+int wingDir6 = UP6;
+int wingDir7 = UP7;
+//int wingDir8 = UP8;
+int refreh=1;
+// Light values and coordinates
+GLfloat  ambientLight[] = { 0.3f, 0.3f, 0.3f, 1.0f };
+GLfloat  diffuseLight[] = { 0.7f, 0.7f, 0.7f, 1.0f };
+GLfloat  specular[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+GLfloat  specref[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+void timer(int value){
+
+	glutPostRedisplay();
+	glutTimerFunc(refreh, timer, 0);
+}
+class Canvas3D
+{
+public:
+	Canvas3D(int width, int height, char* windowTitle); //constructor
+	void setWindow3D(float l, float r, float b, float t);
+	void clearScreen();
+	void setBackgroundColor(float r, float g, float b);
+	void setColor(float r, float g, float b);
+};
+
+
+//<<setWindow>>
+void Canvas3D::setWindow3D(float l, float r, float b, float t)
+{
+	glMatrixMode(GL_PROJECTION); // set the view volume shape
+	glLoadIdentity();
+	glOrtho(-130,130,-130,130,-130,130);
+	glMatrixMode(GL_MODELVIEW); // position and aim the camera
+	glLoadIdentity();
+	gluLookAt(5.0, 5.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+}
+
+
+void Canvas3D::clearScreen(void)
+{
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Canvas3D::setBackgroundColor(float r, float g, float b)
+{
+	glClearColor(r, g, b, 0.0);   //4th variable level of transparency, may need to change 
+}
+
+void Canvas3D::setColor(float r, float g, float b)
+{
+	glColor3f(r, g, b);
+}
+
+Canvas3D::Canvas3D(int width, int height, char* windowTitle)
+{
+	char* argv[1];  //dummy argument list for glutinit()
+	char dummyString[8];
+	argv[0] = dummyString;  //hook up the pointer
+	int argc = 1;
+
+	glutInit(&argc, argv);
+	glutInitWindowSize(width, height);
+	glutInitWindowPosition(20, 20);
+	glutCreateWindow(windowTitle);
+	setWindow3D(0, (float)width, 0, (float)height); // default world window
+
+}
+
+
+Canvas3D cvs(640, 480, "try out Canvas"); //global canvas object
+
+GLfloat zvalue = 2;
+GLfloat xvalue = 0;
+GLfloat yvalue = 2;
+
+
+GLfloat xro = 20.0;
+GLfloat yro = 0.0;
+GLfloat zro = -1.0;
+
+void SpecialKeys(int key, int x, int y)
+{
+	if (key == GLUT_KEY_DOWN){ xvalue += 2.5; zvalue += 2.5; }
+	if (key == GLUT_KEY_UP){ xvalue -= 2.5; zvalue -= 2.5; }
+	if (key == GLUT_KEY_RIGHT){ xvalue += 2.5; zvalue -= 2.5; }
+	if (key == GLUT_KEY_LEFT){ xvalue -= 2.5; zvalue += 2.5; }
+	glutPostRedisplay();
+}
+
+
+void Cylinder()
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0,1.0,1.0);
+	gluCylinder(qobj, 2,2,20, 1000,10); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+
+void myKeyboard(unsigned char key, int mouseX, int mouseY)
+{
+	if (key == 'a' || key == 'A')
+	{
+		//for(int i=1;i<100;i++){
+		x += 8;
+		glutPostRedisplay();
+		//}
+			
+	}
+	 if (key == 'w' || key == 'W')
+	{
+		x -= 8;
+		glutPostRedisplay();
+	}
+	 if(y==0||y==45){
+	if (key == 'd' || key == 'D')
+	{
+		y += 45;
+		
+		
+		if(t==0){
+		a = 20;
+		s = 25;
+		d = 1.5;
+		t++;
+		}
+		else{
+			t=0;
+		a = 20;
+		s = 55;
+		d = 1.5;
+
+		
+		}
+		
+		glutPostRedisplay();
+	}
+	 }
+	if (key == 's' || key == 'S')
+	{
+		y = 0;
+		//t += 10;
+
+		a = 0;
+		s = 0;
+		d = 0;
+		t=0;
+		glutPostRedisplay();
+	}
+	if (key == 'z' || key == 'Z')
+	{
+		c =2.0;
+		glutPostRedisplay();
+	}
+	if (key == 'c' || key == 'C')
+	{
+		c =3.5;
+		glutPostRedisplay();
+	}
+	if (key == 't' || key == 'T')
+	{
+		t =1;
+		glutPostRedisplay();
+	}
+	if (key == 'y' || key == 'Y')
+	{
+		t =0;
+		glutPostRedisplay();
+	}
+}
+void Cylinder5()//-------------ขา
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0f, 1.0f, 1.0f);
+	gluCylinder(qobj, 5,5,6.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder6()//-------------ขากางเกง
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(qobj, 6.5,6.5,6.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder7()//-------------รองเท้า
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(qobj, 7.0,7.0,30.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void foor()//-------------พื้นดิน
+{  
+glPushMatrix();
+	glColor3f(0.0f, 1.0f, 0.0f);
+	glTranslated(-30, -97.3, 0);
+	//gluSphere(40.0,50.0,20);
+	
+	glScalef(1.0,0.2, 1.0);
+		
+	glutSolidCube(100);
+
+	glPopMatrix();
+
+}
+
+void leg(){ // leg laft
+	glPushMatrix();
+		glTranslated(12, 10, 12);
+	glPushMatrix();//--------Leg
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1, 4.7, 1);
+		glTranslated(-30, -12.3, 0);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder5();
+	glPopMatrix();
+
+	glPushMatrix();//-------------ขากางเกง
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-30, -37, 0);
+		glRotatef(180, 0.0, 1.0, 1.0);
+	Cylinder6();
+	glPopMatrix();
+
+	glPushMatrix();//---------------หัวเข่า
+	glColor3f(1.0f, 1.0f, 0.0f);
+		glTranslated(-30, -62, 0);
+		glScaled(1, 1, 1.3);
+		glutSolidSphere(5.0, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();//---------รองเท้า
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-30, -95, 0);	
+		//glScaled(1, 4.7, 1);
+	glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder7();
+
+	glPopMatrix();
+
+	glPushMatrix();//---------------หนามเท้า4
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-70, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+	
+	glPushMatrix();//---------------หนามเท้า3
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-75, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+	glPushMatrix();//---------------หนามเท้า2
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-80, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+
+	glPushMatrix();//---------------หนามเท้า
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-85, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+
+	glPushMatrix();//--------เท้า
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-27, -100, 0);
+		glScaled(2.5, 1.0, 1.5);
+		glutSolidCube(8);
+
+
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void leg2(){ // leg 2
+	glPushMatrix();
+		glTranslated(11, 11, -6);
+	glPushMatrix();//--------Leg
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 1.0f, 0.0f);
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1, 4.7, 1);
+		glTranslated(-30, -12.3, 0);
+glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder5();
+	glPopMatrix();
+
+		glPushMatrix();//---------------กลมๆ
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-21.5,-25, 8.5);
+		glScaled(-0.2, 1.0, 1);
+		glutSolidSphere(4, 50, 50);
+
+	glPopMatrix();
+
+
+		glPushMatrix();//-------------ขากางเกง
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-30, -37, 0);
+		glRotatef(180, 0.0, 1.0, 1.0);
+	Cylinder6();
+	glPopMatrix();
+
+	glPushMatrix();//-------หัวเข้า2
+	glColor3f(1.0f, 1.0f, 0.0f);
+		glTranslated(-30, -62, 0);
+			glScaled(1, 1, 1.3);
+		glutSolidSphere(5.0, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();//---------รองเท้า2
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-30, -95, 0);	
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder7();
+
+	glPopMatrix();
+
+
+	glPushMatrix();//---------------หนามเท้า4
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-70, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+	
+	glPushMatrix();//---------------หนามเท้า3
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-75, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+	glPushMatrix();//---------------หนามเท้า2
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-80, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+
+	glPushMatrix();//---------------หนามเท้า
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-29.5,-85, 0.5);
+		glScaled(2.0, 1.0, 0.5);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+
+
+	glPushMatrix();//--------เท้า
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-27, -100, 0);
+		glScaled(2.5, 1.0, 1.5);
+		glutSolidCube(8);
+
+
+	glPopMatrix();
+
+	glPopMatrix();
+}
+void Cylinder2()//------------หน้าอก
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(qobj, 4,6.5,5.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder3()//------------หน้าท้อง
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(qobj, 3.5,4.5,4, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder4()//------------เอว
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0f, 0.0f, 1.0f);
+	gluCylinder(qobj, 4.8,4.8,2.0, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder11()//------------ผม
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0f, 1.0f, 0.0f);
+	gluCylinder(qobj, 2.8,4.8,3.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+
+void Cylinder12()//------------แหลมๆ
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0f, 1.0f, 0.0f);
+	gluCylinder(qobj, 1.5,0.1,2.5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void body(){ // body
+	glPushMatrix();//--------------------------
+	glColor3f(1.0f, 1.0f, 0.0f);
+	glTranslated(-30.3, 30, 10);
+		glutSolidSphere(8.0, 50, 0);
+	glPopMatrix();
+	
+
+	glPushMatrix();//---------------ผมๆ
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-18.5,99, 4.5);
+		glScaled(1.6, 1.0, 3);
+		glutWireSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+
+		glPushMatrix();//glPushMatrix();//--------------ผมๆ
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 1.0f, 0.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, 10.7, 1.35);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder11();
+
+		
+		
+	glPopMatrix();
+
+		glPushMatrix();//glPushMatrix();//--------------แหลมๆ3
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, 7, 9);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder12();
+
+		
+		
+	glPopMatrix();
+
+		glPushMatrix();//glPushMatrix();//--------------แหลมๆ4
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, 7, -6);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder12();
+
+		
+		
+	glPopMatrix();
+
+	glPushMatrix();//glPushMatrix();//--------------แหลมๆ2
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, 7, -3);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder12();
+
+		
+		
+	glPopMatrix();
+
+
+	glPushMatrix();//glPushMatrix();//--------------แหลมๆ
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, 7, 6);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder12();
+
+		
+		
+	glPopMatrix();
+
+
+
+
+	glPushMatrix();//---------------หน้าอก
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-18, 48, 4.5);
+		glScaled(2.8, 2.1, 7);
+		glutSolidSphere(5.0, 50, 50);
+
+	glPopMatrix();
+
+	glPushMatrix();//glPushMatrix();//--------------Body
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(2.0, 7.0, 3.5);//1.7
+		glTranslated(-9, 0.7, 1);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder2();
+
+		
+		
+	glPopMatrix();
+
+		glPushMatrix();//---------------กลมๆ
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+	glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+	glTranslated(-13, 35, 4.0);
+		glScaled(-0.8, 2, 1);
+		glutSolidSphere(10.0, 50, 50);
+
+	glPopMatrix();
+
+
+		glPushMatrix();
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(2.0, 7.0, 3.5);//1.7
+		glTranslated(-9, -2, 1);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder3();
+
+		
+		
+	glPopMatrix();
+	glPushMatrix();//----------------เอว
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 1.0f);
+		
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.7, 7.0, 3.5);
+		glTranslated(-11, -3, 1);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder4();
+
+		
+		
+	glPopMatrix();
+
+}
+void Cylinder1()
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,0.0);
+	gluCylinder(qobj, 5,5,10, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+
+void nec(){ // nec
+	glPushMatrix();//----------------ผม
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		
+		glScaled(1.7, 0.8, 3);
+		glTranslated(-11, 100, 1.5);
+		
+		glutSolidCube(8.9);
+glPopMatrix();
+	glPushMatrix();
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 1.0f, 1.0f);
+		
+		
+		glTranslated(-18, 80, 4.5);
+		glScaled(2.5, 4.6, 2.2);
+		glutSolidSphere(5.0, 50, 50);
+glPopMatrix();
+
+glPushMatrix();
+		glColor3f(1.0f, 1.0f, 0.0f);
+		glTranslated(-18, 50, 5);
+		
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder1();
+
+	glPopMatrix();
+
+
+}
+void eye(){ // eye
+	glPushMatrix();//-------------ตาขวา
+	glColor3f(1.0f, 0.0f, 0.0f);
+		glTranslated(-10, 80, 10);
+		glutSolidSphere(l, 50, 50);
+	glPopMatrix();
+
+glPushMatrix();//-------------ตาซ่้าย
+	glColor3f(0.0f, 0.0f, 0.0f);
+		glTranslated(-9, 80, 1);
+		glutSolidSphere(l, 50, 50);
+	glPopMatrix();
+	
+	glPushMatrix();//--------------ปาก
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 1.0f, 0.0f);
+		
+		glScaled(1.7, 1.7, 4);
+		glTranslated(-5.5, 40, 1.2);
+		
+		glutSolidCube(2);
+glPopMatrix();
+
+glPushMatrix();//--------------คิ้ว
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 0.0f);
+		
+		glScaled(1.7, 1.3, 3);
+		glTranslated(-4, 65, 3.8);
+		
+		//glutSolidCube(2);
+glPopMatrix();
+
+glPushMatrix();//--------------คิ้วขวา
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(0.0f, 0.0f, 0.0f);
+		
+		glScaled(1.7, 1.3, 3);
+		glTranslated(-7, 57, -1.0);
+		
+		glutSolidCube(2);
+glPopMatrix();
+
+}
+void Cylinder9()//-----ต้นเเขน
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(0.0,0.0,1.0);
+	gluCylinder(qobj, 5,5,6.6, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder10()//-----เเขน
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,1.0);
+	gluCylinder(qobj, 3,3,6, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void arm(){ // arm
+	
+	glPushMatrix();
+		
+		//glRotatef(y,0.0, 0.0,1.0);
+		//glTranslated(0, 0, 24);
+	//glRotatef(y, 0, 0, 1);
+	
+	glPushMatrix();//-------------ไหล่
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18, 38, 24);
+		glRotatef(0,0.0, 1.0,0.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+	glPushMatrix();//-------------ไหล่
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-18, 38, 28);
+		glRotatef(0,0.0, 1.0,0.0);
+		glutSolidSphere(8.9, 50, 50);
+	glPopMatrix();
+
+	
+	//glPushMatrix();//--------------arm1
+	
+	//glRotatef(y,0.0, 0.0,1.0);
+	
+	glPushMatrix();//--------------arm1
+	
+		
+		glColor3f(0.0f, 1.0f, 0.0f);
+		//glRotatef(-100, 0.0, 0.0, 10.0);
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-18, 3, 28);
+		glRotatef(0,0.0, 0.0,1.0);
+		glRotatef(180, 0.0, 1.0, 1.0);
+
+			Cylinder9();
+
+		
+	glPopMatrix();
+	glPushMatrix();//-------------ข้อต่อ
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-18, 5.5, 28);
+		glutSolidSphere(6.0, 50, 50);
+	glPopMatrix();
+	
+	glPushMatrix();//--------------arm ต่อ
+	
+		
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-18, -5, 28);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder10();
+		glPopMatrix();
+
+		glPushMatrix();//-------------มือ
+	glColor3f(1.0f, 1.0f, 1.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-18, -17, 28);
+		glScaled(1, 2, 1);
+		glutSolidSphere(5.0, 50, 50);
+	glPopMatrix();
+
+	glPopMatrix();
+}
+
+void Cylinder14()//-----ดาบ
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,1.0);
+	gluCylinder(qobj, 1.5,1.5,5, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder15()//-----ปลายดาบ
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,1.0);
+	gluCylinder(qobj, 2.3,0.2,20, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder16()//-----ตัวดาบดาบ
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,1.0);
+	gluCylinder(qobj, 3.0,2.3,60, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+void Cylinder17()//-----ตัวดาบดาบ2
+{  	GLUquadricObj * qobj;
+	qobj = gluNewQuadric();
+	glPushMatrix(); 
+
+	gluQuadricDrawStyle(qobj,GLU_LINE);
+	glColor3f(1.0,1.0,1.0);
+	gluCylinder(qobj, 3.3,3.0,10, 1000,1000); 
+	//base top height slice stack 
+	glPopMatrix();
+
+}
+
+
+void sword(){//-------------------ดาบ-----------------------------------------------------------------------------------------------------
+	glPushMatrix();//-------------ดาบ
+	glTranslated(90, 6.5, 0);
+	glRotatef(-60, 0, 0.0, 1.0);
+	
+	glPushMatrix();//-------------ดาบ
+	glColor3f(0.0f, 0.0f, 0.0f);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-28, -30, 28);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder14();
+		
+	glPopMatrix();
+
+	glPushMatrix();//--------ท้ายดาบ
+	glColor3f(1.0f, 0.0f, 0.0f);
+		glTranslated(-28, -120, 28);
+		glScaled(1.5, 1.0, 1.5);
+		glutSolidCube(4);
+
+
+	glPopMatrix();
+
+	glPushMatrix();//--------กันมือ
+	glColor3f(1.0f, 0.0f, 0.0f);
+		glTranslated(-28, -95, 28);
+		glScaled(6.5, 1.0, 1.5);
+		glutSolidCube(4);
+
+
+	glPopMatrix();
+
+	//glPopMatrix();
+
+	/*glPushMatrix();//--------ตัวดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-27, -70, 28);
+		glScaled(2.5, 15.0, 0.7);
+		glutSolidCube(4);
+
+
+	glPopMatrix();*/
+
+	glPushMatrix();//--------ตัวดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -90, 28.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder16();
+
+
+	glPopMatrix();
+
+	glPushMatrix();//--------ตัวดาบ2
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -93, 28.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder17();
+
+
+	glPopMatrix();
+
+
+	glPushMatrix();//--------ปลายดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -30, 28.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder15();
+
+
+	glPopMatrix();
+		glPopMatrix();
+
+}
+void sword2(){//-------------------ดาบ2-----------------------------------------------------------------------------------------------------
+	glPushMatrix();//-------------ดาบ
+	glTranslated(90, 6.5, 0);
+	glRotatef(-60, 0, 0.0, 1.0);
+	
+	glPushMatrix();//-------------ดาบ
+	glColor3f(0.0f, 0.0f, 0.0f);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-28, -30, -20);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder14();
+		
+	glPopMatrix();
+
+	glPushMatrix();//--------ท้ายดาบ
+	glColor3f(1.0f, 0.0f, 0.0f);
+		glTranslated(-28, -120, -20);
+		glScaled(1.5, 1.0, 1.5);
+		glutSolidCube(4);
+
+
+	glPopMatrix();
+
+	glPushMatrix();//--------กันมือ
+	glColor3f(1.0f, 0.0f, 0.0f);
+		glTranslated(-28, -95, -20);
+		glScaled(6.5, 1.0, 1.5);
+		glutSolidCube(4);
+
+
+	glPopMatrix();
+
+	//glPopMatrix();
+
+	/*glPushMatrix();//--------ตัวดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-27, -70, 28);
+		glScaled(2.5, 15.0, 0.7);
+		glutSolidCube(4);
+
+
+	glPopMatrix();*/
+
+	glPushMatrix();//--------ตัวดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -90, -20.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder16();
+
+
+	glPopMatrix();
+
+	glPushMatrix();//--------ตัวดาบ2
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -93, -20.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder17();
+
+
+	glPopMatrix();
+
+
+	glPushMatrix();//--------ปลายดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -30, -20.5);
+		glScaled(c, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder15();
+
+
+	glPopMatrix();
+		glPopMatrix();
+
+}
+
+void arm2(){ // arm2
+	glPushMatrix();//-------------ไหล่
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-19, 38, -14);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+	glPushMatrix();//-------------ไหล่
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-19, 38, -19);
+		glutSolidSphere(8.9, 50, 50);
+	glPopMatrix();
+
+
+	glPushMatrix();//--------------arm1
+	
+		
+		glColor3f(0.0f, 1.0f, 0.0f);
+		//glRotatef(-90, 0.0, 0.0, -10.0);
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-18, 3, -20);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder9();
+
+		
+	glPopMatrix();
+
+	glPushMatrix();//-------------ข้อต่อ
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-18, 5.5, -20);
+		glutSolidSphere(6.0, 50, 50);
+	glPopMatrix();
+	
+	glPushMatrix();//--------------arm ต่อ
+	
+		
+		glColor3f(0.0f, 0.0f, 0.0f);
+		glScaled(1.0, 4.0, 1);
+		glTranslated(-18, -5, -20);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder10();
+		glPopMatrix();
+
+		glPushMatrix();//-------------มือ
+	glColor3f(1.0f, 1.0f, 1.0f);
+	//glScaled(300.0, 0, 0);
+		glTranslated(-18, -17, -20);
+		glScaled(1, 2, 1);
+		glutSolidSphere(5.0, 50, 50);
+	glPopMatrix();
+}
+void tri(){ 
+		glPushMatrix();//--------Leg
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		//glutSolidTeapot(2);
+	//glutSolidCube(1.5);
+		glScaled(1, 6.0, 1);
+		glTranslated(-11, 4, 3);
+
+		glutSolidCube(5);
+	glPopMatrix();
+
+	glPushMatrix();//----------------t
+	
+		//glRotatef(-10, -50.0, 1.0, 10.0);
+		glColor3f(1.0f, 0.0f, 0.0f);
+		
+		glScaled(1.7, 0.7, 4.2);
+		glTranslated(-9, 47, 1);
+
+		
+		glutSolidCube(8);
+glPopMatrix();
+
+}
+void skill(){
+	glPushMatrix();//-------------1
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18, q, 60);
+		glRotatef(y,0.0, 0.0,1.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();//-------------2
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18,i, 50);
+		glRotatef(y,0.0, 0.0,1.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();//-------------3
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18, o, 5);
+		glRotatef(y,0.0, 0.0,1.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+
+	glPushMatrix();//-------------4
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18, p, -45);
+		glRotatef(y,0.0, 0.0,1.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+
+		glPushMatrix();//-------------5
+	glColor3f(1.0f, 1.0f, 0.0f);
+	//glTranslated(0, 0, 24);
+		glTranslated(-18, k, -60);
+		glRotatef(y,0.0, 0.0,1.0);
+		glutSolidSphere(8.0, 50, 50);
+	glPopMatrix();
+
+}
+void foor1(){
+	glPushMatrix();
+	glTranslated(0,-90, 0);
+ glRotatef(90, 1.0, 0.0, 0.0);
+// glRotatef(90, 0.0, 1.0, 0.0);
+	glBegin(GL_QUADS);
+        glColor3f(.5,1.,0.); glVertex3f(-700.0, -700.0,0.0);
+        glColor3f(.5,1.,0.); glVertex3f(700.0, -700.0,0.0);
+        glColor3f(.5,1.,0.); glVertex3f(700.0, 700.0,0.0);
+        glColor3f(.5,1.,0.); glVertex3f(-700.0, 700.0,0.0);
+    glEnd();
+	glPopMatrix();
+
+}
+void sky1(){
+	glPushMatrix();
+	glTranslated(0,170, -570);
+ glRotatef(90, 1.0, 0.0, 0.0);
+// glRotatef(90, 0.0, 1.0, 0.0);
+	glBegin(GL_QUADS);
+        glColor3f(1.,1.,0.); glVertex3f(-700.0, -700.0,0.0);
+        glColor3f(1.,1.,0.); glVertex3f(700.0, -700.0,0.0);
+        glColor3f(1.,1.,0.); glVertex3f(700.0, 700.0,0.0);
+        glColor3f(1.,1.,0.); glVertex3f(-700.0, 700.0,0.0);
+    glEnd();
+	glPopMatrix();
+
+}
+void sword3(){//-------------------กระบอกดาบบบบบบบบบบบบ-----------------------------------------------------------------------------------------------------
+	glPushMatrix();//
+	glRotatef(c, 0, 1.0, 0.0);
+	glPushMatrix();//-------------ดาบ
+	glTranslated(-60, -20, 30);
+	glRotatef(180, 0, 0.0, 1.0);
+	
+
+	
+
+
+	glPushMatrix();//--------ตัวดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -90, -20.5);
+		glScaled(2, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder16();
+
+
+	glPopMatrix();
+
+	glPushMatrix();//--------ตัวดาบ2
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -93, -20.5);
+		glScaled(2, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder17();
+
+
+	glPopMatrix();
+
+
+	glPushMatrix();//--------ปลายดาบ
+	glColor3f(0.0f, 0.0f, 1.0f);
+		glTranslated(-28, -30, -20.5);
+		glScaled(2, 1.0, 0.7);
+		glRotatef(180, 0.0, 1.0, 1.0);
+		Cylinder15();
+
+
+	glPopMatrix();
+		glPopMatrix();
+glPopMatrix();
+}
+void display(void)
+{   		
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		
+	glClearColor(0,0,0,0.0);
+		//glRotatef(x,0.0, 1.0,0.0); //หมุนแบบแกน x
+	//glRotatef(x,y, 1.0,0.0);
+	foor1();
+	//sky1();
+	glPushMatrix();
+	glRotatef(x,0.0, 1.0,0.0);
+		
+	
+	glPushMatrix();
+	//glRotatef(x,0.0, 1.0,0.0);
+		eye();
+		nec();
+	glPopMatrix();
+	leg2();
+
+	body();
+	leg();
+	
+	glPushMatrix();
+	glTranslated(a,s, d);
+		glRotatef(y,0.0, 0.0,1.0);
+		
+		sword();
+		arm();
+	glPopMatrix();
+	//sword3();
+	sword2();
+	arm2();
+	tri();
+
+	skill();
+glPopMatrix();
+//-------------------------------------------------------------------------------
+
+
+
+
+
+
+//==================================================================================
+if(wingDir ==UP)//------------------------------------1
+{
+	q += 1.5; 
+	if (q > 50)
+		wingDir = DOWN; 
+} 
+else 
+{
+	q -=1.5;
+	if (q < 20)
+		wingDir= UP; 
+}
+
+
+if(wingDir2 ==UP2)//----------------------------------2
+{
+	i += 1.5; 
+	if (i > 95)
+		wingDir2 = DOWN2; 
+} 
+else 
+{
+	i -=1.5;
+	if (i < 80)
+		wingDir2= UP2; 
+}
+
+if(wingDir3 ==UP3)//----------------------------------3
+{
+	o += 1.5; 
+	if (o > 148)
+		wingDir3 = DOWN3; 
+} 
+else 
+{
+	o -=1.5;
+	if (o < 130)
+		wingDir3= UP3; 
+}
+
+if(wingDir4 ==UP4)//----------------------------------4
+{
+	p += 1.5; 
+	if (p > 90)
+		wingDir4 = DOWN4; 
+} 
+else 
+{
+	p -=1.5;
+	if (p< 84)
+		wingDir4= UP4; 
+}
+
+if(wingDir5 ==UP5)//----------------------------------5
+{
+	k += 1.5; 
+	if (k > 42)
+		wingDir5 = DOWN5; 
+} 
+else 
+{
+	k -=1.5;
+	if (k< 34)
+		wingDir5= UP5; 
+}
+
+if(wingDir6 ==UP6)//----------------------------------ขยายตา
+{
+	l += 1.0; 
+	if (l > 2.2)
+		wingDir6 = DOWN6; 
+} 
+else 
+{
+	l -=1.0;
+	if (l< 2.1)
+		wingDir6= UP6; 
+}
+
+
+if(t==1){
+
+if(wingDir7 ==UP7)//----------------------------------ฟันดาบบบบบบบบบบบบบบบบบบบบบบบบบบบบบ
+{
+	y = 90.0; 
+	a = 20;
+	s = 55;
+	d = 1.5;
+	t=1;
+	if (y == 90.0)
+		wingDir7 = DOWN7; 
+} 
+else 
+{
+	y = 0.0; 
+	a = 0.0;
+	s = 0.0;
+	d = 0.0;
+	if (y== 0.0)
+		wingDir7= UP7; 
+}
+}
+
+
+	glFlush();
+	glutSwapBuffers();
+
+	//x+=5;
+}
+
+void Init()
+{		
+	// light_position[] = { xvalue, 50, -15, 0.0 };
+	//GLfloat position[] = { xvalue, 50, -15, 0.0 };
+		//GLfloat mat_ambient[] = { 0.0, 0.0, 0.0, 1.0 };//เวกเตอร์สะท้อนแสงโดยรอบ โดยก าหนดสี R G B A
+	//GLfloat mat_diffuse[] = { 1.0, 1.0, 1.0, 1.0 }; //เวกเตอร์สะท้อนแสงแพร่ โดยก าหนดสี R G B A 
+   GLfloat mat_specular[] = { 1.0, 1.0, 1.0,1.0 };
+   GLfloat mat_shininess[] = { 100.0 };
+   GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+   //GLfloat light_position[] = { 1, 1, 1, 0 };
+GLfloat light0_diffuse[] = { 1,1, 1, 1 };
+GLfloat light0_specular[] = { 1, 1, 1, 1 };
+
+//GLfloat mat_ambient[] = {1, 1, 1, 1 };
+//GLfloat mat_diffuse[] = { .2f, .2f, .6f, 1 };
+//GLfloat mat_specular[] = { .8f, .8f, .8f, 1 };
+//GLfloat mat_shininess[] = { 128 };
+
+   glClearColor (0.0,0.0, 0.0, 0.0);
+   glShadeModel (GL_SMOOTH);
+ // glEnable(GL_DITHER);
+   
+
+  glLightfv( GL_LIGHT0, GL_DIFFUSE, light0_diffuse);
+glLightfv( GL_LIGHT0, GL_SPECULAR, light0_specular);
+// glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+//glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
+   glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+   glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+   glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+   glEnable(GL_DEPTH_TEST);
+
+    glColorMaterial(GL_FRONT, GL_SHININESS);
+	//glEnable(GL_COLOR_MATERIAL);
+   
+
+	glutSwapBuffers();
+}
+void main(void)
+{
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	Init();
+	glutDisplayFunc(display);
+		glutIdleFunc(display);
+	//glutMouseFunc(Mouse);
+	//glutKeyboardFunc(SpecialKeys);
+	glutSpecialFunc(SpecialKeys);
+	glutKeyboardFunc(myKeyboard);
+	//glutKeyboardFunc(processKeys);
+	//glutTimerFunc(0,timer,0);
+	glutMainLoop();
+}
