@@ -68,6 +68,8 @@
 
 
   String fall_history_json = "\'{\"falling\": [";
+  Double last_lat = 0.0d;
+  Double last_lon = 0.0d;
 
 
     try {
@@ -207,9 +209,10 @@
             e.printStackTrace();
           }
           try {
-
+			//String sql = "SELECT tstamp , hr , act_type FROM archive_RFG2D3T6ET WHERE tstamp BETWEEN SUBTIME('2017-06-18 01:35:14' , '1:00:00') AND '2017-06-18 01:35:14'"
             String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+currentDate+"' , '1:00:00') AND '"+currentDate+"' order by tstamp";
-            ResultSet rs = dbm.executeQuery(sql);
+
+		   ResultSet rs = dbm.executeQuery(sql);
             if((rs!=null) && (rs.next())){
               fall_history_json = fall_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\"}";
             }
@@ -223,6 +226,24 @@
               e.printStackTrace();
             }
 
+		out.println(fall_history_json);
+			
+			
+		try {
+  		String sql = "SELECT lat , lon FROM alerts WHERE SSSN = '"+sssn+"' ORDER BY id DESC LIMIT 1";
+  		ResultSet rs = dbm.executeQuery(sql);
+
+  		if (rs.next()){
+			last_lat = rs.getDouble("lat");
+			last_lon = rs.getDouble("lon");
+
+  		}
+
+  		} catch (Exception e) {
+  			out.println(e.getMessage());
+  			e.printStackTrace();
+  		}	
+		//out.println(last_lat +" "+last_lon);
 		dbm.closeConnection();
 %>
 <!doctype html>
@@ -259,9 +280,11 @@
   var message_act;
   var message_ts;
   var message_hr;
+  var message_lat;
+  var message_lon;
   var fall_history = <%=fall_history_json%>;
   var json_fall_history = JSON.parse(fall_history);
-
+var countna = 0
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
 	var hr = 0;
@@ -285,7 +308,9 @@
   var stab_3mean = <%=stab_3mean%>;
   var sym_mean = <%=sym_mean%>;
   var sym_3mean = <%=sym_3mean%>;
-
+  var last_lat =<%=last_lat%>;
+  var last_lon =<%=last_lon%>;
+  var infoWindow;
 
   var alert_sta = 0;
   var checksta = 0;
@@ -320,6 +345,7 @@
 
 	//Chart2
 	var startDate = new Date();
+	
 	startDate.setHours(0);
 	startDate.setMinutes(0);
 	startDate.setSeconds(0);
@@ -573,9 +599,11 @@ ctx.fillRect(0, 0, 80, 80);
 		   sdistance = sdistance + parseFloat(message.getAttribute('dist'));
        sta_index = parseFloat(message.getAttribute("stab"));
        sym_index = parseFloat(message.getAttribute("sym"));
-       message_act = parseInt(message.getAttribute("act_type"));
- message_hr = parseInt(message.getAttribute("hr"));
- message_ts = moment(parseInt(message.getAttribute("ts"))).format("YYYY-MM-DD HH:mm:ss");
+    message_act = parseInt(message.getAttribute("act_type"));
+	message_hr = parseInt(message.getAttribute("hr"));
+	message_ts = moment(parseInt(message.getAttribute("ts"))).format("YYYY-MM-DD HH:mm:ss");
+	message_lat = parseFloat(message.getAttribute("lat"));
+	message_lon = parseFloat(message.getAttribute("lon"));
 
  step_index += parseInt(message.getAttribute("step"))
 stride_index  += parseInt(message.getAttribute("stride"))
@@ -583,6 +611,7 @@ spd_index = parseFloat(message.getAttribute("spd"))
 step_frq_index = parseFloat(message.getAttribute("step_frq"))
 step_len_index = parseFloat(message.getAttribute("step_len"))
 dist_index += parseFloat(message.getAttribute("dist"))
+
 
        console.log("sta_index: " + sta_index);
  console.log("sym_index: " + sym_index);
@@ -630,6 +659,14 @@ dist_index += parseFloat(message.getAttribute("dist"))
 		   updateChart_ActivityDetail();
        updateChart_FallRisk();
 
+        //MoveMarker
+        marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
+        //map.panTo( new google.maps.LatLng( message_lat, message_lon) );
+        countna ++;
+        var contentString = '<div>ben: ' + countna + "</div>";
+        infoWindow.setContent(contentString);
+        infoWindow.open(map,marker);
+      
         },
         myId: 'test0',
         myDestination: 'topic://<%=sssn%>_pred'
@@ -889,6 +926,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
 
 
 }
+
 function updateChart_FallRisk(){
   document.getElementById("StepCount").innerHTML=step_index;
   document.getElementById("StrideCount").innerHTML=stride_index;
@@ -900,8 +938,9 @@ function updateChart_FallRisk(){
 // console.log("StepCount: " + StepCount);
 // console.log("StrideCount: " + StrideCount);
 // console.log("Distance: " + Distance);
-console.log("sta_index: " + sta_index + " typeof: " + typeof sta_index);
-console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
+
+//console.log("sta_index: " + sta_index + " typeof: " + typeof sta_index);
+//console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
 
     if ( gaugeChartSta ) {
@@ -1033,9 +1072,9 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
   				else if(parseInt(json_fall_history.falling[i].act) == 6){color_code = "#e448e7";}
 
 
-  				//console.log("show data json act = " + json_fall_history.falling[i].act);
-  				//console.log("show data json start = " + json_fall_history.falling[i].start);
-  				//console.log("show data json hr = " + json_fall_history.falling[i].value);
+  				console.log("show data json act = " + json_fall_history.falling[i].act);
+  				console.log("show data json start = " + json_fall_history.falling[i].start);
+  				console.log("show data json hr = " + json_fall_history.falling[i].value);
 
   				Data.push({
   					lineColor: color_code,
@@ -1101,6 +1140,21 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
     function zoomChart_realtime() {
         chart_realtime.zoomToIndexes(chart_realtime.endIndex-20,chart_realtime.endIndex);
     }
+	
+	
+	
+	
+    var map;
+	var maker =[];
+
+	var	contentString =
+            '<h1>Info Patient</h1>'+
+			'<b class="infotext" >Patient Name : </b><p id="patient_name"></p>'+
+			'<b class="infotext" >Stability index : </b><p id="sta"></p>'+
+			'<b class="infotext" >Symmetry index : </b><p id="sym"></p>'+
+			'<b class="infotext" >AVG speed : </b><p id="avg_spd"></p>'+
+			'<b class="infotext" >last time : </b><p id="last_time"></p>';
+	
     setInterval( function() {
       // normally you would load new datapoints here,
       // but we will just generate some random values
@@ -1124,9 +1178,9 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
     	//console.log(heartrate_random);
     	//console.log(color_text);
 
-    	console.log("show real time message_act = " + message_act);
+    	/*console.log("show real time message_act = " + message_act);
     	console.log("show real time message_hr = " + message_hr);
-    	console.log("show real time message_ts = " + message_ts);
+    	console.log("show real time message_ts = " + message_ts);*/
 
     	chart_realtime.dataProvider.push( {
 
@@ -1139,10 +1193,120 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
     	}, 3000 );
 
+/*
+setInterval(function(){
+function initMap() {
+   var myLatLng = {lat:last_lat, lng: last_lon};
+
+   	if(message_lat === undefined || message_lon === undefined){
+	 //var myLatLng = new google.maps.LatLng(-34.397, 150.644);
+
+	  map = new google.maps.Map(document.getElementById('map'),  {
+      zoom: 16,
+      center: myLatLng
+
+    });
+
+    marker = new google.maps.Marker({
+      position: myLatLng,
+      map: map
+    });
+			
+	}
+
+	else{
+	infowindow.close();			
+	infowindow = new google.maps.InfoWindow({
+    content: '<h1>'+message_ts+'</h1>'
+    });
+	
+	infowindow.open(map, this);
+
+	marker.setMap( map );
+    moveMarker( map, marker );
+		
+	}
+
+	
+	function moveMarker( map, marker ) {
+		
+        marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
+        map.panTo( new google.maps.LatLng( message_lat, message_lon) );
+        
+};
+
+google.maps.event.trigger(map, 'resize');
+
+}
+
+initMap();
+},3000);
+*/
+	
+	
+
+function initMap() {
+   var myLatLng = {lat:last_lat, lng: last_lon};
+
+   
+	 //var myLatLng = new google.maps.LatLng(-34.397, 150.644);
+
+	  map = new google.maps.Map(document.getElementById('map'),  {
+      zoom: 16,
+      center: myLatLng
+
+    });
+
+    marker = new google.maps.Marker({
+      position: myLatLng,
+      map: map
+    });
+			
+	
+	
+	/*infowindow = new google.maps.InfoWindow({
+    content: '<h1>test</h1>'
+    });*/
+	
+ infoWindow = new google.maps.InfoWindow();
+
+            /*marker.addListener('click', function() {  
+              var content = "";
+              infoWindow.setContent(content);
+                infoWindow.open(map, marker);
+
+            });*/
+
+
+	marker.setMap( map );
+   // moveMarker( map, marker );
+
+	
+
+  setInterval(function(){
+    google.maps.event.trigger(map, 'resize');
+  },300)
+  
+
+}
+
+/*function moveMarker( map, marker ) {
+		
+        marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
+        map.panTo( new google.maps.LatLng( message_lat, message_lon) );
+        
+}*/
+
+
 </script>
+  
+	
+	<script async defer
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvaaEu7gTg_1ewo6F22MRkHtuF6jCbi7g&callback=initMap">
+   </script>
 
 <style>
-
+.infotext { float:left; }
 .legend{
   position: absolute; top:0;
    margin-top: 5px;
@@ -1152,6 +1316,13 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
   width		: 100%;
   height		: 500px;
   font-size	: 11px;
+}
+#map {
+          position: relative;
+          width: 100%;
+          height: 45vh;
+          margin: 0;
+          padding: 0;
 }
 .chart { width:100%; height:500px; }
 .icon { float:left; margin-right:10px; }
@@ -1185,6 +1356,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
     <li class="active"><a data-toggle="tab" href="#fall-risk-analysis"><font class="s17">Fall Risk Analysis</font></a></li>
     <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
     <li><a data-toggle="tab" href="#activity_realtime"><font class="s17">Realtime Activity</font></a></li>
+	<li><a data-toggle="tab" href="#patient_location"><font class="s17">Patient Location</font></a></li>
   </ul>
 
 
@@ -1409,9 +1581,34 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
           </div>
 
+		  
+          <div id="patient_location" class="tab-pane fade">
+
+            <div class="row">
+          		<div class="col-md-12">
+
+					<div class="panel" style="margin-left:10px;margin-right:10px;">
+
+
+						<div id="map" style="height:900px; max-width: none; "></div>
+
+          
+
+					</div>
+                </div>
+          	</div>
+
+
+          </div>		  
     </div>
 </div>
+
+
 <!-- JS Main File -->
+	
+
+
+
 <script src="../js/bootstrap.min.js"></script>
 </body>
 </html>
