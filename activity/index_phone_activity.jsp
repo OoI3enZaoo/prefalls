@@ -309,7 +309,7 @@
 	var lactive = <%=lactive%>;
 	var lhactive = <%=lhactive%>;
 	var d = new Date();
-	var curdate = d.toDateString();
+	//var curdate = d.toDateString();
 	var actString = <%=acttype%>;
 	var acttype = JSON.parse(actString);
 	var curact = "Not Available";
@@ -497,9 +497,9 @@ var bottomTextSta;
 	}
 
 	function init(){
-		document.getElementById("curdate").innerHTML = curdate;
+		//document.getElementById("curdate").innerHTML = curdate;
 		document.getElementById("curact").innerHTML = curact;
-		document.getElementById("patient").innerHTML = "Patient Name : " + name;
+		//document.getElementById("patient").innerHTML = "Patient Name : " + name;
 
 
     var canvas = document.getElementById("canvas1");
@@ -547,7 +547,7 @@ ctx.fillRect(0, 0, 80, 80);
         rcvMessage: function(message)
         {
 		   d = new Date(parseInt(message.getAttribute('ts')));
-		   curdate = d.toDateString();
+		 //  curdate = d.toDateString();
 
 		   //End of day reset
 		   if (notAvail <= 0){
@@ -967,7 +967,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 		chart.validateData();
 
 		document.getElementById("curact").innerHTML = curact;
-		document.getElementById("curdate").innerHTML = curdate;
+		//document.getElementById("curdate").innerHTML = curdate;
 		document.getElementById("hr").innerHTML = Math.round(hr);
 		document.getElementById("steps").innerHTML = numberWithCommas(sstep);
 		document.getElementById("dist").innerHTML = numberWithCommas(Math.round(sdistance * 100)/100);
@@ -984,7 +984,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 		//chart2.dataProvider = chartActivityDetail;
 		chart2.validateData();
 
-		document.getElementById("patient").innerHTML = "Patient Name : " + name;
+		//document.getElementById("patient").innerHTML = "Patient Name : " + name;
 
 		//alert(chartActivityDetail.length);
 		//alert(chartActivityDetail[0].time + " " + chartActivityDetail[0].acttype + " " +  chartActivityDetail[0].value);
@@ -1179,7 +1179,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
 
 <div class="container">
-	<div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
+	<!-- <div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div> -->
 
 
 

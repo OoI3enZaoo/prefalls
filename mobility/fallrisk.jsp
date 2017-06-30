@@ -4,10 +4,18 @@
 <jsp:useBean id="dbm" class="th.ac.utcc.database.DBManager" />
 
 <%
+
+
+	String test_lat = "";
+	String test_lon = "";
+	
    if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
   dbm.createConnection();
+  
+  
+  
   String stab_mean = null;
   String stab_3mean = null;
   String sym_mean = null;
@@ -56,7 +64,7 @@ if(request.getParameter("stab_3mean") != null){
     }
   }
   try{
-    String sql = "select stab, sym, step,stride, dist,step_frq ,step_len,spd from archive_RFG2D3T6ET where tstamp = '"+tstamp+"'";
+    String sql = "select stab, sym, step,stride, dist,step_frq ,step_len,spd from archive_"+sssn+" where tstamp = '"+tstamp+"'";
     ResultSet rs = dbm.executeQuery(sql);
     if (rs.next()){
       sta_index = rs.getFloat("stab");
@@ -72,8 +80,28 @@ if(request.getParameter("stab_3mean") != null){
       out.println(e.getMessage());
       e.printStackTrace();
     }
-    
+	
+	
+	try {
 
+
+		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+tstamp+"','%Y-%m-%d %H:%i:%s')";
+		ResultSet rs = dbm.executeQuery(sql);
+
+		while((rs!=null) && (rs.next())){
+			test_lat = String.valueOf(rs.getDouble("lat"));
+			test_lon = String.valueOf(rs.getDouble("lon"));
+		}
+
+
+		} catch (Exception e) {
+			out.println(e.getMessage());
+			e.printStackTrace();
+		}
+
+	//out.println(test_lat +"m"+ test_lon);
+	
+	
  		dbm.closeConnection();
   %>
 
@@ -93,146 +121,12 @@ if(request.getParameter("stab_3mean") != null){
   <script src="https://www.amcharts.com/lib/3/gauge.js"></script>
   <script src="../js/bootstrap-notify.min.js"></script>
   <link rel="stylesheet" href="../css/animate.min.css">
-    <script async defer
-   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
-   </script>
-
-
-
-  <style media="screen">
-    .chart { width:100%; height:500px; }
-    #map {
-          position: relative;
-          width: 100%;
-          height: 45vh;
-          margin: 0;
-          padding: 0;
-      }
-
-  </style>
-  <body>
-<%@include file="../include/nav.jsp"%>
-
-
-
-  <div class="container">
-  <div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Fall History<span class="right"><%=name%> <%=tstamp%></span></font></div>
-
-  <div class="row">
-
-    <div id="tab0default" class="tab-pane fade in active">
-                <div class="col-md-6 col-xs-12">
-                    <div class="panel" style="margin-left:5px;margin-right:5px;">
-          <!--<img src=https://image.flaticon.com/icons/svg/148/148976.svg>-->
-           <div id="map" style="height:268px;"></div>
-                    </div>
-                </div>
-       <div class="col-md-6 col-xs-12">
-                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/148/148976.svg" width="30" height="30"></div>
-                        <div class="fs20">Date : <font id="date"></font></div>
-                    </div>
-                </div>
-      <div class="col-md-6 col-xs-12">
-                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                        <div class="icon"><img style="margin-top:10px;" src="https://image.flaticon.com/icons/svg/149/149060.svg" width="30" height="30" ></div>
-                        <div class="fs20">Location : <font id="location"></font></div>
-                    </div>
-                </div>
-     <!-- <div class="col-md-6 col-xs-12">
-                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/130/130160.svg" width="30" height="30"></div>
-                        <div class="fs20">Type of Falling : <font id="type_of_falling"></font>Falling to front</div>
-                    </div>
-                </div>-->
-                <div class="col-md-6 col-xs-12">
-                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/109/109394.svg" width="30" height="30"></div>
-                        <div class="fs20">Impact Force : <font id="speed_before"></font> N</div>
-                    </div>
-                    <!--<div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/353/353990.svg" width="30" height="30"></div>
-                        <div class="fs20">Additional info : <font id="additional">Test ADditional Data for testing once</font></div>
-                    </div>-->
-                </div>
-              </div>
-            </div>
-
-    <div class="row" style="margin-left:0px;margin-right:0px;">
-      <div class="col-md-12 col-xs-12">
-        <div class="panel" style="margin-left:0px;margin-right:0px;">
-          <div class="row" style="margin-left:0px;margin-right:0px;">
-            <div class="col-md-6 col-xs-12">
-              <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
-              <div id="chart-sta" class="chart" width="200px" style="padding-bottom: 90px;"></div>
-            </div>
-            <div class="col-md-6 col-xs-12">
-              <div class="fs20 text-primary text-center" style="margin-top: 10px">Symmetry Index</div>
-              <div id="chart-sym" class="chart" style="padding-bottom: 90px;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row" style="margin-left:0px;margin-right:0px;">
-  <div class="col-md-12 col-xs-12">
-    <div class="panel" style="color:#2d904f;margin-left:0px;margin-right:0px;padding-top: 10px; padding-bottom: 10px; margin-top: 0px; margin-bottom:0px;">
-      <div class="row" style="margin-left:0px;margin-right:0px;">
-        <div class="col-md-6 col-xs-12">
-          <div class="fs20">
-            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step Count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;Steps</div>
-
-            <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
-
-            <div class="fs20" style="margin-top: 15px">
-              <img src="../images/icons/active.png" width="30" height="30">
-
-                <font  style="color:#f57a3e;">Stride Count&nbsp;:&nbsp;<font id="StrideCount"></font>&nbsp;strides</font>
-              </div>
-
-              <div class="fs20" style="margin-top: 15px">
-                <img src="../images/icons/marker.png" width="30" height="30">
-                  <font style="color:#ea5f5c;">AVG Speed&nbsp;:&nbsp;<font id ="Speed">2.2</font>&nbsp;m/s</font>
-                </div>
-
-              </div>
-
-              <div class="col-md-6 col-xs-12">
-
-                <div class="fs20">
-                  <img src="../images/icons/walk.png" width="30" height="30">
-                    <font style="color:#2d904f;">AVG step frequency&nbsp;:&nbsp;<font id = "StepAvg">2</font>&nbsp;steps/s</font>
-                  </div>
-
-                  <div class="fs20" style="margin-top: 15px">
-                    <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font style="color:#f57a3e;">Estimated step lengh&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
-                    </div>
-
-                    <div class="fs20" style="margin-top: 15px">
-                      <img src="../images/icons/distance.png" width="30" height="30">
-
-                        <font style="color:#2f4074;">Distance&nbsp;:&nbsp;<font id="Distance" ></font>&nbsp;m.</font>
-                      </div>
-
-                    </div>
-
-                  </div>
-
-                </div>
-
-              </div>
-
-
-            </div>
-
-          </div>
-
-
-        </body>
-
         <script type="text/javascript">
+		var lat = <%=test_lat%>;
+		var lng = <%=test_lon%>;
+		
+		
+		
         var stab_mean = <%=stab_mean%>;
         var stab_3mean = <%=stab_3mean%>;
         var sym_mean = <%=sym_mean%>;
@@ -258,7 +152,17 @@ if(request.getParameter("stab_3mean") != null){
         console.log("step_frq_index: " + step_frq_index);
         console.log("step_len_index: " + step_len_index);
         console.log("spd_index: " + spd_index);
-        if(sta_index == 0 && sym_index == 0 && step_index == 0 && stride_index == 0 && dist_index == 0 && step_frq_index == 0 && step_len_index == 0 && spd_index == 0){
+        
+		
+window.onload = function() {
+     
+	document.getElementById("speed").innerHTML=spd_index;
+   document.getElementById("StepAvg").innerHTML=step_frq_index;
+   document.getElementById("EstLengh").innerHTML=step_len_index;
+ 
+} 		
+		
+		if(sta_index == 0 && sym_index == 0 && step_index == 0 && stride_index == 0 && dist_index == 0 && step_frq_index == 0 && step_len_index == 0 && spd_index == 0){
           console.log("no data");
           $.notify({
           	title: '<strong>Unsuccessful</strong>',
@@ -336,12 +240,8 @@ if(request.getParameter("stab_3mean") != null){
                "enabled": true
              }
            } );
-          document.getElementById("StepCount").innerHTML=step_index;
-          document.getElementById("StrideCount").innerHTML=stride_index;
-          document.getElementById("Distance").innerHTML=dist_index.toFixed(2);
-          document.getElementById("Speed").innerHTML=spd_index.toFixed(2);
-          document.getElementById("StepAvg").innerHTML=step_frq_index;
-          document.getElementById("StepLength").innerHTML=step_len_index.toFixed(2);
+
+
 function setValueInGauge(){
   if ( gaugeChartSta ) {
     if ( gaugeChartSta.arrows ) {
@@ -358,7 +258,7 @@ function setValueInGauge(){
             level = "Normal";
           }
           gaugeChartSta.axes[ 0 ].setBottomText(sta_index + "\n\n Stability Level : "+level );
-          console.log("stagauge");
+          //console.log("stagauge");
         }
       }
     }
@@ -381,8 +281,23 @@ function setValueInGauge(){
       }
     }
   }
-  clearInterval(timegauge);
+  //clearInterval(timegauge);
 }
+
+function randomValue() {
+
+  if ( gaugeChartSta ) {
+    if ( gaugeChartSta.arrows ) {
+      if ( gaugeChartSta.arrows[ 0 ] ) {
+        if ( gaugeChartSta.arrows[ 0 ].setValue ) {
+          gaugeChartSta.arrows[ 0 ].setValue( 50 );
+          gaugeChartSta.axes[ 0 ].setBottomText( 50 + " km/h" );
+        }
+      }
+    }
+  }
+}
+
 
 function initMap() {
     var myLatLng = {lat:lat, lng: lng};
@@ -413,4 +328,99 @@ if(lat == 0 || lng == 0){
 
 }
 
-        </script>
+
+
+</script>    
+	
+	
+	<script async defer
+   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
+   </script>
+	
+  <style media="screen">
+  
+  .icon { float:left; margin-right:10px; }
+  
+    .chart { width:100%; height:300px; }
+    #map {
+          position: relative;
+          width: 100%;
+          height: 45vh;
+          margin: 0;
+          padding: 0;
+      }
+      
+  </style>
+  <body>
+<%@include file="../include/nav.jsp"%>
+
+
+
+  <div class="container">
+  <div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Fall History<span class="right"><%=name%></span></font></div>
+
+  <div class="row">
+
+    <div id="tab0default" class="tab-pane fade in active">
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="margin-left:5px;margin-right:5px;">
+						<div id="map" style="height:300px;"></div>
+                    </div>
+                </div>
+				<div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img src="https://image.flaticon.com/icons/svg/148/148976.svg" width="30" height="30"></div>
+                        <div class="fs20">Date : <font id="date"> <%=tstamp%></font></div>
+                    </div>
+                </div>
+				<div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+                        <div class="icon"><img style="" src="https://image.flaticon.com/icons/svg/149/149060.svg" width="30" height="30" ></div>
+                        <div class="fs20">Location : <font id="location"><script>getLocation('<%=test_lat%>','<%=test_lon%>');</script></font></div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+						<div class="icon"><img style="" src="../images/icons/marker.png" width="30" height="30" ></div> 
+						<div class="fs20">AVG Speed : <font id="speed"></font> m/s</div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+						<div class="icon"><img style="" src="../images/icons/walk.png" width="30" height="30" ></div> 
+						<div class="fs20">AVG step frequency : <font id="StepAvg"></font> steps/s</div>
+                    </div>
+                </div>	
+                <div class="col-md-6 col-xs-12">
+                    <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
+						<div class="icon"><img style="" src="../images/icons/step_length.png" width="30" height="30" ></div> 
+						<div class="fs20">Estimated step lengh : <font id="EstLengh"></font> CM.</div>
+                    </div>
+                </div>				
+              </div>
+            </div>
+
+    <div class="row" style="margin-left:0px;margin-right:0px;">
+      <div class="col-md-12 col-xs-12">
+        <div class="panel" style="margin-left:0px;margin-right:0px;">
+          <div class="row" style="margin-left:0px;margin-right:0px;">
+            <div class="col-md-6 col-xs-12">
+              <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
+              <div id="chart-sta" class="chart" width="200px" "></div>
+            </div>
+            <div class="col-md-6 col-xs-12">
+              <div class="fs20 text-primary text-center" style="margin-top: 10px">Symmetry Index</div>
+              <div id="chart-sym" class="chart" "></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+          </div>
+
+
+        </body>
+

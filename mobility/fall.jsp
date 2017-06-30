@@ -17,8 +17,6 @@
  	if(request.getParameter("SSSN") != null){
  		session.setAttribute("SSSN",request.getParameter("SSSN"));
  	}
-
-
 String sssn = (String)session.getAttribute("SSSN");
 String fall_history_json = "\'{\"falling\": [";
 String test_lat = "";
@@ -27,6 +25,7 @@ String test_lon = "";
 String impact_force ="";
 
 	try {
+
 		String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+tstamp+"' , '0:30:00') AND ADDTIME('"+tstamp+"' , '0:30:00') ORDER BY tstamp";
 		ResultSet rs = dbm.executeQuery(sql);
 		if((rs!=null) && (rs.next())){

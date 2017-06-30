@@ -84,7 +84,7 @@
 
 </script>
 <div class="container">
-    <div class="panel"><font class="fs17">Assessment Log<span id="patient" class="right"><%=name%></span></font></div>
+    <div class="panel"><font class="fs17">Fall History<span id="patient" class="right"><%=name%></span></font></div>
     <div class="panel">
 
 

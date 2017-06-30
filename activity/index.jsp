@@ -197,6 +197,9 @@
             stab_3mean  = rs.getFloat("stab_3mean");
             sym_mean = rs.getFloat("sym_mean");
             sym_3mean = rs.getFloat("sym_3mean");
+
+     
+
             session.setAttribute("stab_mean",stab_mean);
             session.setAttribute("stab_3mean",stab_3mean);
             session.setAttribute("sym_mean",sym_mean);
@@ -226,7 +229,7 @@
               e.printStackTrace();
             }
 
-		out.println(fall_history_json);
+		//out.println(fall_history_json);
 			
 			
 		try {
@@ -284,7 +287,9 @@
   var message_lon;
   var fall_history = <%=fall_history_json%>;
   var json_fall_history = JSON.parse(fall_history);
-var countna = 0
+
+
+
 	var msgInterval = <%=msgInterval%>;
 	var actgroup = 0;
 	var hr = 0;
@@ -314,7 +319,7 @@ var countna = 0
 
   var alert_sta = 0;
   var checksta = 0;
-
+    var color_text ="";
   var sta_interval1;
   var sta_interval2;
 
@@ -404,7 +409,7 @@ var bottomTextSta;
       "axisThickness": 1,
       "axisAlpha": 0.2,
       "tickAlpha": 0.2,
-
+      "valueInterval": 0.4,
       "bands": [ {
         "color": "#84b761",
         "endValue": <%=stab_mean%>,
@@ -420,14 +425,15 @@ var bottomTextSta;
         "startValue":<%=stab_3mean%>
       } ],
       "bottomText": "0",
-      "bottomTextYOffset": -20,
+      "bottomTextYOffset": 10,
       "endValue": <%=stab_3mean *2 %>,
 
-      "bottomTextFontSize" : 15
+      "bottomTextFontSize" : 15,
+
     } ],
     "arrows": [ {} ],
     "export": {
-      "enabled": false
+      "enabled": true
     }
   } );
 
@@ -441,6 +447,7 @@ var bottomTextSta;
       "axisThickness": 1,
       "axisAlpha": 0.2,
       "tickAlpha": 0.2,
+ 	"valueInterval": 0.4,
 
       "bands": [ {
         "color": "#84b761",
@@ -457,9 +464,10 @@ var bottomTextSta;
         "startValue": <%=sym_3mean%>
       } ],
       "bottomText": "0",
-      "bottomTextYOffset": -20,
+      "bottomTextYOffset": 10,
       "endValue": <%=sym_3mean *2%>,
-      "bottomTextFontSize" : 15
+      "bottomTextFontSize" : 15,
+
     } ],
     "arrows": [ {} ],
     "export": {
@@ -659,13 +667,48 @@ dist_index += parseFloat(message.getAttribute("dist"))
 		   updateChart_ActivityDetail();
        updateChart_FallRisk();
 
+	   
+    	if(message_act == 2){color_text = "#C0C0C0"}
+    			else if(message_act == 1){color_text = "#e98529";}
+    			else if(message_act == 3){color_text = "#d4f145";}
+    			else if(message_act == 4){color_text = "#5bda47";}
+    			else if(message_act == 5){color_text = "#003300";}
+    			else if(message_act == 8 || message_act == 7){color_text = "#0983d2";}
+    			else if(message_act == 6){color_text = "#e448e7";}
+
+    	//console.log(date_test);
+    	//console.log(heartrate_random);
+    	//console.log(color_text);
+
+    	/*console.log("show real time message_act = " + message_act);
+    	console.log("show real time message_hr = " + message_hr);
+    	console.log("show real time message_ts = " + message_ts);*/
+
+    	chart_realtime.dataProvider.push( {
+
+    	lineColor: color_text,
+    	date: message_ts,
+    	heartrate: message_hr
+
+    	} );
+    	chart_realtime.validateData();
+
+	   
+	   
+	   
         //MoveMarker
         marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
-        //map.panTo( new google.maps.LatLng( message_lat, message_lon) );
-        countna ++;
-        var contentString = '<div>ben: ' + countna + "</div>";
+        map.panTo( new google.maps.LatLng( message_lat, message_lon) );
+        var contentString =             
+			'<h1>Info Patient</h1>'+
+			'<b class="infotext" >Patient Name : </b><p id="patient_name">'+name+'</p>'+
+			'<b class="infotext" >Stability index : </b><p id="sta">'+sta_index+'</p>'+
+			'<b class="infotext" >Symmetry index : </b><p id="sym">'+sym_index+'</p>'+
+			'<b class="infotext" >AVG speed : </b><p id="avg_spd">'+spd_index+'</p>'+
+			'<b class="infotext" >last time : </b><p id="last_time">'+message_ts+'</p>';
+			
         infoWindow.setContent(contentString);
-        infoWindow.open(map,marker);
+		infoWindow.open(map,marker);
       
         },
         myId: 'test0',
@@ -927,6 +970,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
 
 }
 
+
 function updateChart_FallRisk(){
   document.getElementById("StepCount").innerHTML=step_index;
   document.getElementById("StrideCount").innerHTML=stride_index;
@@ -947,7 +991,11 @@ function updateChart_FallRisk(){
       if ( gaugeChartSta.arrows ) {
         if ( gaugeChartSta.arrows[ 0 ] ) {
           if ( gaugeChartSta.arrows[ 0 ].setValue ) {
-            gaugeChartSta.arrows[ 0 ].setValue( sta_index );
+            if(sta_index > stab_3mean*2){
+                   gaugeChartSta.arrows[ 0 ].setValue( stab_3mean*2 );
+              }else{
+                 gaugeChartSta.arrows[ 0 ].setValue( sta_index );
+              }
             var level;
             if(sta_index> stab_3mean){
               level = "Dangerous";
@@ -980,7 +1028,11 @@ function updateChart_FallRisk(){
       if ( gaugeChartSym.arrows ) {
         if ( gaugeChartSym.arrows[ 0 ] ) {
           if ( gaugeChartSym.arrows[ 0 ].setValue ) {
-            gaugeChartSym.arrows[ 0 ].setValue( sym_index );
+              if(sym_index > sym_3mean*2){
+                  gaugeChartSym.arrows[ 0 ].setValue( sym_index *2);
+              }else{
+                gaugeChartSym.arrows[ 0 ].setValue( sym_index );
+              }
             gaugeChartSym.axes[ 0 ].setBottomText( sym_index + "\n\n Symmetry Level : "+level);
 
           }
@@ -1145,61 +1197,12 @@ function updateChart_FallRisk(){
 	
 	
     var map;
-	var maker =[];
+	var marker;
 
-	var	contentString =
-            '<h1>Info Patient</h1>'+
-			'<b class="infotext" >Patient Name : </b><p id="patient_name"></p>'+
-			'<b class="infotext" >Stability index : </b><p id="sta"></p>'+
-			'<b class="infotext" >Symmetry index : </b><p id="sym"></p>'+
-			'<b class="infotext" >AVG speed : </b><p id="avg_spd"></p>'+
-			'<b class="infotext" >last time : </b><p id="last_time"></p>';
-	
-    setInterval( function() {
-      // normally you would load new datapoints here,
-      // but we will just generate some random values
-      // and remove the value from the beginning so that
-      // we get nice sliding graph feeling
 
-      // remove datapoint from the beginning
-      //chart_realtime.dataProvider.shift();
 
-      // add new one at the end
-      var color_text ="";
-    	if(message_act == 2){color_text = "#C0C0C0"}
-    			else if(message_act == 1){color_text = "#e98529";}
-    			else if(message_act == 3){color_text = "#d4f145";}
-    			else if(message_act == 4){color_text = "#5bda47";}
-    			else if(message_act == 5){color_text = "#003300";}
-    			else if(message_act == 8 || message_act == 7){color_text = "#0983d2";}
-    			else if(message_act == 6){color_text = "#e448e7";}
-
-    	//console.log(date_test);
-    	//console.log(heartrate_random);
-    	//console.log(color_text);
-
-    	/*console.log("show real time message_act = " + message_act);
-    	console.log("show real time message_hr = " + message_hr);
-    	console.log("show real time message_ts = " + message_ts);*/
-
-    	chart_realtime.dataProvider.push( {
-
-    	lineColor: color_text,
-    	date: message_ts,
-    	heartrate: message_hr
-
-    	} );
-    	chart_realtime.validateData();
-
-    	}, 3000 );
-
-/*
-setInterval(function(){
 function initMap() {
    var myLatLng = {lat:last_lat, lng: last_lon};
-
-   	if(message_lat === undefined || message_lon === undefined){
-	 //var myLatLng = new google.maps.LatLng(-34.397, 150.644);
 
 	  map = new google.maps.Map(document.getElementById('map'),  {
       zoom: 16,
@@ -1212,84 +1215,70 @@ function initMap() {
       map: map
     });
 			
-	}
 
-	else{
-	infowindow.close();			
-	infowindow = new google.maps.InfoWindow({
-    content: '<h1>'+message_ts+'</h1>'
-    });
-	
-	infowindow.open(map, this);
+	infoWindow = new google.maps.InfoWindow();
 
-	marker.setMap( map );
-    moveMarker( map, marker );
-		
-	}
-
-	
-	function moveMarker( map, marker ) {
-		
-        marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
-        map.panTo( new google.maps.LatLng( message_lat, message_lon) );
-        
-};
-
-google.maps.event.trigger(map, 'resize');
-
-}
-
-initMap();
-},3000);
-*/
-	
-	
-
-function initMap() {
-   var myLatLng = {lat:last_lat, lng: last_lon};
-
-   
-	 //var myLatLng = new google.maps.LatLng(-34.397, 150.644);
-
-	  map = new google.maps.Map(document.getElementById('map'),  {
-      zoom: 16,
-      center: myLatLng
-
-    });
-
-    marker = new google.maps.Marker({
-      position: myLatLng,
-      map: map
-    });
-			
-	
-	
-	/*infowindow = new google.maps.InfoWindow({
-    content: '<h1>test</h1>'
-    });*/
-	
- infoWindow = new google.maps.InfoWindow();
-
-            /*marker.addListener('click', function() {  
-              var content = "";
-              infoWindow.setContent(content);
-                infoWindow.open(map, marker);
-
-            });*/
 
 
 	marker.setMap( map );
-   // moveMarker( map, marker );
+ 
 
-	
 
   setInterval(function(){
     google.maps.event.trigger(map, 'resize');
   },300)
   
-
 }
 
+/*
+
+  function initMap() {
+        var uluru = {lat: -25.363, lng: 131.044};
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: uluru
+        });
+
+        var contentString = '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+            '<div id="bodyContent">'+
+            '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+            'sandstone rock formation in the southern part of the '+
+            'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
+            'south west of the nearest large town, Alice Springs; 450&#160;km '+
+            '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
+            'features of the Uluru - Kata Tjuta National Park. Uluru is '+
+            'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
+            'Aboriginal people of the area. It has many springs, waterholes, '+
+            'rock caves and ancient paintings. Uluru is listed as a World '+
+            'Heritage Site.</p>'+
+            '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+            'https://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+            '(last visited June 22, 2009).</p>'+
+            '</div>'+
+            '</div>';
+
+        var infowindow = new google.maps.InfoWindow({
+          content: contentString
+        });
+
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map,
+          title: 'Uluru (Ayers Rock)'
+        });
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+		
+		
+  setInterval(function(){
+    google.maps.event.trigger(map, 'resize');
+  },300)
+      }
+*/
 /*function moveMarker( map, marker ) {
 		
         marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
@@ -1298,6 +1287,18 @@ function initMap() {
 }*/
 
 
+	/*$(function(){
+
+			console.log("step_index: " + step_index)
+
+	 document.getElementById("StepCount").innerHTML=step_index;
+	  document.getElementById("StrideCount").innerHTML=stride_index;
+	  document.getElementById("Speed").innerHTML=spd_index.toFixed(2);
+	  document.getElementById("StepLength").innerHTML=step_len_index.toFixed(2);
+	  document.getElementById("StepAvg").innerHTML=step_frq_index;
+	  document.getElementById("Distance").innerHTML = dist_index.toFixed(2);
+
+	});*/
 </script>
   
 	
@@ -1391,8 +1392,7 @@ function initMap() {
       <div class="row" style="margin-left:0px;margin-right:0px;">
         <div class="col-md-6 col-xs-12">
           <div class="fs20">
-            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step Count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;Steps</div>
-
+            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;steps</div>
             <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
 
             <div class="fs20" style="margin-top: 15px">
@@ -1417,7 +1417,7 @@ function initMap() {
 
                   <div class="fs20" style="margin-top: 15px">
                     <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font id="velocity" style="color:#f57a3e;">Estimated step lengh&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
+                      <font id="velocity" style="color:#f57a3e;">Estimated step length&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;cm.</font>
                     </div>
 
                     <div class="fs20" style="margin-top: 15px">

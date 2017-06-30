@@ -49,17 +49,36 @@
 
 	String hr = "\'{\"allhr\": [";
 	String rollalerts = "\'{\"allrollalerts\": [";
-	String fall_history_json = "\'{\"falling\": [";
+	String sta_sym_history_json = "\'{\"sta_sym\": [";
 
+	
     int minhr = 0;
     int maxhr = 0;
 
+	Double sta_mean = 0.0;
+	Double sta_3mean = 0.0;
+	Double sym_mean = 0.0;
+	Double sym_3mean = 0.0;
 
-	String test_lat = "";
-	String test_lon = "";
 
 	dbm.createConnection();
 
+try {
+		String sql = "SELECT * FROM gait_criterion ;";
+		ResultSet rs = dbm.executeQuery(sql);
+
+		if (rs.next()){
+			sta_mean = rs.getDouble("stab_mean");
+			sta_3mean = rs.getDouble("stab_3mean");
+			sym_mean = rs.getDouble("sym_mean");
+			sym_3mean = rs.getDouble("sym_3mean");
+		}
+
+	} catch (Exception e) {
+		out.println(e.getMessage());
+		e.printStackTrace();
+	}
+	
     try {
 		String grminmax = "SELECT  hr FROM archive_"+sssn+" where DATE_FORMAT(tstamp,'%Y-%m-%d')= '"+date+"'";
 		ResultSet rshr= dbm.executeQuery(grminmax);
@@ -201,44 +220,50 @@
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
+		
 	try {
-		start_fall = "2017-06-01 18:00:00";
-		String sql = "SELECT tstamp , hr , act_type FROM archive_"+sssn+" WHERE tstamp BETWEEN SUBTIME('"+start_fall+"' , '0:30:00') AND ADDTIME('"+start_fall+"' , '0:30:00')";
+		String sql = "SELECT tstamp , stab , sym FROM archive_"+sssn+" WHERE DATE_FORMAT(tstamp,'%Y-%m-%d') = '"+date+"' ";
 		ResultSet rs = dbm.executeQuery(sql);
-		if((rs!=null) && (rs.next())){
-			fall_history_json = fall_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\"}";
+		if (rs.next()){
+				Double stab = rs.getDouble("stab");
+				Double sym = rs.getDouble("sym");
+				if(stab > sta_3mean*2){
+					stab = sta_3mean*2;
+				
+				}
+				if(sym > sym_3mean){
+					sym = sym_3mean*2;
+				
+				}
+				sta_sym_history_json = sta_sym_history_json + "{\"start\":\"" + rs.getString("tstamp") + "\" , \"value_sta\":\"" + stab+ "\" , \"value_sym\":\"" + sym + "\" }";
+
+			}
+		while(rs.next()){
+				Double stab = rs.getDouble("stab");
+				Double sym = rs.getDouble("sym");
+				if(stab > sta_3mean*2){
+					stab = sta_3mean*2;
+				
+				}
+				if(sym > sym_3mean){
+					sym = sym_3mean*2;
+				
+				}
+
+			sta_sym_history_json = sta_sym_history_json + ", {\"start\":\"" + rs.getString("tstamp") + "\" , \"value_sta\":\"" + stab + "\" , \"value_sym\":\"" + sym + "\" }";
 		}
-		while((rs!=null) && (rs.next())){
-			fall_history_json = fall_history_json + ", {\"start\":\"" + rs.getString("tstamp") + "\" , \"value\":\"" + rs.getFloat("hr") + "\" , \"act\":\"" + rs.getInt("act_type") + "\" }";
-		}
-		fall_history_json = fall_history_json + "]}\'";
+		sta_sym_history_json = sta_sym_history_json + "]}\'";
 
 		} catch (Exception e) {
 			out.println(e.getMessage());
 			e.printStackTrace();
 		}
-		//out.println(fall_history_json);
+		
+		
+	//out.println(sta_history_json);
 
-
-	try {
-		start_fall = "2012-01-02 09:19:52";
-
-		String sql = "SELECT lat , lon FROM archive_"+sssn+" WHERE tstamp = DATE_FORMAT('"+start_fall+"','%Y-%m-%d %H:%i:%s')";
-		ResultSet rs = dbm.executeQuery(sql);
-
-		while((rs!=null) && (rs.next())){
-			test_lat = String.valueOf(rs.getDouble("lat"));
-			test_lon = String.valueOf(rs.getDouble("lon"));
-		}
-
-
-		} catch (Exception e) {
-			out.println(e.getMessage());
-			e.printStackTrace();
-		}
-
-		//out.println(test_lat + test_lon);
-
+	
+	
 	dbm.closeConnection();
 
     date = "\""+date+"\"";
@@ -315,6 +340,10 @@
 
     var minhr = <%=minhr%>;
     var maxhr = <%=maxhr%>;
+	var sta_mean = <%=sta_mean%>;
+	var sta_3mean = <%=sta_3mean%>;
+	var sym_mean =<%=sym_mean%>;
+	var sym_3mean = <%=sym_3mean%>;
 
 	var name = <%=name%>;
 
@@ -322,13 +351,10 @@
 	var jsonhr = JSON.parse(hr);
 	var rollalerts = <%=rollalerts%>;
 	var	jsonrollalerts = JSON.parse(rollalerts);
-	var fall_history = <%=fall_history_json%>;
-	var json_fall_history = JSON.parse(fall_history);
-	console.log(json_fall_history);
+	var json_sta = <%=sta_sym_history_json%>;
+	var	json_sta_sym_history = JSON.parse(json_sta);
 
-	//varible google map
-	var lat = 13.664336;//<%=test_lat%>
-	var lng = 100.387573;//<%=test_lon%>
+
 
 
 	// Donut chart
@@ -488,7 +514,7 @@
             "enabled": true
         }
     });
-
+/*
     charthr.addListener("dataUpdated", zoomChartHR);
     // when we apply theme, the dataUpdated event is fired even before we add listener, so
     // we need to call zoomChart here
@@ -499,7 +525,7 @@
 
         charthr.zoomToIndexes(chartDataHR.length - 250, chartDataHR.length - 100);
     }
-
+*/
 
     function ChartDatahr() {
     var Datahr = [];
@@ -612,105 +638,6 @@
 
 
 
-var chart_realtime = AmCharts.makeChart("chartdivactivity", {
-     "type": "serial",
-    "theme": "light",
-    "marginRight": 80,
-	"dataProvider": Generator_Activity()
-    /*"dataProvider": [{
-           "lineColor": "#b7e021",
-        "date": "2017-06-02 14:50:29",
-        "heartrate": 408
-    },{
-			"lineColor": "#b7e021",
-      "date": "2017-06-02 14:50:30",
-        "heartrate": 208
-    }, {
-        "lineColor": "#FFFF00",
-      "date": "2017-06-02 14:50:31",
-         "heartrate": 482
-    }, {
-        "lineColor": "#FFFF00",
-      "date": "2017-06-02 14:50:32",
-         "heartrate": 562
-    }, {
-        "lineColor": "#FFFF00",
-      "date": "2017-06-02 14:50:33",
-         "heartrate": 379
-    }, {
-		        "lineColor": "#FFFF00",
-      "date": "2017-06-02 14:50:34",
-         "heartrate": 640
-    }, {
-		"lineColor": "#2498d2",
-      "date": "2017-06-02 14:50:35",
-         "heartrate": 379
-    }, {
-      "date": "2017-06-02 14:50:36",
-	  "heartrate": 640
-    },{
-		"lineColor": "#FF0000",
-      "date": "2017-06-02 14:50:37",
-         "heartrate": 379
-    }, {
-      "date": "2017-06-02 14:50:38",
-         "heartrate": 640
-    }, {
-      "date": "2017-06-02 14:50:39",
-         "heartrate": 140
-    }, {
-      "date": "2017-06-02 14:50:40",
-         "heartrate": 240
-    }]
-*/
-	,
-    "balloon": {
-        "cornerRadius": 6,
-        "horizontalPadding": 15,
-        "verticalPadding": 10
-    },
-  "valueAxes": [{
-        "id": "heartrateAxis",
-        "axisAlpha": 0,
-        "gridAlpha": 0,
-        "position": "left",
-        "title": "heartrate1"
-    }],
-    "graphs": [{
-        "bullet": "square",
-        "bulletBorderAlpha": 1,
-        "bulletBorderThickness": 1,
-        "fillAlphas": 0.3,
-        "fillColorsField": "lineColor",
-        "legendValueText": "[[value]]",
-        "lineColorField": "lineColor",
-        "valueField": "heartrate",
-		"valueAxis": "heartrateAxis"
-    }],
-	"chartScrollbar": {
-
-    },
-    "chartCursor": {
-        "categoryBalloonDateFormat": "JJ:NN:SS, DD MMMM YYYY",
-        "cursorPosition": "mouse"
-    },
-    "categoryField": "date",
-	"dateFormat": "YYYY-MM-DD HH:NN:SS",
-    "categoryAxis": {
-        "minPeriod": "ss",
-        "parseDates": true
-    },
-    "export": {
-        "enabled": true
-    },
-});
-
-
-chart_realtime.addListener("dataUpdated", zoomChart_realtime);
-
-function zoomChart_realtime() {
-    chart_realtime.zoomToIndexes(chart_realtime.endIndex-20,chart_realtime.endIndex);
-}
 
 
     function ChartDataRoll() {
@@ -925,110 +852,284 @@ function zoomChart_realtime() {
 		return out;
 	}
 
+	var chart_sta = AmCharts.makeChart("chart_sta", {
+    "type": "serial",
+    "theme": "light",
+    "marginRight":80,
+    "autoMarginOffset":20,
+	"categoryField": "date",
+    "dataDateFormat": "YYYY-MM-DD HH:NN:SS",
+	"dataProvider": Generator_sta()
+ /*   "dataProvider": [{
+           
+        "date": "2017-06-02 14:50:29",
+        "heartrate": 408
+    },{
+			
+      "date": "2017-06-02 14:50:30",
+        "heartrate": 208
+    }, {
+  
+      "date": "2017-06-02 14:50:31",
+         "heartrate": 482
+    }, {
+  
+      "date": "2017-06-02 14:50:32",
+         "heartrate": 562
+    }, {
+   
+      "date": "2017-06-02 14:50:33",
+         "heartrate": 379
+    }, {
+		 
+      "date": "2017-06-02 14:50:34",
+         "heartrate": 640
+    }, {
+	
+      "date": "2017-06-02 14:50:35",
+         "heartrate": 379
+    }, {
+      "date": "2017-06-02 14:50:36",
+	  "heartrate": 640
+    },{
+		
+      "date": "2017-06-02 14:50:37",
+         "heartrate": 379
+    }, {
+      "date": "2017-06-02 14:50:38",
+         "heartrate": 640
+    }, {
+      "date": "2017-06-02 14:50:39",
+         "heartrate": 140
+    }, {
+      "date": "2017-06-02 14:50:40",
+         "heartrate": 240
+    }]*/
+,
+    "valueAxes": [{
+        "axisAlpha": 0,
+        "guides": [{
+            "fillAlpha": 0.1,
+            "fillColor": "#00ff00",
+            "lineAlpha": 0,
+            "toValue": sta_mean,
+            "value": 0
+        },
+        {
+            "fillAlpha": 0.1,
+            "fillColor": "#ffff00",
+            "lineAlpha": 0,
+            "toValue": sta_3mean,
+            "value": sta_mean
+        },
+        {
+            "fillAlpha": 0.1,
+            "fillColor": "#ff0000",
+            "lineAlpha": 0,
+            "toValue": 100,
+            "value": sta_3mean
+        }],
+        "position": "left",
+        "tickLength": 0
+    }],
+    "graphs": [{
+        "balloonText": "[[category]]<br><b><span style='font-size:14px;'>Stability:[[value]]</span></b>",
+        "bullet": "round",
+        "dashLength": 3,
+        "colorField":"color",
+        "valueField": "stability",
+		"valueAxis": "StabilityAxis"
+    }],
 
-      function initMap() {
-        var myLatLng = {lat:lat, lng: lng};
-
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 16,
-          center: myLatLng
-        });
-
-        var marker = new google.maps.Marker({
-          position: myLatLng,
-          map: map,
-          title: 'Hello World!'
-        });
-      }
-
-		var i_realtime =1;
-	setInterval( function() {
-  // normally you would load new datapoints here,
-  // but we will just generate some random values
-  // and remove the value from the beginning so that
-  // we get nice sliding graph feeling
-
-  // remove datapoint from the beginning
-  //chart_realtime.dataProvider.shift();
-
-  // add new one at the end
-
-	var stringdate = "2017-06-01 18:30:00";
-	var momentdate = moment(stringdate);
-
-	console.log("show i =" + i_realtime);
-	var date_test = moment(momentdate).add(3*i_realtime,'s').format('YYYY-MM-D k:mm:ss');
-	var heartrate_random = Math.floor((Math.random() *100)+1);
-	var color_text = "";
-	if (heartrate_random > 60){
-		color_text = "#b7e021";
-	}
-	else if (heartrate_random >20){
-		color_text = "#FF0000";
-	}
-	else {
-		color_text = "#FF00FF";
-	}
-
-	console.log(date_test);
-	console.log(heartrate_random);
-	console.log(color_text);
-
-	chart_realtime.dataProvider.push( {
-
-	lineColor: color_text,
-	date: date_test,
-	heartrate: heartrate_random
-
-	} );
-	chart_realtime.validateData();
-
-	i_realtime++;
-	}, 3000 );
-
-
-	$.getJSON("http://maps.googleapis.com/maps/api/geocode/json?latlng="+lat+","+lng+"&sensor=false", function(result){
-            $("#location").text(result.results[0].formatted_address);
-			console.log("print location = "  + result.results[0].formatted_address);
-    });
-
-
-$(function(){
-
-
-		var canvas = document.getElementById("canvas1");
-   var ctx = canvas.getContext("2d");
-   ctx.fillStyle = '#fa2e13';
-   ctx.fillRect(0, 0, 80, 80);
-   var canvas = document.getElementById("canvas2");
-  var ctx = canvas.getContext("2d");
-  ctx.fillStyle = '#5bda47';
-  ctx.fillRect(0, 0, 80, 80);
-  var canvas = document.getElementById("canvas3");
- var ctx = canvas.getContext("2d");
- ctx.fillStyle = '#e448e7';
- ctx.fillRect(0, 0, 80, 80);
- var canvas = document.getElementById("canvas4");
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = '#e98529';
-ctx.fillRect(0, 0, 80, 80);
-var canvas = document.getElementById("canvas5");
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = '#a2d6f9';
-ctx.fillRect(0, 0, 80, 80);
-var canvas = document.getElementById("canvas6");
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = '#d4f145';
-ctx.fillRect(0, 0, 80, 80);
-var canvas = document.getElementById("canvas7");
-var ctx = canvas.getContext("2d");
-ctx.fillStyle = '#0983d2';
-ctx.fillRect(0, 0, 80, 80);
+    "chartScrollbar": {
+        "scrollbarHeight":2,
+        "offset":-1,
+        "backgroundAlpha":0.1,
+        "backgroundColor":"#888888",
+        "selectedBackgroundColor":"#67b7dc",
+        "selectedBackgroundAlpha":1
+    },
+    "chartCursor": {
+        "fullWidth":true,
+        "valueLineEabled":true,
+        "valueLineBalloonEnabled":true,
+        "valueLineAlpha":0.5,
+        "cursorAlpha":0,
+		"categoryBalloonDateFormat": "JJ:NN:SS, DD MMMM YYYY",
+        "cursorPosition": "mouse"
+    },
+    "categoryField": "date",
+    "categoryAxis": {
+        "parseDates": true,
+        "axisAlpha": 0,
+        "gridAlpha": 0.1,
+        "minorGridAlpha": 0.1,
+        "minorGridEnabled": true,
+		"minPeriod": "ss",
+        "parseDates": true
+    },
+    "export": {
+        "enabled": true
+     }
 });
-    </script>
-    <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
-    </script>
+
+var chart_sym = AmCharts.makeChart("chart_sym", {
+    "type": "serial",
+    "theme": "light",
+    "marginRight":80,
+    "autoMarginOffset":20,
+	"categoryField": "date",
+    "dataDateFormat": "YYYY-MM-DD HH:NN:SS",
+	"dataProvider": Generator_sym()
+ /*   "dataProvider": [{
+           
+        "date": "2017-06-02 14:50:29",
+        "heartrate": 408
+    },{
+			
+      "date": "2017-06-02 14:50:30",
+        "heartrate": 208
+    }, {
+  
+      "date": "2017-06-02 14:50:31",
+         "heartrate": 482
+    }, {
+  
+      "date": "2017-06-02 14:50:32",
+         "heartrate": 562
+    }, {
+   
+      "date": "2017-06-02 14:50:33",
+         "heartrate": 379
+    }, {
+		 
+      "date": "2017-06-02 14:50:34",
+         "heartrate": 640
+    }, {
+	
+      "date": "2017-06-02 14:50:35",
+         "heartrate": 379
+    }, {
+      "date": "2017-06-02 14:50:36",
+	  "heartrate": 640
+    },{
+		
+      "date": "2017-06-02 14:50:37",
+         "heartrate": 379
+    }, {
+      "date": "2017-06-02 14:50:38",
+         "heartrate": 640
+    }, {
+      "date": "2017-06-02 14:50:39",
+         "heartrate": 140
+    }, {
+      "date": "2017-06-02 14:50:40",
+         "heartrate": 240
+    }]*/
+,
+    "valueAxes": [{
+        "axisAlpha": 0,
+        "guides": [{
+            "fillAlpha": 0.1,
+            "fillColor": "#00ff00",
+            "lineAlpha": 0,
+            "toValue": sym_mean,
+            "value": 0
+        },
+        {
+            "fillAlpha": 0.1,
+            "fillColor": "#ffff00",
+            "lineAlpha": 0,
+            "toValue": sym_3mean,
+            "value": sym_mean
+        },
+        {
+            "fillAlpha": 0.1,
+            "fillColor": "#ff0000",
+            "lineAlpha": 0,
+            "toValue": 100,
+            "value": sym_3mean
+        }],
+        "position": "left",
+        "tickLength": 0
+
+    }],
+    "graphs": [{
+        "balloonText": "[[category]]<br><b><span style='font-size:14px;'>Symmetry:[[value]]</span></b>",
+        "bullet": "round",
+        "dashLength": 3,
+        "colorField":"color",
+        "valueField": "symmetry",
+		"valueAxis": "SymmetryAxis"
+    }],
+
+    "chartScrollbar": {
+        "scrollbarHeight":2,
+        "offset":-1,
+        "backgroundAlpha":0.1,
+        "backgroundColor":"#888888",
+        "selectedBackgroundColor":"#67b7dc",
+        "selectedBackgroundAlpha":1
+    },
+    "chartCursor": {
+        "fullWidth":true,
+        "valueLineEabled":true,
+        "valueLineBalloonEnabled":true,
+        "valueLineAlpha":0.5,
+        "cursorAlpha":0,
+		"categoryBalloonDateFormat": "JJ:NN:SS, DD MMMM YYYY",
+        "cursorPosition": "mouse"
+    },
+    "categoryField": "date",
+    "categoryAxis": {
+        "parseDates": true,
+        "axisAlpha": 0,
+        "gridAlpha": 0.1,
+        "minorGridAlpha": 0.1,
+        "minorGridEnabled": true,
+		"minPeriod": "ss",
+        "parseDates": true
+    },
+    "export": {
+        "enabled": true
+     }
+});
+
+
+function Generator_sta() {
+    var Data = [];
+
+				
+    for (i = 0; i < json_sta_sym_history.sta_sym.length; i++) {
+				//console.log("sta == " + json_sta_history.sta[i].value);
+				//console.log("date == " + json_sta_history.sta[i].start);
+				Data.push({
+					stability: json_sta_sym_history.sta_sym[i].value_sta,
+					date: json_sta_sym_history.sta_sym[i].start
+				});
+				
+
+    }
+    return Data;
+	}
+	
+function Generator_sym() {
+    var Data = [];
+
+				
+    for (i = 0; i < json_sta_sym_history.sta_sym.length; i++) {
+
+				Data.push({
+					symmetry: json_sta_sym_history.sta_sym[i].value_sym,
+					date: json_sta_sym_history.sta_sym[i].start
+				});
+				
+
+    }
+    return Data;
+	}	
+ </script>
+
 <style>
 
 
@@ -1075,25 +1176,17 @@ ctx.fillRect(0, 0, 80, 80);
 	width	: 100%;
 	height	: 500px;
 }
-#chartdivactivity {
-	width		: 100%;
-	height		: 500px;
-	font-size	: 11px;
+#chart_sta {
+	width	: 100%;
+	height	: 500px;
 }
+#chart_sym {
+	width	: 100%;
+	height	: 500px;
+}						
 
 </style>
 
-<style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #map {
-            position: relative;
-            width: 100%;
-            height: 45vh;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
 
 </head>
 <body onload="init()">
@@ -1105,13 +1198,15 @@ ctx.fillRect(0, 0, 80, 80);
 	<div class="row">
 		<div class="col-md-12">
             <ul class="nav nav-tabs" style="margin-left:10px;margin-right:10px;">
-				<!--<li class="active"><a href="#tab0default" data-toggle="tab">Fall History</a></li>-->
+
                 <li class="active"><a href="#tab1default" data-toggle="tab">Summary</a></li>
                 <li><a href="#tab2default" data-toggle="tab">Calories</a></li>
                 <li><a href="#tab3default" data-toggle="tab">Heart rate</a></li>
 <!--                <li><a href="#tab4default" data-toggle="tab">อัตราความเร็วที่ใช้ในการเคลื่อนไหว</a></li>-->
 				<li><a href="#tab5default" data-toggle="tab">Immobility</a></li>
 				<li><a href="#tab6default" data-toggle="tab">Immobility Summary</a></li>
+				<li><a href="#tab7default" data-toggle="tab">Stability Index</a></li>
+				<li><a href="#tab8default" data-toggle="tab">Symmetry Index</a></li>
             </ul>
             <div class="tab-content">
 
@@ -1247,6 +1342,16 @@ ctx.fillRect(0, 0, 80, 80);
 					</table>
                 	</div>
                 </div>
+                <div class="tab-pane fade" id="tab7default">
+                	<div class="panel" style="margin-left:10px;margin-right:10px;">
+						<div id="chart_sta"></div>
+                	</div>
+                </div>
+                <div class="tab-pane fade" id="tab8default">
+                	<div class="panel" style="margin-left:10px;margin-right:10px;">
+						<div id="chart_sym"></div>
+                	</div>
+                </div>					
             </div>
         </div>
 	</div>
