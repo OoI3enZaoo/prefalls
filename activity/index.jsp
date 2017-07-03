@@ -696,7 +696,7 @@ dist_index += parseFloat(message.getAttribute("dist"))
     	chart_realtime.validateData();
 
 
-
+      checkAlert(0);
 
         //MoveMarker
         marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
@@ -802,7 +802,7 @@ dist_index += parseFloat(message.getAttribute("dist"))
 	  "theme": "light",
 
 	  "allLabels": [{
-        "text": "Mobilise Index",
+        "text": "Mobility Index",
 		"size": 25,
         "align": "center",
         "bold": true,
@@ -864,11 +864,18 @@ dist_index += parseFloat(message.getAttribute("dist"))
 
 function checkAlert(type) {
 
-
   console.log("alerttype: " + type);
+  if(type == 7){
+    $.notify({
+      // options
+      icon: "glyphicon glyphicon-bell",
+      message: '<strong>danger</strong> Fall is detected !'
+    },{
+      // settings
+      type: 'danger'
+    });
 
-
-
+  }
   if(sta_index > stab_mean) {
         if(type == 3 && alert_sta != 1){
           alert_sta = 1;
@@ -887,7 +894,7 @@ function checkAlert(type) {
               $.notify({
                 // options
                 icon: "glyphicon glyphicon-bell",
-                message: '<strong>Warning</strong> Stability index warning !'
+                message: '<strong>Stability index reaches warning level</strong> '
               },{
                 // settings
                 type: 'warning'
@@ -920,7 +927,7 @@ function checkAlert(type) {
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
-              message: '<strong>Danger</strong> Stability index danger !'
+              message: '<strong>Stability index reaches danger level</strong>'
             },{
               // settings
               type: 'danger'
@@ -961,7 +968,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
-              message: '<strong>Warning</strong>  Symmetry index warning !'
+              message: '<strong>Symmetry index reaches warning level</strong>'
             },{
               // settings
               type: 'warning'
@@ -989,7 +996,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
           $.notify({
             // options
             icon: "glyphicon glyphicon-bell",
-            message: '<strong>Danger</strong> Symmetry index danger !'
+            message: '<strong>Symmetry index reaches danger level</strong>'
           },{
             // settings
             type: 'danger'
@@ -1056,7 +1063,7 @@ function updateChart_FallRisk(){
               }
             var level;
             if(sta_index> stab_3mean){
-              level = "Dangerous";
+              level = "Danger";
             }
             else if(sta_index > stab_mean){
               level = "Warning";
@@ -1110,7 +1117,7 @@ function updateChart_FallRisk(){
 		chartData.push({"title": "Highly Active","value": Math.round(((hactive/864) + 0.00001) * 100) / 100});
 		chartData.push({"title": "Not Available","value": Math.round(((notAvail/864) + 0.00001) * 100) / 100});
 		chart.dataProvider = chartData;
-		chartMobility.push({"text": "Mobilise Index", "size": 25, "align": "center", "bold": true, "y": 220});
+		chartMobility.push({"text": "Mobility Index", "size": 25, "align": "center", "bold": true, "y": 220});
 		chartMobility.push({"text": mobilityIdx + " %", "size": 20, "align": "center", "bold": false, "y": 250});
 		chart.allLabels = chartMobility;
 		chart.validateData();
@@ -1410,11 +1417,11 @@ function initMap() {
 <%@include file="../include/nav.jsp"%>
 
 <div class="container">
-	<div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Daily activities&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
+	<div class="panel" style="margin-left:15px;margin-right:15px;"><font class="fs17">Real-time Activity&nbsp;&nbsp;>&nbsp;&nbsp;<span id="curdate"></span><span id="patient" class="right"></span></font></div>
 	<ul class="nav nav-tabs" style="margin-left:15px;margin-right:15px;">
     <li class="active"><a data-toggle="tab" href="#fall-risk-analysis"><font class="s17">Fall Risk Analysis</font></a></li>
     <li><a data-toggle="tab" href="#activity"><font class="s17">Activity Detail</font></a></li>
-    <li><a data-toggle="tab" href="#activity_realtime"><font class="s17">Realtime Activity</font></a></li>
+    <li><a data-toggle="tab" href="#activity_realtime"><font class="s17">Activity Timeline</font></a></li>
 	<li><a data-toggle="tab" href="#patient_location"><font class="s17">Patient Location</font></a></li>
   </ul>
 

@@ -261,7 +261,7 @@ function setValueInGauge(){
           gaugeChartSta.arrows[ 0 ].setValue( sta_index );
           var level;
           if(sta_index> stab_3mean){
-            level = "Dangerous";
+            level = "Danger";
           }
           else if(sta_index > stab_mean){
             level = "Warning";

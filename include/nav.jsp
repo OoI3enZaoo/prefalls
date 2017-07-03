@@ -15,7 +15,7 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
          <ul class="nav navbar-nav">
-            <li <% if(path.equals("/prefalls/activity/index.jsp")) {%>class="active"<% } %>><a href="../activity/">Current Activity</a></li>
+            <li <% if(path.equals("/prefalls/activity/index.jsp")) {%>class="active"<% } %>><a href="../activity/">Real-time Activity</a></li>
             <li <% if(path.equals("/prefalls/history/index.jsp") || path.equals("/prefalls/history/show.jsp")) {%>class="active"<% } %>><a href="../history/">Activity Log</a></li>
             <li <% if(path.equals("/prefalls/notifications/index.jsp")) {%>class="active"<% } %>><a href="../notifications/">Notifications</a></li>
             <%-- <li <% if(path.equals("/mobilise/comment/index.jsp")) {%>class="active"<% } %>><a href="../comment/">Medical advices</a></li> --%>

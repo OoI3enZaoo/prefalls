@@ -57,7 +57,7 @@
         dbm.createConnection();
         try {
 
-            String sql = "SELECT a.start,b.alert_name,b.severity FROM alerts a LEFT JOIN alerttypename b ON a.alert_type=b.alert_type where SSSN = '"+sssn+"' GROUP BY a.start ORDER BY a.start";
+            String sql = "SELECT a.start,b.alert_name,b.severity FROM alerts a LEFT JOIN alerttypename b ON a.alert_type=b.alert_type where SSSN = '"+sssn+"' AND  b.alert_type NOT IN (3,4,7,8,9) GROUP BY a.start ORDER BY a.start";
             ResultSet rs = dbm.executeQuery(sql);
 
 

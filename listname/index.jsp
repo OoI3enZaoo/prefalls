@@ -375,9 +375,9 @@ var mlevel;
 var mMessage;
 if(type == 1){
 	if(level == 1){
-			mMessage = "Stability index warning";
+			mMessage = "Stability index reaches warning level";
 	}else{
-		mMessage = "Stability index danger";
+		mMessage = "Stability index reaches danger level";
 	}
 
 }
@@ -386,9 +386,9 @@ else if(type == 3){
 }
 else{
 	if(level == 1){
-	mMessage = "Symmetry index warning";
+	mMessage = "Symmetry index reaches warning level";
 	}else{
-	mMessage = "Symmetry index danger";
+	mMessage = "Symmetry index reaches danger level";
 }
 
 }
