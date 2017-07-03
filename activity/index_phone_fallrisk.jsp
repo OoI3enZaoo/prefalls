@@ -370,76 +370,79 @@
             });
 	*/
 
-var bottomTextSta;
-  var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
-    "type": "gauge",
-    "theme": "light",
-    "axes": [ {
-      "axisThickness": 1,
-      "axisAlpha": 0.2,
-      "tickAlpha": 0.2,
-
-      "bands": [ {
-        "color": "#84b761",
-        "endValue": <%=stab_mean%>,
-        "startValue": 0
-      }, {
-        "color": "#fdd400",
-        "endValue": <%=stab_3mean%>,
-        "startValue": <%=stab_mean%>
-      }, {
-        "color": "#cc4748",
+  var bottomTextSta;
+    var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
+      "type": "gauge",
+      "theme": "light",
+      "axes": [ {
+        "axisThickness": 1,
+        "axisAlpha": 0.2,
+        "tickAlpha": 0.2,
+        "valueInterval": 0.4,
+        "bands": [ {
+          "color": "#84b761",
+          "endValue": <%=stab_mean%>,
+          "startValue": 0
+        }, {
+          "color": "#fdd400",
+          "endValue": <%=stab_3mean%>,
+          "startValue": <%=stab_mean%>
+        }, {
+          "color": "#cc4748",
+          "endValue": <%=stab_3mean *2 %>,
+          "innerRadius": "95%",
+          "startValue":<%=stab_3mean%>
+        } ],
+        "bottomText": "0",
+        "bottomTextYOffset": 10,
         "endValue": <%=stab_3mean *2 %>,
-        "innerRadius": "95%",
-        "startValue":<%=stab_3mean%>
+
+        "bottomTextFontSize" : 15,
+
       } ],
-      "bottomText": "0",
-      "bottomTextYOffset": -20,
-      "endValue": <%=stab_3mean *2 %>,
-
-      "bottomTextFontSize" : 15
-    } ],
-    "arrows": [ {} ],
-    "export": {
-      "enabled": false
-    }
-  } );
+      "arrows": [ {} ],
+      "export": {
+        "enabled": true
+      }
+    } );
 
 
 
 
-  var gaugeChartSym = AmCharts.makeChart( "chart-sym", {
-    "type": "gauge",
-    "theme": "light",
-    "axes": [ {
-      "axisThickness": 1,
-      "axisAlpha": 0.2,
-      "tickAlpha": 0.2,
+    var gaugeChartSym = AmCharts.makeChart( "chart-sym", {
+      "type": "gauge",
+      "theme": "light",
+      "axes": [ {
+        "axisThickness": 1,
+        "axisAlpha": 0.2,
+        "tickAlpha": 0.2,
+   	"valueInterval": 0.4,
 
-      "bands": [ {
-        "color": "#84b761",
-        "endValue": <%=sym_mean%>,
-        "startValue": 0
-      }, {
-        "color": "#fdd400",
-        "endValue": <%=sym_3mean%>,
-        "startValue": <%=sym_mean%>
-      }, {
-        "color": "#cc4748",
+        "bands": [ {
+          "color": "#84b761",
+          "endValue": <%=sym_mean%>,
+          "startValue": 0
+        }, {
+          "color": "#fdd400",
+          "endValue": <%=sym_3mean%>,
+          "startValue": <%=sym_mean%>
+        }, {
+          "color": "#cc4748",
+          "endValue": <%=sym_3mean *2%>,
+          "innerRadius": "95%",
+          "startValue": <%=sym_3mean%>
+        } ],
+        "bottomText": "0",
+        "bottomTextYOffset": 10,
         "endValue": <%=sym_3mean *2%>,
-        "innerRadius": "95%",
-        "startValue": <%=sym_3mean%>
+        "bottomTextFontSize" : 15,
+
       } ],
-      "bottomText": "0",
-      "bottomTextYOffset": -20,
-      "endValue": <%=sym_3mean *2%>,
-      "bottomTextFontSize" : 15
-    } ],
-    "arrows": [ {} ],
-    "export": {
-      "enabled": true
-    }
-  } );
+      "arrows": [ {} ],
+      "export": {
+        "enabled": true
+      }
+    } );
 
 
 	var chart2 = AmCharts.makeChart("chartdiv2", {
@@ -1214,7 +1217,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
       <div class="row" style="margin-left:0px;margin-right:0px;">
         <div class="col-md-6 col-xs-12">
           <div class="fs20">
-            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step Count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;Steps</div>
+            <img src="../images/icons/step.png" width="30" height="30">&nbsp;<font  style="color:#2d904f;">Step count&nbsp;:&nbsp;<font id ="StepCount"></font></font>&nbsp;Steps</div>
 
             <%-- <div class="fs15">Longest&nbsp;:&nbsp;<font id="lstationary"></font></div> --%>
 
@@ -1240,7 +1243,7 @@ console.log("sym_index: " + sym_index)+ " typeof: " + typeof sym_index;
 
                   <div class="fs20" style="margin-top: 15px">
                     <img src="../images/icons/step_length.png" width="35" height="35">
-                      <font id="velocity" style="color:#f57a3e;">Estimated step lengh&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;CM.</font>
+                      <font id="velocity" style="color:#f57a3e;">Estimated step length&nbsp;:&nbsp;<font id = "StepLength">40</font>&nbsp;cm.</font>
                     </div>
 
                     <div class="fs20" style="margin-top: 15px">

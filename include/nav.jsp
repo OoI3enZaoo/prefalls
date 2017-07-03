@@ -15,13 +15,15 @@
       </div>
       <div id="navbar" class="navbar-collapse collapse">
          <ul class="nav navbar-nav">
-            <li <% if(path.equals("/mobilise/activity/index.jsp")) {%>class="active"<% } %>><a href="../activity/">Current Activity</a></li>
-            <li <% if(path.equals("/mobilise/history/index.jsp") || path.equals("/mobilise/history/show.jsp")) {%>class="active"<% } %>><a href="../history/">Activity Log</a></li>
-            <li <% if(path.equals("/mobilise/notifications/index.jsp")) {%>class="active"<% } %>><a href="../notifications/">Notifications</a></li>
-            <li <% if(path.equals("/mobilise/comment/index.jsp")) {%>class="active"<% } %>><a href="../comment/">Medical advices</a></li>
-            <li <% if(path.equals("/mobilise/mobility/index.jsp") || path.equals("/mobilise/mobility/mobility.jsp")) {%>class="active"<% } %>><a href="../mobility/">Assessment Log</a></li>
-            <li <% if(path.equals("/mobilise/profile/index.jsp") || path.equals("/mobilise/profile/edit.jsp")) {%>class="active"<% } %>><a href="../profile/">Patient Information</a></li>
-            <li class="end<% if(path.equals("/mobilise/setting/index.jsp") || path.equals("/mobilise/setting/edit.jsp")) {%> active<% } %>"><a href="../setting/">Settings</a></li>
+            <li <% if(path.equals("/prefalls/activity/index.jsp")) {%>class="active"<% } %>><a href="../activity/">Current Activity</a></li>
+            <li <% if(path.equals("/prefalls/history/index.jsp") || path.equals("/prefalls/history/show.jsp")) {%>class="active"<% } %>><a href="../history/">Activity Log</a></li>
+            <li <% if(path.equals("/prefalls/notifications/index.jsp")) {%>class="active"<% } %>><a href="../notifications/">Notifications</a></li>
+            <%-- <li <% if(path.equals("/mobilise/comment/index.jsp")) {%>class="active"<% } %>><a href="../comment/">Medical advices</a></li> --%>
+            <li <% if(path.equals("/prefalls/mobility/index.jsp") || path.equals("/prefalls/mobility/mobility.jsp")) {%>class="active"<% } %>><a href="../mobility/">Fall history</a></li>
+            <li <% if(path.equals("/prefalls/profile/index.jsp") || path.equals("/prefalls/profile/edit.jsp")) {%>class="active"<% } %>><a href="../profile/">Patient Information</a></li>
+            <li class="end<% if(path.equals("/prefalls/setting/index.jsp") || path.equals("/prefalls/setting/edit.jsp")) {%> active<% } %>"><a href="../setting/">Settings</a></li>
+
+
          </ul>
          <ul class="nav navbar-nav navbar-right">
             <!--<li><a>แจ้งเตือน</a></li>-->

@@ -198,7 +198,7 @@
             sym_mean = rs.getFloat("sym_mean");
             sym_3mean = rs.getFloat("sym_3mean");
 
-     
+
 
             session.setAttribute("stab_mean",stab_mean);
             session.setAttribute("stab_3mean",stab_3mean);
@@ -230,8 +230,8 @@
             }
 
 		//out.println(fall_history_json);
-			
-			
+
+
 		try {
   		String sql = "SELECT lat , lon FROM alerts WHERE SSSN = '"+sssn+"' ORDER BY id DESC LIMIT 1";
   		ResultSet rs = dbm.executeQuery(sql);
@@ -245,7 +245,7 @@
   		} catch (Exception e) {
   			out.println(e.getMessage());
   			e.printStackTrace();
-  		}	
+  		}
 		//out.println(last_lat +" "+last_lon);
 		dbm.closeConnection();
 %>
@@ -317,6 +317,8 @@
   var last_lon =<%=last_lon%>;
   var infoWindow;
 
+  var noti_stab = false
+  var noti_sym = false;
   var alert_sta = 0;
   var checksta = 0;
     var color_text ="";
@@ -350,7 +352,7 @@
 
 	//Chart2
 	var startDate = new Date();
-	
+
 	startDate.setHours(0);
 	startDate.setMinutes(0);
 	startDate.setSeconds(0);
@@ -667,7 +669,7 @@ dist_index += parseFloat(message.getAttribute("dist"))
 		   updateChart_ActivityDetail();
        updateChart_FallRisk();
 
-	   
+
     	if(message_act == 2){color_text = "#C0C0C0"}
     			else if(message_act == 1){color_text = "#e98529";}
     			else if(message_act == 3){color_text = "#d4f145";}
@@ -693,23 +695,23 @@ dist_index += parseFloat(message.getAttribute("dist"))
     	} );
     	chart_realtime.validateData();
 
-	   
-	   
-	   
+
+
+
         //MoveMarker
         marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
         map.panTo( new google.maps.LatLng( message_lat, message_lon) );
-        var contentString =             
+        var contentString =
 			'<h1>Info Patient</h1>'+
 			'<b class="infotext" >Patient Name : </b><p id="patient_name">'+name+'</p>'+
 			'<b class="infotext" >Stability index : </b><p id="sta">'+sta_index+'</p>'+
 			'<b class="infotext" >Symmetry index : </b><p id="sym">'+sym_index+'</p>'+
 			'<b class="infotext" >AVG speed : </b><p id="avg_spd">'+spd_index+'</p>'+
 			'<b class="infotext" >last time : </b><p id="last_time">'+message_ts+'</p>';
-			
+
         infoWindow.setContent(contentString);
 		infoWindow.open(map,marker);
-      
+
         },
         myId: 'test0',
         myDestination: 'topic://<%=sssn%>_pred'
@@ -730,6 +732,59 @@ dist_index += parseFloat(message.getAttribute("dist"))
             //
             // }
             checkAlert(alert_type);
+              // var type = alert_type;
+              // var mType  = '';
+              // var mMessage = '';
+              // if(type == 3 || type == 8){
+              // 	mType= "<strong>Warning</strong>";
+              //
+              // }
+              //
+              // if(type == 9 || type == 4 || type == 7){
+              // 	mType= "<strong>Danger</strong>";
+              // }
+              // if(type == 3){
+              //   noti_stab = true;
+              //   mMessage = "Stability index warning !";
+              // }
+              // if(type == 4){
+              //   noti_stab = true;
+              //   mMessage = "Stability index danger !";
+              // }
+              // if(type == 8){
+              //   noti_sym = true;
+              // 	mMessage = "Symmetry index warning !";
+              // }
+              // if(type == 9){
+              //   noti_sym = true;
+              // 	mMessage = "Symmetry index danger !";
+              // }
+              //
+              // if(type == 7){
+              // 	mMessage = "Fall is detected !";
+              // }
+              //
+              //   $.notify({
+              //   // options
+              //     icon: "glyphicon glyphicon-bell",
+              //     message: mType + ' ' + mMessage
+              //   },{
+              //   // settings
+              //       type: 'warning'
+              //   });
+              //
+              //   if(noti_stab == true){
+              //     setInterval(function(){
+              //         $("#chart-sta").css("background-color","#edf0bf");
+              //     },5000);
+              //
+              //   }
+              //
+
+
+
+
+
         },
         myId: 'test1',
         myDestination: 'topic://<%=sssn%>_alert'
@@ -861,7 +916,7 @@ function checkAlert(type) {
               checksta = 0;
           }
           countalertsta ++;
-          if(countalertsta == 7){
+         if(countalertsta == 7){
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
@@ -871,16 +926,18 @@ function checkAlert(type) {
               type: 'danger'
             });
             countalertsta = 0;
-          }
+            }
 
 
         },1000);
       }
+
 }else{
   alert_sta = 0;
   clearInterval(sta_interval1);
   clearInterval(sta_interval2);
   $("#chart-sta").css("background-color","#fff");
+  $("#chart-sym").css("background-color","#fff");
   checksta = 1;
 }
 
@@ -904,13 +961,13 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
             $.notify({
               // options
               icon: "glyphicon glyphicon-bell",
-              message: '<strong>Warning</strong>  Stability index warning !'
+              message: '<strong>Warning</strong>  Symmetry index warning !'
             },{
               // settings
               type: 'warning'
             });
             countalertsym = 0;
-          }
+         }
 
 
         },1000);
@@ -932,7 +989,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
           $.notify({
             // options
             icon: "glyphicon glyphicon-bell",
-            message: '<strong>Danger</strong> Stability index danger !'
+            message: '<strong>Danger</strong> Symmetry index danger !'
           },{
             // settings
             type: 'danger'
@@ -945,6 +1002,7 @@ console.log("Symindex " + sym_index + " symmean" + sym_mean);
       }
 }else{
   alert_sym = 0;
+  $("#chart-sta").css("background-color","#fff");
   $("#chart-sym").css("background-color","#fff");
   checksym = 1;
   clearInterval(sym_interval1);
@@ -1192,10 +1250,10 @@ function updateChart_FallRisk(){
     function zoomChart_realtime() {
         chart_realtime.zoomToIndexes(chart_realtime.endIndex-20,chart_realtime.endIndex);
     }
-	
-	
-	
-	
+
+
+
+
     var map;
 	var marker;
 
@@ -1214,20 +1272,20 @@ function initMap() {
       position: myLatLng,
       map: map
     });
-			
+
 
 	infoWindow = new google.maps.InfoWindow();
 
 
 
 	marker.setMap( map );
- 
+
 
 
   setInterval(function(){
     google.maps.event.trigger(map, 'resize');
   },300)
-  
+
 }
 
 /*
@@ -1272,18 +1330,18 @@ function initMap() {
         marker.addListener('click', function() {
           infowindow.open(map, marker);
         });
-		
-		
+
+
   setInterval(function(){
     google.maps.event.trigger(map, 'resize');
   },300)
       }
 */
 /*function moveMarker( map, marker ) {
-		
+
         marker.setPosition( new google.maps.LatLng( message_lat, message_lon ) );
         map.panTo( new google.maps.LatLng( message_lat, message_lon) );
-        
+
 }*/
 
 
@@ -1300,8 +1358,8 @@ function initMap() {
 
 	});*/
 </script>
-  
-	
+
+
 	<script async defer
    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvaaEu7gTg_1ewo6F22MRkHtuF6jCbi7g&callback=initMap">
    </script>
@@ -1581,7 +1639,7 @@ function initMap() {
 
           </div>
 
-		  
+
           <div id="patient_location" class="tab-pane fade">
 
             <div class="row">
@@ -1592,20 +1650,20 @@ function initMap() {
 
 						<div id="map" style="height:900px; max-width: none; "></div>
 
-          
+
 
 					</div>
                 </div>
           	</div>
 
 
-          </div>		  
+          </div>
     </div>
 </div>
 
 
 <!-- JS Main File -->
-	
+
 
 
 

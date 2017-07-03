@@ -8,14 +8,14 @@
 
 	String test_lat = "";
 	String test_lon = "";
-	
+
    if(session.getAttribute("ssuid") == null){
 		response.sendRedirect("./");
 	}
   dbm.createConnection();
-  
-  
-  
+
+
+
   String stab_mean = null;
   String stab_3mean = null;
   String sym_mean = null;
@@ -80,8 +80,8 @@ if(request.getParameter("stab_3mean") != null){
       out.println(e.getMessage());
       e.printStackTrace();
     }
-	
-	
+
+
 	try {
 
 
@@ -100,8 +100,8 @@ if(request.getParameter("stab_3mean") != null){
 		}
 
 	//out.println(test_lat +"m"+ test_lon);
-	
-	
+
+
  		dbm.closeConnection();
   %>
 
@@ -124,9 +124,9 @@ if(request.getParameter("stab_3mean") != null){
         <script type="text/javascript">
 		var lat = <%=test_lat%>;
 		var lng = <%=test_lon%>;
-		
-		
-		
+
+
+
         var stab_mean = <%=stab_mean%>;
         var stab_3mean = <%=stab_3mean%>;
         var sym_mean = <%=sym_mean%>;
@@ -152,16 +152,16 @@ if(request.getParameter("stab_3mean") != null){
         console.log("step_frq_index: " + step_frq_index);
         console.log("step_len_index: " + step_len_index);
         console.log("spd_index: " + spd_index);
-        
-		
+
+
 window.onload = function() {
-     
+
 	document.getElementById("speed").innerHTML=spd_index;
    document.getElementById("StepAvg").innerHTML=step_frq_index;
    document.getElementById("EstLengh").innerHTML=step_len_index;
- 
-} 		
-		
+
+}
+
 		if(sta_index == 0 && sym_index == 0 && step_index == 0 && stride_index == 0 && dist_index == 0 && step_frq_index == 0 && step_len_index == 0 && spd_index == 0){
           console.log("no data");
           $.notify({
@@ -178,68 +178,79 @@ window.onload = function() {
           	type: 'success'
           });
         }
-        var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
-           "type": "gauge",
-           "theme": "light",
-           "axes": [ {
-             "axisThickness": 1,
-             "axisAlpha": 0.2,
-             "tickAlpha": 0.2,
-             "bands": [ {
-               "color": "#84b761",
-               "endValue": stab_mean,
-               "startValue": 0
-             }, {
-               "color": "#fdd400",
-               "endValue": stab_3mean,
-               "startValue": stab_mean
-             }, {
-               "color": "#cc4748",
-               "endValue": stab_3mean*2,
-               "innerRadius": "95%",
-               "startValue":stab_3mean
-             } ],
-             "bottomText": "0",
-             "bottomTextYOffset": -20,
-             "endValue": stab_3mean*2,
-             "bottomTextFontSize" : 15
-           } ],
-           "arrows": [ {} ],
-           "export": {
-             "enabled": false
-           }
-         } );
-         var  gaugeChartSym = AmCharts.makeChart( "chart-sym", {
-             "type": "gauge",
-             "theme": "light",
-             "axes": [ {
-               "axisThickness": 1,
-               "axisAlpha": 0.2,
-               "tickAlpha": 0.2,
-               "bands": [ {
-                 "color": "#84b761",
-                 "endValue": sym_mean,
-                 "startValue": 0
-               }, {
-                 "color": "#fdd400",
-                 "endValue": sym_3mean,
-                 "startValue": sym_mean
-               }, {
-                 "color": "#cc4748",
-                 "endValue": sym_3mean*2,
-                 "innerRadius": "95%",
-                 "startValue": sym_3mean
-               } ],
-               "bottomText": "0",
-               "bottomTextYOffset": -20,
-               "endValue": sym_3mean*2,
-               "bottomTextFontSize" : 15
-             } ],
-             "arrows": [ {} ],
-             "export": {
-               "enabled": true
-             }
-           } );
+
+				var gaugeChartSta = AmCharts.makeChart( "chart-sta", {
+					"type": "gauge",
+					"theme": "light",
+					"axes": [ {
+						"axisThickness": 1,
+						"axisAlpha": 0.2,
+						"tickAlpha": 0.2,
+						"valueInterval": 0.4,
+						"bands": [ {
+							"color": "#84b761",
+							"endValue": stab_mean,
+							"startValue": 0
+						}, {
+							"color": "#fdd400",
+							"endValue": stab_3mean,
+							"startValue": stab_mean
+						}, {
+							"color": "#cc4748",
+							"endValue": stab_3mean *2,
+							"innerRadius": "95%",
+							"startValue":stab_3mean
+						} ],
+						"bottomText": "0",
+						"bottomTextYOffset": 10,
+						"endValue": stab_3mean *2,
+
+						"bottomTextFontSize" : 15,
+
+					} ],
+					"arrows": [ {} ],
+					"export": {
+						"enabled": true
+					}
+				} );
+
+
+
+
+				var gaugeChartSym = AmCharts.makeChart( "chart-sym", {
+					"type": "gauge",
+					"theme": "light",
+					"axes": [ {
+						"axisThickness": 1,
+						"axisAlpha": 0.2,
+						"tickAlpha": 0.2,
+				"valueInterval": 0.4,
+
+						"bands": [ {
+							"color": "#84b761",
+							"endValue": sym_mean,
+							"startValue": 0
+						}, {
+							"color": "#fdd400",
+							"endValue": sym_3mean,
+							"startValue": sym_mean
+						}, {
+							"color": "#cc4748",
+							"endValue": sym_3mean *2,
+							"innerRadius": "95%",
+							"startValue": sym_3mean
+						} ],
+						"bottomText": "0",
+						"bottomTextYOffset": 10,
+						"endValue": sym_3mean *2,
+						"bottomTextFontSize" : 15,
+
+					} ],
+					"arrows": [ {} ],
+					"export": {
+						"enabled": true
+					}
+				} );
 
 
 function setValueInGauge(){
@@ -330,17 +341,17 @@ if(lat == 0 || lng == 0){
 
 
 
-</script>    
-	
-	
+</script>
+
+
 	<script async defer
    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFdI5SnLF-CIQ5lRKo_lEqaR6yPN4g7sk&callback=initMap">
    </script>
-	
+
   <style media="screen">
-  
+
   .icon { float:left; margin-right:10px; }
-  
+
     .chart { width:100%; height:300px; }
     #map {
           position: relative;
@@ -349,7 +360,7 @@ if(lat == 0 || lng == 0){
           margin: 0;
           padding: 0;
       }
-      
+
   </style>
   <body>
 <%@include file="../include/nav.jsp"%>
@@ -381,22 +392,22 @@ if(lat == 0 || lng == 0){
                 </div>
                 <div class="col-md-6 col-xs-12">
                     <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-						<div class="icon"><img style="" src="../images/icons/marker.png" width="30" height="30" ></div> 
+						<div class="icon"><img style="" src="../images/icons/marker.png" width="30" height="30" ></div>
 						<div class="fs20">AVG Speed : <font id="speed"></font> m/s</div>
                     </div>
                 </div>
                 <div class="col-md-6 col-xs-12">
                     <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-						<div class="icon"><img style="" src="../images/icons/walk.png" width="30" height="30" ></div> 
+						<div class="icon"><img style="" src="../images/icons/walk.png" width="30" height="30" ></div>
 						<div class="fs20">AVG step frequency : <font id="StepAvg"></font> steps/s</div>
                     </div>
-                </div>	
+                </div>
                 <div class="col-md-6 col-xs-12">
                     <div class="panel" style="color:#ea5f5c;margin-left:5px;margin-right:5px;">
-						<div class="icon"><img style="" src="../images/icons/step_length.png" width="30" height="30" ></div> 
+						<div class="icon"><img style="" src="../images/icons/step_length.png" width="30" height="30" ></div>
 						<div class="fs20">Estimated step lengh : <font id="EstLengh"></font> CM.</div>
                     </div>
-                </div>				
+                </div>
               </div>
             </div>
 
@@ -406,11 +417,11 @@ if(lat == 0 || lng == 0){
           <div class="row" style="margin-left:0px;margin-right:0px;">
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center" style="margin-top: 10px">Stability Index</div>
-              <div id="chart-sta" class="chart" width="200px" "></div>
+              <div id="chart-sta" class="chart" width="400px"></div>
             </div>
             <div class="col-md-6 col-xs-12">
               <div class="fs20 text-primary text-center" style="margin-top: 10px">Symmetry Index</div>
-              <div id="chart-sym" class="chart" "></div>
+              <div id="chart-sym" class="chart" width="400px" ></div>
             </div>
           </div>
         </div>
@@ -423,4 +434,3 @@ if(lat == 0 || lng == 0){
 
 
         </body>
-
